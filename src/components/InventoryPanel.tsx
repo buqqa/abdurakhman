@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useI18n } from '../i18n/I18nContext';
+import { WaterBottle } from './WaterBottle';
 
 interface Props {
   wood: number;
@@ -31,7 +32,7 @@ export function InventoryPanel({ wood, food, water, onEat, onDrink }: Props) {
         <div className="inventory-grid">
           <div className="inventory-slot"><span>🪵</span><p>{t('wood')}</p><strong>{wood}</strong></div>
           <div className="inventory-slot"><span>🍗</span><p>{t('food')}</p><strong>{food}</strong><button className="use-item" disabled={food === 0} onClick={onEat}>{t('eat')}</button></div>
-          <div className="inventory-slot"><span>💧</span><p>{t('water')}</p><strong>{water}</strong><button className="use-item" disabled={water === 0} onClick={onDrink}>{t('drink')}</button></div>
+          <div className="inventory-slot"><WaterBottle className="inventory-water-bottle" /><p>{t('water')}</p><strong>{water}</strong><button className="use-item" disabled={water === 0} onClick={onDrink}>{t('drink')}</button></div>
         </div>
         <p className="inventory-help">{t('inventoryHelp')}</p>
       </section>
