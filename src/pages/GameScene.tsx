@@ -45,8 +45,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={restart} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={restart} />}
       {isPaused && <PauseMenu onContinue={() => { resumeClock(); setIsPaused(false); }}
-        onRestart={() => { resumeClock(); setIsPaused(false); startGame(game.maxNights, game.difficulty); }}
-        onQuit={() => { resumeClock(); setIsPaused(false); restart(); }} />}
+        onRestart={() => { resumeClock(); setIsPaused(false); restart(); }} />}
     </main>
   );
 }
