@@ -72,7 +72,7 @@ export function useZombieWave(options: Options) {
         const attackDistance = targetsPlayer ? 20 : 68;
         if (distance <= attackDistance) {
           if (time - zombie.lastAttack >= 1050) {
-            const damage = targetsPlayer ? (zombie.isBoss ? 20 : zombie.hasAxe ? 2 : 10) : zombie.damage;
+            const damage = targetsPlayer ? (zombie.isBoss || zombie.hasAxe ? 20 : 10) : zombie.damage;
             attacks.push({ player: targetsPlayer, damage });
             return { ...zombie, lastAttack: time };
           }

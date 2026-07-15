@@ -32,7 +32,7 @@ export function createZombieWave(night: number) {
     const health = normalHealth * (isBoss ? 2 : 1);
     return {
       id: `zombie-${night}-${index}`, ...spawnPoint(index), health, maxHealth: health,
-      damage: hasAxe ? 2 : normalDamage * (isBoss ? 2 : 1), speed: 25 + Math.min(night, 12),
+      damage: hasAxe ? 20 : normalDamage * (isBoss ? 2 : 1), speed: 25 + Math.min(night, 12),
       isBoss, hasAxe, lastAttack: 0, facingLeft: false, hitAt: 0,
     };
   });
