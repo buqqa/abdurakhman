@@ -47,11 +47,11 @@ export function createDailyResources(day: number, occupied: InteractableObject[]
     }
   };
   addRandom('tree');
-  addRandom('crate-food');
-  addRandom('crate-wood');
-  if (Math.random() < 0.4) {
+  const crateCount = 1 + Math.floor(Math.random() * 2);
+  for (let index = 0; index < crateCount; index += 1) {
     const point = createPoint();
-    if (point) resources.push({ id: `daily-water-${day}`, kind: 'crate-water', ...point });
+    const kind: CrateKind = Math.random() < .65 ? 'crate-food' : 'crate-wood';
+    if (point) resources.push({ id: `daily-${kind}-${day}-${index}`, kind, ...point });
   }
   return resources;
 }

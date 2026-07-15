@@ -28,7 +28,10 @@ export function useGameLoop() {
     if (kind === 'crate-water') {
       setGame((state) => ({ ...state, wood: state.wood + 2, water: state.water + 1, message: message.waterLoot }));
     } else if (kind === 'crate-food') {
-      setGame((state) => ({ ...state, wood: state.wood + 2, message: message.foodLoot }));
+      const hasWater = Math.random() < .25;
+      setGame((state) => ({ ...state, wood: state.wood + 2, water: state.water + (hasWater ? 1 : 0), message: hasWater
+        ? language === 'en' ? 'Chicken dropped, and the crate contained water!' : language === 'kk' ? 'Тауық еті түсті, жәшіктен су да табылды!' : 'Курица выпала, а в ящике дополнительно найдена вода!'
+        : message.foodLoot }));
     } else {
       setGame((state) => ({ ...state, wood: state.wood + 8, message: message.stockLoot }));
     }

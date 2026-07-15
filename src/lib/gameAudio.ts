@@ -3,12 +3,13 @@ export type GameSound = 'zombie' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 
 let audioContext: AudioContext | undefined;
 let ambientGain: GainNode | undefined;
 let masterVolume = Number(localStorage.getItem('forest-volume') ?? .7);
+const EFFECT_VOLUME_BOOST = 1.8;
 
 export function getGameVolume() { return masterVolume; }
 export function setGameVolume(volume: number) {
   masterVolume = Math.max(0, Math.min(1, volume));
   localStorage.setItem('forest-volume', String(masterVolume));
-  if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(masterVolume * .045, audioContext.currentTime, .08);
+  if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(masterVolume * .075, audioContext.currentTime, .08);
 }
 
 function getContext() {
@@ -24,7 +25,7 @@ function tone(context: AudioContext, start: number, end: number, duration: numbe
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(start, now);
   oscillator.frequency.exponentialRampToValueAtTime(end, now + duration);
-  gain.gain.setValueAtTime(volume * masterVolume, now);
+  gain.gain.setValueAtTime(volume * masterVolume * EFFECT_VOLUME_BOOST, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
   oscillator.connect(gain).connect(context.destination);
   oscillator.start(now);
@@ -42,7 +43,7 @@ function noise(context: AudioContext, duration: number, volume: number, frequenc
   source.buffer = buffer;
   filter.type = 'lowpass';
   filter.frequency.value = frequency;
-  gain.gain.setValueAtTime(volume * masterVolume, context.currentTime);
+  gain.gain.setValueAtTime(volume * masterVolume * EFFECT_VOLUME_BOOST, context.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration);
   source.connect(filter).connect(gain).connect(context.destination);
   source.start();
@@ -54,7 +55,7 @@ function startAmbientMusic(context: AudioContext) {
   const filter = context.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.value = 520;
-  ambientGain.gain.value = masterVolume * .045;
+  ambientGain.gain.value = masterVolume * .075;
   ambientGain.connect(filter).connect(context.destination);
 
   [55, 82.4, 110].forEach((frequency, index) => {

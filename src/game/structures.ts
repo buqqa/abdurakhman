@@ -30,8 +30,8 @@ export function createStructure(kind: StructureKind, occupied: InteractableObjec
 
   const structure: WorldStructure = { id: `structure-${kind}`, kind, ...position };
   const kinds: CrateKind[] = kind === 'tent'
-    ? ['crate-food', 'crate-water', randomCrate(['crate-food', 'crate-water'])]
-    : ['crate-wood', 'crate-wood', randomCrate(['crate-wood', 'crate-food', 'crate-water'])];
+    ? ['crate-food', 'crate-food', 'crate-food']
+    : ['crate-wood', 'crate-wood', randomCrate(['crate-wood', 'crate-food'])];
   const crates = kinds.map<InteractableObject>((crateKind, index) => ({
     id: `${structure.id}-crate-${index}`,
     kind: crateKind,
