@@ -1,0 +1,30 @@
+.map-water { position: absolute; z-index: 2; font-size: 25px; filter: drop-shadow(0 3px 2px #244457); animation: water-float 1.4s ease-in-out infinite; }
+@keyframes water-float { 50% { translate: 0 -3px; } }
+.map-zombie { position: absolute; left: 0; top: 0; width: 30px; height: 36px; z-index: 3; filter: drop-shadow(0 3px 2px #111a12); animation: zombie-walk .42s steps(2) infinite; }
+.zombie-sprite { position: absolute; inset: 0; transform-origin: center; }
+.map-zombie--left .zombie-sprite { transform: scaleX(-1); }
+.zombie-head { position: absolute; left: 7px; top: 5px; width: 17px; height: 14px; border: 2px solid #263326; border-radius: 3px; background: #75915c; }
+.zombie-head i, .zombie-head b { position: absolute; top: 5px; width: 3px; height: 3px; background: #d8d56e; }
+.zombie-head i { left: 2px; } .zombie-head b { right: 2px; }
+.zombie-body { position: absolute; left: 5px; bottom: 0; width: 21px; height: 19px; border: 2px solid #29342d; background: #4d5f58; }
+.zombie-arm { position: absolute; left: 20px; width: 16px; height: 5px; border: 1px solid #334333; border-radius: 0 3px 3px 0; background: #75915c; z-index: 2; transform-origin: left; }
+.zombie-arm--top { top: 17px; } .zombie-arm--bottom { top: 23px; }
+.zombie-leg { position: absolute; bottom: -5px; width: 7px; height: 10px; border: 2px solid #29342d; background: #3e4a49; }
+.zombie-leg--one { left: 6px; } .zombie-leg--two { right: 4px; }
+.zombie-health { position: absolute; left: 1px; top: -4px; width: 28px; height: 4px; overflow: hidden; border-radius: 3px; background: #302622; }
+.zombie-health i { display: block; height: 100%; background: #9fc46e; }
+.map-zombie--boss { scale: 1.45; z-index: 4; filter: drop-shadow(0 0 5px #7b2925); }
+.map-zombie--boss .zombie-head { background: #6e3f39; }
+.map-zombie--boss .zombie-body { background: #453d55; }
+.zombie-crown { position: absolute; left: 7px; top: -9px; color: #d7a94e; font-size: 16px; text-shadow: 0 1px #4a2822; }
+.map-zombie--hit .zombie-sprite { filter: brightness(2) sepia(1) saturate(4); }
+.map-zombie strong { position: absolute; left: -2px; top: -15px; color: #df6b5d; font-size: 7px; letter-spacing: .08em; }
+@keyframes zombie-walk { 50% { translate: 0 2px; } }
+.map-zombie .zombie-arm--top { animation: zombie-arms .42s steps(2) infinite; }
+@keyframes zombie-arms { 50% { transform: rotate(7deg); } }
+.fence-slot { position: absolute; width: 36px; height: 17px; z-index: 1; border: 1px dashed rgba(190, 194, 179, .48); border-radius: 3px; background: rgba(62, 69, 59, .32); }
+.map-fence { position: absolute; width: 38px; height: 18px; z-index: 2; border: 2px solid #3f433e; border-radius: 2px; background-color: #73786f; background-image: linear-gradient(90deg, transparent 45%, #4e534d 46% 52%, transparent 53%), linear-gradient(0deg, transparent 43%, #4e534d 44% 55%, transparent 56%); filter: drop-shadow(0 3px 1px #25321f); }
+.map-fence::before { content: ''; position: absolute; left: -2px; right: -2px; top: -8px; height: 8px; background: repeating-linear-gradient(90deg, #858a80 0 7px, transparent 8px 12px); border-bottom: 2px solid #3f433e; }
+.map-fence::after { content: ''; position: absolute; left: 3px; right: 3px; top: 7px; height: 4px; border: 1px solid #3f2b1e; background: linear-gradient(90deg, #6b492e, #9a6a3f); transform: rotate(-4deg); }
+.map-fence i { position: absolute; top: -5px; width: 6px; height: 24px; border: 1px solid #353936; background: linear-gradient(90deg, #626760, #92968c); z-index: 2; }
+.map-fence i:nth-child(1) { left: -3px; } .map-fence i:nth-child(2) { display: none; } .map-fence i:nth-child(3) { right: -3px; }

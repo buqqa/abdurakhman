@@ -1,19 +1,26 @@
-// Стартовый экран твоего проекта — пока он простой и пустой.
-// Когда понадобятся вход и база данных, готовые примеры уже лежат рядом:
-//   src/components/Auth.tsx      — вход / регистрация
-//   src/components/Entries.tsx   — чтение и запись в базу
-// Просто попроси Codex подключить их на экран.
+import { useEffect, useState } from 'react';
+import type { Session } from '@supabase/supabase-js';
+import { StartMenu } from './components/StartMenu';
+import { supabase } from './lib/supabase';
+import { GameScene } from './pages/GameScene';
 
 export default function App() {
-  return (
-    <main className="container">
-      <section className="hello">
-        <h1>Привет! 🚀</h1>
-        <p>Это твой проект. Пока тут пусто — самое интересное впереди.</p>
-        <p className="hello__hint">
-          Открой Codex и опиши свою идею — этот экран станет твоим приложением.
-        </p>
-      </section>
-    </main>
-  );
+  const [session, setSession] = useState<Session | null>();
+  const [guestNickname, setGuestNickname] = useState<string>();
+
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  if (session === undefined) return <main className="session-loading">Загрузка Forest Base…</main>;
+  const savedNickname = session?.user.user_metadata.nickname;
+  const googleName = session?.user.user_metadata.full_name ?? session?.user.user_metadata.name;
+  const playerNickname = typeof savedNickname === 'string' && savedNickname.trim()
+    ? savedNickname.trim()
+    : typeof googleName === 'string' && googleName.trim() ? googleName.trim() : session?.user.email?.split('@')[0];
+  return session || guestNickname
+    ? <GameScene playerNickname={playerNickname ?? guestNickname ?? 'Гость'} />
+    : <StartMenu onGuestLogin={() => setGuestNickname('Гость')} />;
 }
