@@ -22,11 +22,11 @@ interface Footprint extends Position { id: number }
 
 const fenceRotation = (position: Position) => Math.atan2(position.y - FENCE_CENTER.y, position.x - FENCE_CENTER.x) * 180 / Math.PI + 90;
 
-interface Props { playerNickname: string; phase: Phase; day: number; baseHealth: number; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
+interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
 
-export function ForestMap({ playerNickname, phase, day, baseHealth, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, playerNickname, phase, day, baseHealth, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const isNight = phase === 'night';
-  const canMove = phase === 'day' || phase === 'night';
+  const canMove = !paused && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
   const [objects, setObjects] = useState(WORLD_OBJECTS);
   const treeHits = useRef<Record<string, number>>({});
@@ -58,7 +58,7 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
     });
   }, [day, phase]);
   const updatePlayer = useCallback((position: Position) => setPlayer(position), []);
-  const { zombies, hitZombie } = useZombieWave({ phase, day, player, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
+  const { zombies, hitZombie } = useZombieWave({ phase, day, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
   const swingAxe = useCallback(() => {
     setIsSwinging(true);
     window.setTimeout(() => setIsSwinging(false), 260);
@@ -133,7 +133,7 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
       onUnavailable={onUnavailable} onInteracted={collectObject} />
     <AttackSystem enabled={canMove} player={player} targets={phase === 'night' ? zombieTargets : [...trees, ...crates]}
       onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
-    <BuildSystem enabled={phase === 'day'} player={player} onBuild={buildFenceAtSlot} />
+    <BuildSystem enabled={!paused && phase === 'day'} player={player} onBuild={buildFenceAtSlot} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
     <GameCamera player={player}>

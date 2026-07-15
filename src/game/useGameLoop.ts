@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { FENCE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, REPAIR_WOOD_COST, WATER_HEAL } from './config';
 import type { Fence, GameState } from './types';
 import { playGameSound } from '../lib/gameAudio';
@@ -16,10 +16,14 @@ export function useGameLoop() {
   const message = gameMessages[language];
   const [game, setGame] = useState<GameState>(initialState);
   const startedAt = useRef(Date.now());
+  const pausedAt = useRef<number>();
+  const pausedTime = useRef(0);
   const fenceId = useRef(0);
   const startGame = (maxNights: number, difficulty: string) => {
     playGameSound('start');
     startedAt.current = Date.now();
+    pausedAt.current = undefined;
+    pausedTime.current = 0;
     fenceId.current = 0;
     setGame({ ...initialState, phase: 'day', maxNights, difficulty, message: message.prepare });
   };
@@ -83,10 +87,16 @@ export function useGameLoop() {
   });
   const finishNight = () => setGame((state) => {
     if (state.phase !== 'night') return state;
-    if (state.day === state.maxNights) return { ...state, phase: 'won', message: message.won, completionTime: Math.floor((Date.now() - startedAt.current) / 1000) };
+    if (state.day === state.maxNights) return { ...state, phase: 'won', message: message.won, completionTime: Math.floor((Date.now() - startedAt.current - pausedTime.current) / 1000) };
     return { ...state, day: state.day + 1, phase: 'day', food: Math.max(0, state.food - 1), message: message.newDay };
   });
   const restart = () => setGame(initialState);
+  const pauseClock = useCallback(() => { pausedAt.current ??= Date.now(); }, []);
+  const resumeClock = useCallback(() => {
+    if (!pausedAt.current) return;
+    pausedTime.current += Date.now() - pausedAt.current;
+    pausedAt.current = undefined;
+  }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
 }

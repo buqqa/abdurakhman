@@ -8,6 +8,7 @@ import { playGameSound } from '../../lib/gameAudio';
 interface Options {
   phase: Phase;
   day: number;
+  paused: boolean;
   player: Position;
   onPlayerDamage: (damage: number) => void;
   onBaseDamage: (damage: number) => void;
@@ -26,13 +27,15 @@ export function useZombieWave(options: Options) {
 
   useEffect(() => {
     window.clearTimeout(spawnTimer.current);
-    if (options.phase !== 'night' || spawnedNight.current === options.day) return;
-    const wave = createZombieWave(options.day);
-    spawnedNight.current = options.day;
-    activeWave.current = true;
-    zombiesRef.current = wave.slice(0, 1);
-    waitingZombies.current = wave.slice(1);
-    setZombies(zombiesRef.current);
+    if (options.phase !== 'night' || options.paused) return;
+    if (spawnedNight.current !== options.day) {
+      const wave = createZombieWave(options.day);
+      spawnedNight.current = options.day;
+      activeWave.current = true;
+      zombiesRef.current = wave.slice(0, 1);
+      waitingZombies.current = wave.slice(1);
+      setZombies(zombiesRef.current);
+    }
     const spawnNext = () => {
       if (!waitingZombies.current.length) return;
       spawnTimer.current = window.setTimeout(() => {
@@ -48,10 +51,10 @@ export function useZombieWave(options: Options) {
     };
     spawnNext();
     return () => window.clearTimeout(spawnTimer.current);
-  }, [options.day, options.phase]);
+  }, [options.day, options.paused, options.phase]);
 
   useEffect(() => {
-    if (options.phase !== 'night') return;
+    if (options.phase !== 'night' || options.paused) return;
     let frame = 0;
     let previous = performance.now();
     const update = (time: number) => {
@@ -88,7 +91,7 @@ export function useZombieWave(options: Options) {
     };
     frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [options.phase]);
+  }, [options.paused, options.phase]);
 
   const hitZombie = (id: string) => {
     const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - 1, hitAt: performance.now() } : zombie);
