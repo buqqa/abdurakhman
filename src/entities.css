@@ -16,6 +16,8 @@
 .map-zombie--hit .zombie-sprite { filter: brightness(2) sepia(1) saturate(4); }
 .map-zombie strong { position: absolute; left: 50%; top: -17px; transform: translateX(-50%); color: #ff3d32; font-size: 8px; font-weight: 900; letter-spacing: .1em; text-shadow: 0 1px 2px #300; }
 .zombie-crown { position: absolute; left: 8px; top: -10px; color: #e6bb45; font-size: 14px; line-height: 1; text-shadow: 0 1px #5c3717, 0 0 3px rgba(255, 211, 83, .65); }
+.zombie-axe { position: absolute; left: 31px; top: 13px; width: 3px; height: 20px; border-radius: 1px; background: #79512f; transform: rotate(-27deg); transform-origin: bottom; z-index: 3; }
+.zombie-axe::after { content: ''; position: absolute; left: -5px; top: -2px; width: 12px; height: 7px; border: 1px solid #303a3d; border-radius: 4px 1px 2px 4px; background: #919b99; }
 @keyframes zombie-walk { 50% { translate: 0 2px; } }
 .map-zombie .zombie-arm--top { animation: zombie-arms .42s steps(2) infinite; }
 @keyframes zombie-arms { 50% { transform: rotate(7deg); } }

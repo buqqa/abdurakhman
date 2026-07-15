@@ -1,4 +1,4 @@
-export type GameSound = 'zombie' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 'start' | 'defeat';
+export type GameSound = 'zombie' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 'start' | 'victory' | 'defeat';
 
 let audioContext: AudioContext | undefined;
 let ambientGain: GainNode | undefined;
@@ -50,7 +50,10 @@ function noise(context: AudioContext, duration: number, volume: number, frequenc
 }
 
 function startAmbientMusic(context: AudioContext) {
-  if (ambientGain) return;
+  if (ambientGain) {
+    ambientGain.gain.setTargetAtTime(masterVolume * .075, context.currentTime, .12);
+    return;
+  }
   ambientGain = context.createGain();
   const filter = context.createBiquadFilter();
   filter.type = 'lowpass';
@@ -103,8 +106,14 @@ export function playGameSound(sound: GameSound) {
     startAmbientMusic(context);
     tone(context, 260, 520, .32, .1, 'triangle');
     window.setTimeout(() => tone(context, 390, 780, .28, .075, 'triangle'), 150);
+  } else if (sound === 'victory') {
+    ambientGain?.gain.setTargetAtTime(masterVolume * .018, context.currentTime, .18);
+    [392, 494, 587, 784].forEach((note, index) => window.setTimeout(() => tone(context, note, note * 1.01, .55, .14, 'triangle'), index * 190));
   } else {
+    ambientGain?.gain.setTargetAtTime(masterVolume * .012, context.currentTime, .18);
     tone(context, 180, 42, .8, .16, 'sawtooth');
     noise(context, .55, .075, 380);
+    window.setTimeout(() => tone(context, 130, 52, .9, .13, 'sawtooth'), 430);
+    window.setTimeout(() => tone(context, 92, 38, 1.1, .11, 'triangle'), 820);
   }
 }

@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+import { useI18n } from '../i18n/I18nContext';
+import { playGameSound } from '../lib/gameAudio';
+
 interface Props { seconds: number; nights: number; onRestart: () => void }
 
 function formatTime(totalSeconds: number) {
@@ -8,6 +12,7 @@ function formatTime(totalSeconds: number) {
 
 export function VictoryScreen({ seconds, nights, onRestart }: Props) {
   const { t } = useI18n();
+  useEffect(() => playGameSound('victory'), []);
   return (
     <div className="victory-backdrop">
       <section className="victory-screen">
@@ -19,4 +24,3 @@ export function VictoryScreen({ seconds, nights, onRestart }: Props) {
     </div>
   );
 }
-import { useI18n } from '../i18n/I18nContext';

@@ -9,6 +9,7 @@ export interface Zombie {
   damage: number;
   speed: number;
   isBoss: boolean;
+  hasAxe: boolean;
   lastAttack: number;
   facingLeft: boolean;
   hitAt: number;
@@ -27,11 +28,12 @@ export function createZombieWave(night: number) {
 
   return Array.from({ length: count }, (_, index): Zombie => {
     const isBoss = night % 5 === 0 && index === 0;
+    const hasAxe = !isBoss && Math.random() < .1;
     const health = normalHealth * (isBoss ? 2 : 1);
     return {
       id: `zombie-${night}-${index}`, ...spawnPoint(index), health, maxHealth: health,
-      damage: normalDamage * (isBoss ? 2 : 1), speed: 25 + Math.min(night, 12),
-      isBoss, lastAttack: 0, facingLeft: false, hitAt: 0,
+      damage: hasAxe ? 2 : normalDamage * (isBoss ? 2 : 1), speed: 25 + Math.min(night, 12),
+      isBoss, hasAxe, lastAttack: 0, facingLeft: false, hitAt: 0,
     };
   });
 }
