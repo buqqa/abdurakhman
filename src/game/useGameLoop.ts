@@ -25,18 +25,15 @@ export function useGameLoop() {
   };
   const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: message.wood }));
   const gatherCrateLoot = (kind: CrateKind) => {
-    if (kind === 'crate-water') {
-      setGame((state) => ({ ...state, wood: state.wood + 2, water: state.water + 1, message: message.waterLoot }));
-    } else if (kind === 'crate-food') {
-      const hasWater = Math.random() < .25;
-      setGame((state) => ({ ...state, wood: state.wood + 2, water: state.water + (hasWater ? 1 : 0), message: hasWater
-        ? language === 'en' ? 'Chicken dropped, and the crate contained water!' : language === 'kk' ? 'Тауық еті түсті, жәшіктен су да табылды!' : 'Курица выпала, а в ящике дополнительно найдена вода!'
-        : message.foodLoot }));
-    } else {
+    if (kind === 'crate-wood') {
       setGame((state) => ({ ...state, wood: state.wood + 8, message: message.stockLoot }));
+    } else {
+      const emptyText = language === 'en' ? 'The crate was empty. You received 2 wood from it.' : language === 'kk' ? 'Жәшік бос болды. Одан 2 ағаш алынды.' : 'Ящик оказался пустым. Получено 2 дерева от ящика.';
+      setGame((state) => ({ ...state, wood: state.wood + 2, message: kind === 'crate-food' ? message.foodLoot : emptyText }));
     }
   };
   const gatherFood = () => setGame((state) => ({ ...state, food: state.food + 1, message: language === 'en' ? 'Chicken added to the inventory.' : language === 'kk' ? 'Тауық еті қоржынға салынды.' : 'Курица добавлена в инвентарь.' }));
+  const gatherWater = () => setGame((state) => ({ ...state, water: state.water + 1, message: language === 'en' ? 'Water added to the inventory.' : language === 'kk' ? 'Су қоржынға салынды.' : 'Вода добавлена в инвентарь.' }));
   const eatFood = () => {
     if (game.food > 0 && game.playerHealth < 100) playGameSound('eat');
     setGame((state) => {
@@ -91,5 +88,5 @@ export function useGameLoop() {
   });
   const restart = () => setGame(initialState);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart };
 }

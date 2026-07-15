@@ -20,7 +20,7 @@ function spawnPoint(index: number) {
 }
 
 export function createZombieWave(night: number) {
-  const maxCount = Math.min(5, 1 + Math.ceil(night / 2));
+  const maxCount = Math.min(10, 2 + Math.ceil(night * .8));
   const count = 1 + Math.floor(Math.random() * maxCount);
   const normalHealth = 4 + Math.floor((night - 1) / 3);
   const normalDamage = 3 + Math.floor((night - 1) / 5);

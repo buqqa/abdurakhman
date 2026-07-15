@@ -25,7 +25,7 @@ export function useZombieWave(options: Options) {
   optionsRef.current = options;
 
   useEffect(() => {
-    window.clearInterval(spawnTimer.current);
+    window.clearTimeout(spawnTimer.current);
     if (options.phase !== 'night' || spawnedNight.current === options.day) return;
     const wave = createZombieWave(options.day);
     spawnedNight.current = options.day;
@@ -33,17 +33,21 @@ export function useZombieWave(options: Options) {
     zombiesRef.current = wave.slice(0, 1);
     waitingZombies.current = wave.slice(1);
     setZombies(zombiesRef.current);
-    if (waitingZombies.current.length) {
-      spawnTimer.current = window.setInterval(() => {
-        const zombie = waitingZombies.current.shift();
-        if (!zombie) return window.clearInterval(spawnTimer.current);
+    const spawnNext = () => {
+      if (!waitingZombies.current.length) return;
+      spawnTimer.current = window.setTimeout(() => {
+        const groupRoll = Math.random();
+        const groupSize = groupRoll < .05 ? 3 : groupRoll < .2 ? 2 : 1;
+        const group = waitingZombies.current.splice(0, groupSize);
+        if (!group.length) return;
         playGameSound('zombie');
-        zombiesRef.current = [...zombiesRef.current, zombie];
+        zombiesRef.current = [...zombiesRef.current, ...group];
         setZombies(zombiesRef.current);
-        if (!waitingZombies.current.length) window.clearInterval(spawnTimer.current);
-      }, 1100);
-    }
-    return () => window.clearInterval(spawnTimer.current);
+        spawnNext();
+      }, 650 + Math.random() * 1700);
+    };
+    spawnNext();
+    return () => window.clearTimeout(spawnTimer.current);
   }, [options.day, options.phase]);
 
   useEffect(() => {

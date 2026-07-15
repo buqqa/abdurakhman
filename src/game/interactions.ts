@@ -7,7 +7,7 @@ export interface InteractableObject {
   y: number;
 }
 
-export type CrateKind = 'crate-food' | 'crate-water' | 'crate-wood';
+export type CrateKind = 'crate-food' | 'crate-wood' | 'crate-empty';
 
 export type InteractionHandler = (object: InteractableObject) => void;
 export type InteractionHandlers = Record<string, InteractionHandler | undefined>;
@@ -22,10 +22,15 @@ export function findNearestObject(player: { x: number; y: number }, objects: Int
   }, { distance: Number.POSITIVE_INFINITY });
 }
 
+const startingCrateCount = Math.floor(Math.random() * 3);
+const startingCrates: InteractableObject[] = [
+  { id: 'starting-crate-1', kind: Math.random() < .7 ? 'crate-food' : 'crate-empty', x: 500, y: 105 },
+  { id: 'starting-crate-2', kind: Math.random() < .7 ? 'crate-food' : 'crate-wood', x: 625, y: 300 },
+].slice(0, startingCrateCount);
+
 export const WORLD_OBJECTS: InteractableObject[] = [
   ...TREES.map((tree, index) => ({ id: `tree-${index}`, kind: 'tree', x: tree.x + 25, y: tree.y + 50 })),
-  { id: 'starting-food-crate-1', kind: 'crate-food', x: 500, y: 105 },
-  { id: 'starting-food-crate-2', kind: 'crate-food', x: 625, y: 300 },
+  ...startingCrates,
   { id: 'base', kind: 'building', ...BASE_POSITION },
 ];
 
@@ -47,10 +52,12 @@ export function createDailyResources(day: number, occupied: InteractableObject[]
     }
   };
   addRandom('tree');
-  const crateCount = 1 + Math.floor(Math.random() * 2);
+  const crateRoll = Math.random();
+  const crateCount = crateRoll < .35 ? 0 : crateRoll < .8 ? 1 : 2;
   for (let index = 0; index < crateCount; index += 1) {
     const point = createPoint();
-    const kind: CrateKind = Math.random() < .65 ? 'crate-food' : 'crate-wood';
+    const kindRoll = Math.random();
+    const kind: CrateKind = kindRoll < .55 ? 'crate-food' : kindRoll < .8 ? 'crate-wood' : 'crate-empty';
     if (point) resources.push({ id: `daily-${kind}-${day}-${index}`, kind, ...point });
   }
   return resources;
