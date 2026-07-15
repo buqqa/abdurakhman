@@ -1,12 +1,14 @@
 export type GameSound = 'zombie' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 'start' | 'defeat';
 
 let audioContext: AudioContext | undefined;
+let ambientGain: GainNode | undefined;
 let masterVolume = Number(localStorage.getItem('forest-volume') ?? .7);
 
 export function getGameVolume() { return masterVolume; }
 export function setGameVolume(volume: number) {
   masterVolume = Math.max(0, Math.min(1, volume));
   localStorage.setItem('forest-volume', String(masterVolume));
+  if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(masterVolume * .045, audioContext.currentTime, .08);
 }
 
 function getContext() {
@@ -46,6 +48,34 @@ function noise(context: AudioContext, duration: number, volume: number, frequenc
   source.start();
 }
 
+function startAmbientMusic(context: AudioContext) {
+  if (ambientGain) return;
+  ambientGain = context.createGain();
+  const filter = context.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 520;
+  ambientGain.gain.value = masterVolume * .045;
+  ambientGain.connect(filter).connect(context.destination);
+
+  [55, 82.4, 110].forEach((frequency, index) => {
+    const oscillator = context.createOscillator();
+    const voiceGain = context.createGain();
+    oscillator.type = index === 1 ? 'triangle' : 'sine';
+    oscillator.frequency.value = frequency;
+    oscillator.detune.value = index * 5 - 4;
+    voiceGain.gain.value = index === 0 ? .55 : .22;
+    oscillator.connect(voiceGain).connect(ambientGain!);
+    oscillator.start();
+  });
+
+  const pulse = context.createOscillator();
+  const pulseDepth = context.createGain();
+  pulse.frequency.value = .11;
+  pulseDepth.gain.value = .008;
+  pulse.connect(pulseDepth).connect(ambientGain.gain);
+  pulse.start();
+}
+
 export function playGameSound(sound: GameSound) {
   const context = getContext();
   if (sound === 'zombie') {
@@ -64,6 +94,7 @@ export function playGameSound(sound: GameSound) {
     tone(context, 190, 72, .16, .13, 'triangle');
     noise(context, .11, .065, 650);
   } else if (sound === 'start') {
+    startAmbientMusic(context);
     tone(context, 260, 520, .32, .1, 'triangle');
     window.setTimeout(() => tone(context, 390, 780, .28, .075, 'triangle'), 150);
   } else {
