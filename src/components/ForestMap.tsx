@@ -146,7 +146,9 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
         <WorldStructures structures={structures} />
         {crates.map((crate) => <LootCrate crate={crate} animation={crateAnimation?.id === crate.id ? crateAnimation.breaking ? 'break' : 'hit' : undefined} key={crate.id} />)}
         {objects.filter((object) => object.kind === 'food').map((food) => <div className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id}>🍗</div>)}
-        {objects.filter((object) => object.kind === 'water').map((water) => <div className="map-food-drop" style={{ left: water.x - 11, top: water.y - 12 }} key={water.id}>💧</div>)}
+        {objects.filter((object) => object.kind === 'water').map((water) => <div className="map-water-bottle" style={{ left: water.x - 8, top: water.y - 14 }} key={water.id} aria-label="Бутылка воды">
+          <span className="water-bottle__cap" /><span className="water-bottle__body"><i /></span>
+        </div>)}
         <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} />
         {phase === 'day' && FENCE_SLOTS.filter((slot) => !fences.some((fence) => Math.hypot(fence.x - slot.x, fence.y - slot.y) < 8))
           .map((slot) => <span className="fence-slot" style={{ left: slot.x - 18, top: slot.y - 8, transform: `rotate(${fenceRotation(slot)}deg)` }} key={`${slot.x}-${slot.y}`} />)}
