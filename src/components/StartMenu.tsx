@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Auth } from './Auth';
 import { LobbySettings } from './LobbySettings';
 import { useI18n } from '../i18n/I18nContext';
+import { startBackgroundMusic } from '../lib/gameAudio';
 
 type StartMenuProps = {
   onGuestLogin: () => void;
@@ -8,6 +10,12 @@ type StartMenuProps = {
 
 export function StartMenu({ onGuestLogin }: StartMenuProps) {
   const { t } = useI18n();
+  useEffect(() => {
+    const startMusic = () => startBackgroundMusic();
+    window.addEventListener('pointerdown', startMusic, { once: true });
+    window.addEventListener('keydown', startMusic, { once: true });
+    return () => { window.removeEventListener('pointerdown', startMusic); window.removeEventListener('keydown', startMusic); };
+  }, []);
   return (
     <main className="start-menu">
       <section className="start-menu__intro">

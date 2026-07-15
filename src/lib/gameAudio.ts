@@ -77,6 +77,10 @@ function startAmbientMusic(context: AudioContext) {
   pulse.start();
 }
 
+export function startBackgroundMusic() {
+  startAmbientMusic(getContext());
+}
+
 export function playGameSound(sound: GameSound) {
   const context = getContext();
   if (sound === 'zombie') {
@@ -89,11 +93,12 @@ export function playGameSound(sound: GameSound) {
     tone(context, 720, 210, .13, .12, 'square');
     noise(context, .09, .05, 1800);
   } else if (sound === 'eat') {
-    noise(context, .2, .13, 1350);
-    window.setTimeout(() => noise(context, .14, .09, 950), 100);
+    tone(context, 520, 210, .18, .13, 'triangle');
+    noise(context, .22, .18, 1550);
+    window.setTimeout(() => noise(context, .16, .13, 1050), 100);
   } else if (sound === 'chop') {
-    tone(context, 190, 72, .16, .13, 'triangle');
-    noise(context, .11, .065, 650);
+    tone(context, 240, 62, .2, .2, 'triangle');
+    noise(context, .14, .11, 780);
   } else if (sound === 'start') {
     startAmbientMusic(context);
     tone(context, 260, 520, .32, .1, 'triangle');

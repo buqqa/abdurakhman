@@ -98,6 +98,7 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
   const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: zombie.isBoss ? 'boss' : 'zombie', x: zombie.x, y: zombie.y }));
   const attackZombie = useCallback((target: { id: string }) => {
     swingAxe();
+    playGameSound('chop');
     hitZombie(target.id);
   }, [hitZombie, swingAxe]);
   const breakCrate = useCallback((crate: { id: string; kind: string }) => {

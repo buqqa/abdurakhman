@@ -24,8 +24,8 @@ export function findNearestObject(player: { x: number; y: number }, objects: Int
 
 const startingCrateCount = Math.floor(Math.random() * 3);
 const startingCrates: InteractableObject[] = [
-  { id: 'starting-crate-1', kind: Math.random() < .7 ? 'crate-food' : 'crate-empty', x: 500, y: 105 },
-  { id: 'starting-crate-2', kind: Math.random() < .7 ? 'crate-food' : 'crate-wood', x: 625, y: 300 },
+  { id: 'starting-crate-1', kind: Math.random() < .15 ? 'crate-empty' : 'crate-food', x: 500, y: 105 },
+  { id: 'starting-crate-2', kind: Math.random() < .15 ? 'crate-empty' : 'crate-food', x: 625, y: 300 },
 ].slice(0, startingCrateCount);
 
 export const WORLD_OBJECTS: InteractableObject[] = [
@@ -56,8 +56,7 @@ export function createDailyResources(day: number, occupied: InteractableObject[]
   const crateCount = crateRoll < .35 ? 0 : crateRoll < .8 ? 1 : 2;
   for (let index = 0; index < crateCount; index += 1) {
     const point = createPoint();
-    const kindRoll = Math.random();
-    const kind: CrateKind = kindRoll < .55 ? 'crate-food' : kindRoll < .8 ? 'crate-wood' : 'crate-empty';
+    const kind: CrateKind = Math.random() < .15 ? 'crate-empty' : 'crate-food';
     if (point) resources.push({ id: `daily-${kind}-${day}-${index}`, kind, ...point });
   }
   return resources;
