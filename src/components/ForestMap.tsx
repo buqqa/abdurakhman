@@ -95,7 +95,7 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
     window.setTimeout(() => setTreeAnimation(undefined), falling ? 620 : 260);
     if (falling) window.setTimeout(() => setObjects((items) => items.filter((item) => item.id !== tree.id)), 600);
   }, [onHarvest, swingAxe]);
-  const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: zombie.isBoss ? 'boss' : 'zombie', x: zombie.x, y: zombie.y }));
+  const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: 'zombie', x: zombie.x, y: zombie.y }));
   const attackZombie = useCallback((target: { id: string }) => {
     swingAxe();
     playGameSound('chop');

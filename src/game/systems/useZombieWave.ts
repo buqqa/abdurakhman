@@ -63,10 +63,10 @@ export function useZombieWave(options: Options) {
       const next = zombiesRef.current.map((zombie) => {
         const playerDistance = Math.hypot(player.x - zombie.x, player.y - zombie.y);
         const baseDistance = Math.hypot(base.x - zombie.x, base.y - zombie.y);
-        const targetsPlayer = zombie.isBoss ? playerDistance <= 360 : playerDistance < baseDistance;
+        const targetsPlayer = playerDistance < baseDistance;
         const target = targetsPlayer ? player : base;
         const distance = targetsPlayer ? playerDistance : baseDistance;
-        const attackDistance = targetsPlayer ? (zombie.isBoss ? 48 : 20) : (zombie.isBoss ? 76 : 68);
+        const attackDistance = targetsPlayer ? 20 : 68;
         if (distance <= attackDistance) {
           if (time - zombie.lastAttack >= 1050) {
             const damage = targetsPlayer ? (zombie.isBoss ? 20 : 10) : zombie.damage;

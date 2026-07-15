@@ -13,12 +13,8 @@
 .zombie-leg--one { left: 6px; } .zombie-leg--two { right: 4px; }
 .zombie-health { position: absolute; left: 1px; top: -4px; width: 28px; height: 4px; overflow: hidden; border-radius: 3px; background: #302622; }
 .zombie-health i { display: block; height: 100%; background: #9fc46e; }
-.map-zombie--boss { scale: 1.45; z-index: 4; filter: drop-shadow(0 0 5px #7b2925); }
-.map-zombie--boss .zombie-head { background: #6e3f39; }
-.map-zombie--boss .zombie-body { background: #453d55; }
-.zombie-crown { position: absolute; left: 7px; top: -9px; color: #d7a94e; font-size: 16px; text-shadow: 0 1px #4a2822; }
 .map-zombie--hit .zombie-sprite { filter: brightness(2) sepia(1) saturate(4); }
-.map-zombie strong { position: absolute; left: -2px; top: -15px; color: #df6b5d; font-size: 7px; letter-spacing: .08em; }
+.map-zombie strong { position: absolute; left: 50%; top: -17px; transform: translateX(-50%); color: #ff3d32; font-size: 8px; font-weight: 900; letter-spacing: .1em; text-shadow: 0 1px 2px #300; }
 @keyframes zombie-walk { 50% { translate: 0 2px; } }
 .map-zombie .zombie-arm--top { animation: zombie-arms .42s steps(2) infinite; }
 @keyframes zombie-arms { 50% { transform: rotate(7deg); } }
