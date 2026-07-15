@@ -9,6 +9,7 @@ export function ZombieSprite({ zombie }: { zombie: Zombie }) {
       <span className="zombie-sprite"><span className="zombie-arm zombie-arm--top" /><span className="zombie-arm zombie-arm--bottom" />
         <span className="zombie-head"><i /><b /></span><span className="zombie-body" />
         <span className="zombie-leg zombie-leg--one" /><span className="zombie-leg zombie-leg--two" />
+        {zombie.isBoss && <span className="zombie-crown" aria-hidden="true">♛</span>}
       </span>
       {zombie.isBoss && <strong>BOSS</strong>}
     </div>
