@@ -3,7 +3,8 @@ import type { WorldStructure } from '../game/structures';
 export function WorldStructures({ structures }: { structures: WorldStructure[] }) {
   return structures.map((structure) => structure.kind === 'tent' ? (
     <div className="abandoned-tent" style={{ left: structure.x, top: structure.y }} aria-label="Заброшенная палатка" key={structure.id}>
-      <span className="tent-roof" /><span className="tent-door" /><span className="tent-patch" />
+      <span className="tent-roof" /><span className="tent-door" />
+      <span className="tent-web"><i /><i /><i /></span>
     </div>
   ) : (
     <div className="abandoned-warehouse" style={{ left: structure.x, top: structure.y }} aria-label="Заброшенный склад" key={structure.id}>
