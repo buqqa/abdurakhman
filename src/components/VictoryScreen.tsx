@@ -7,14 +7,16 @@ function formatTime(totalSeconds: number) {
 }
 
 export function VictoryScreen({ seconds, nights, onRestart }: Props) {
+  const { t } = useI18n();
   return (
     <div className="victory-backdrop">
       <section className="victory-screen">
         <span className="victory-screen__sun">☀</span>
-        <p>Спасатели прибыли</p><h2>Ты пережил {nights} ночей!</h2>
-        <div className="victory-time"><span>Время прохождения</span><strong>{formatTime(seconds)}</strong></div>
-        <button onClick={onRestart}>Сыграть ещё раз</button>
+        <p>{t('survived')}</p><h2>{t('survivedNights', { count: nights })}</h2>
+        <div className="victory-time"><span>{t('time')}</span><strong>{formatTime(seconds)}</strong></div>
+        <button onClick={onRestart}>{t('playAgain')}</button>
       </section>
     </div>
   );
 }
+import { useI18n } from '../i18n/I18nContext';

@@ -1,6 +1,13 @@
 export type GameSound = 'zombie' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 'start' | 'defeat';
 
 let audioContext: AudioContext | undefined;
+let masterVolume = Number(localStorage.getItem('forest-volume') ?? .7);
+
+export function getGameVolume() { return masterVolume; }
+export function setGameVolume(volume: number) {
+  masterVolume = Math.max(0, Math.min(1, volume));
+  localStorage.setItem('forest-volume', String(masterVolume));
+}
 
 function getContext() {
   audioContext ??= new AudioContext();
@@ -15,7 +22,7 @@ function tone(context: AudioContext, start: number, end: number, duration: numbe
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(start, now);
   oscillator.frequency.exponentialRampToValueAtTime(end, now + duration);
-  gain.gain.setValueAtTime(volume, now);
+  gain.gain.setValueAtTime(volume * masterVolume, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
   oscillator.connect(gain).connect(context.destination);
   oscillator.start(now);
@@ -33,7 +40,7 @@ function noise(context: AudioContext, duration: number, volume: number, frequenc
   source.buffer = buffer;
   filter.type = 'lowpass';
   filter.frequency.value = frequency;
-  gain.gain.setValueAtTime(volume, context.currentTime);
+  gain.gain.setValueAtTime(volume * masterVolume, context.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration);
   source.connect(filter).connect(gain).connect(context.destination);
   source.start();

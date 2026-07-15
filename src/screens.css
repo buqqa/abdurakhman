@@ -59,3 +59,11 @@
 .google-button span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; color: #4285f4; background: #fff; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
 .guest-button { border: 1px solid #52634e; color: #d9dfd4; background: transparent; }
 .guest-button:hover { background: #263324; }
+.lobby-settings { width: min(340px, 100%); display: grid; gap: 8px; margin-top: 18px; padding: 10px 12px; border: 1px solid #384735; border-radius: 9px; background: rgba(18, 27, 17, .72); }
+.lobby-settings > label { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: #aeb7a8; font-size: 13px; }
+.language-buttons { display: flex; gap: 4px; }
+.language-buttons button { padding: 4px 7px; color: #879482; background: #111a11; font-size: 11px; }
+.language-buttons button.active { border-color: #c5a85c; color: #fff0af; background: #354430; }
+.volume-control { display: grid; grid-template-columns: 15px minmax(90px, 140px) 38px; align-items: center; gap: 7px; }
+.volume-control input { width: 100%; accent-color: #c5a85c; }
+.volume-control strong { color: #e6d392; font-size: 12px; text-align: right; }

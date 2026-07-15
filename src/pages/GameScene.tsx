@@ -7,15 +7,17 @@ import { PlayerStats } from '../components/PlayerStats';
 import { VictoryScreen } from '../components/VictoryScreen';
 import { DifficultyScreen } from '../components/DifficultyScreen';
 import { DefeatScreen } from '../components/DefeatScreen';
+import { useI18n } from '../i18n/I18nContext';
 
 export function GameScene({ playerNickname }: { playerNickname: string }) {
+  const { t } = useI18n();
   const { game, startGame, gatherWood, gatherCrateLoot, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart } = useGameLoop();
   if (game.phase === 'menu') return <DifficultyScreen onSelect={startGame} />;
   const interactionHandlers = { building: repairBase };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
     <main className="game-shell">
-      <div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">Продержись {game.maxNights} ночей</span></div>
+      <div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">{t('goal', { count: game.maxNights })}</span></div>
       <GameHud game={game} />
       <PlayerStats health={game.playerHealth} />
       <GameWorld playerNickname={playerNickname} phase={game.phase} day={game.day} baseHealth={game.baseHealth} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}

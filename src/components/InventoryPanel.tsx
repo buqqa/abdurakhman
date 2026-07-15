@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useI18n } from '../i18n/I18nContext';
 
 interface Props {
   wood: number;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function InventoryPanel({ wood, food, water, onEat, onDrink }: Props) {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -20,18 +22,18 @@ export function InventoryPanel({ wood, food, water, onEat, onDrink }: Props) {
     return () => window.removeEventListener('keydown', toggleInventory);
   }, []);
 
-  if (!isOpen) return <div className="inventory-hint">B — инвентарь</div>;
+  if (!isOpen) return <div className="inventory-hint">{t('inventoryHint')}</div>;
 
   return (
     <div className="inventory-backdrop" onClick={() => setIsOpen(false)}>
       <section className="inventory" onClick={(event) => event.stopPropagation()} aria-label="Инвентарь">
-        <header><h2>Инвентарь</h2><button className="small" onClick={() => setIsOpen(false)}>Закрыть</button></header>
+        <header><h2>{t('inventory')}</h2><button className="small" onClick={() => setIsOpen(false)}>{t('close')}</button></header>
         <div className="inventory-grid">
-          <div className="inventory-slot"><span>🪵</span><p>Дерево</p><strong>{wood}</strong></div>
-          <div className="inventory-slot"><span>🍗</span><p>Еда</p><strong>{food}</strong><button className="use-item" disabled={food === 0} onClick={onEat}>Съесть</button></div>
-          <div className="inventory-slot"><span>💧</span><p>Вода</p><strong>{water}</strong><button className="use-item" disabled={water === 0} onClick={onDrink}>Выпить</button></div>
+          <div className="inventory-slot"><span>🪵</span><p>{t('wood')}</p><strong>{wood}</strong></div>
+          <div className="inventory-slot"><span>🍗</span><p>{t('food')}</p><strong>{food}</strong><button className="use-item" disabled={food === 0} onClick={onEat}>{t('eat')}</button></div>
+          <div className="inventory-slot"><span>💧</span><p>{t('water')}</p><strong>{water}</strong><button className="use-item" disabled={water === 0} onClick={onDrink}>{t('drink')}</button></div>
         </div>
-        <p className="inventory-help">F — построить забор за 2 дерева. B или Escape — закрыть.</p>
+        <p className="inventory-help">{t('inventoryHelp')}</p>
       </section>
     </div>
   );

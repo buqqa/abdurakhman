@@ -4,6 +4,7 @@ import type { InteractionHandlers } from '../game/interactions';
 import type { Fence } from '../game/types';
 import type { Position } from './PlayerController';
 import type { CrateKind } from '../game/interactions';
+import { useI18n } from '../i18n/I18nContext';
 
 interface Props {
   playerNickname: string;
@@ -23,12 +24,13 @@ interface Props {
 }
 
 export function GameWorld({ playerNickname, phase, day, baseHealth, fences, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+  const { t } = useI18n();
   return (
     <section>
       <ForestMap playerNickname={playerNickname} phase={phase} day={day} baseHealth={baseHealth} fences={fences} handlers={interactionHandlers} onUnavailable={onUnavailable}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onBuildFence={onBuildFence} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
-      <p className="controls">WASD — движение · E — взаимодействие · ЛКМ — атака · ПКМ — ремонт · F — забор</p>
+      <p className="controls">{t('controls')}</p>
     </section>
   );
 }

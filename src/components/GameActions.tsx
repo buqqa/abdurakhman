@@ -1,4 +1,5 @@
 import type { Phase } from '../game/types';
+import { useI18n } from '../i18n/I18nContext';
 
 interface Props {
   phase: Phase;
@@ -7,7 +8,8 @@ interface Props {
 }
 
 export function GameActions(props: Props) {
-  if (props.phase === 'won' || props.phase === 'lost') return <button onClick={props.onRestart}>Начать заново</button>;
-  if (props.phase === 'night') return <button disabled>Волна идёт…</button>;
-  return <button className="danger" onClick={props.onNext}>Начать ночь</button>;
+  const { t } = useI18n();
+  if (props.phase === 'won' || props.phase === 'lost') return <button onClick={props.onRestart}>{t('restart')}</button>;
+  if (props.phase === 'night') return <button disabled>{t('wave')}</button>;
+  return <button className="danger" onClick={props.onNext}>{t('startNight')}</button>;
 }
