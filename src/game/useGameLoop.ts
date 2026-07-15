@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { FENCE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_WOOD, WATER_HEAL } from './config';
+import { FENCE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, REPAIR_WOOD_COST, WATER_HEAL } from './config';
 import type { Fence, GameState } from './types';
 import { playGameSound } from '../lib/gameAudio';
 import type { CrateKind } from './interactions';
@@ -54,10 +54,10 @@ export function useGameLoop() {
   const attack = () => setGame((state) => ({ ...state, message: message.miss }));
   const repairBase = () => setGame((state) => {
     if (state.baseHealth === MAX_BASE_HEALTH) return { ...state, message: message.baseFine };
-    if (state.wood < 1) return { ...state, message: message.noWoodRepair };
-    const baseHealth = Math.min(MAX_BASE_HEALTH, state.baseHealth + REPAIR_PER_WOOD);
-    const steps = Math.ceil((MAX_BASE_HEALTH - baseHealth) / REPAIR_PER_WOOD);
-    return { ...state, wood: state.wood - 1, baseHealth, message: steps ? message.repairSteps(steps) : message.repaired };
+    if (state.wood < REPAIR_WOOD_COST) return { ...state, message: language === 'en' ? 'You need 5 wood for one repair step.' : language === 'kk' ? 'Бір жөндеу қадамына 5 ағаш керек.' : 'Для одного шага ремонта нужно 5 дерева.' };
+    const baseHealth = Math.min(MAX_BASE_HEALTH, state.baseHealth + REPAIR_PER_STEP);
+    const steps = Math.ceil((MAX_BASE_HEALTH - baseHealth) / REPAIR_PER_STEP);
+    return { ...state, wood: state.wood - REPAIR_WOOD_COST, baseHealth, message: steps ? message.repairSteps(steps) : message.repaired };
   });
   const buildFence = (position: { x: number; y: number }) => setGame((state) => {
     if (state.wood < FENCE_COST) return { ...state, message: message.noWoodFence(FENCE_COST) };
