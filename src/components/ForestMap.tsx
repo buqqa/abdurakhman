@@ -111,7 +111,12 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
     window.setTimeout(() => setCrateAnimation(undefined), breaking ? 520 : 240);
     if (!breaking) return;
     onCrateLoot(crate.kind as CrateKind);
-    window.setTimeout(() => setObjects((items) => items.filter((item) => item.id !== crate.id)), 480);
+    window.setTimeout(() => setObjects((items) => {
+      const remaining = items.filter((item) => item.id !== crate.id);
+      if (crate.kind !== 'crate-food') return remaining;
+      const source = items.find((item) => item.id === crate.id);
+      return source ? [...remaining, { id: `food-drop-${crate.id}`, kind: 'food', x: source.x, y: source.y + 9 }] : remaining;
+    }), 480);
   }, [onCrateLoot, swingAxe]);
   const attackResource = useCallback((target: { id: string; kind: string }) => {
     if (target.kind === 'tree') harvestTree(target);
@@ -137,6 +142,7 @@ export function ForestMap({ playerNickname, phase, day, baseHealth, fences, hand
         </div>)}
         <WorldStructures structures={structures} />
         {crates.map((crate) => <LootCrate crate={crate} animation={crateAnimation?.id === crate.id ? crateAnimation.breaking ? 'break' : 'hit' : undefined} key={crate.id} />)}
+        {objects.filter((object) => object.kind === 'food').map((food) => <div className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id}>🍗</div>)}
         <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} />
         {phase === 'day' && FENCE_SLOTS.filter((slot) => !fences.some((fence) => Math.hypot(fence.x - slot.x, fence.y - slot.y) < 8))
           .map((slot) => <span className="fence-slot" style={{ left: slot.x - 18, top: slot.y - 8, transform: `rotate(${fenceRotation(slot)}deg)` }} key={`${slot.x}-${slot.y}`} />)}

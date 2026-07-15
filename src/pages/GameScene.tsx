@@ -11,9 +11,9 @@ import { useI18n } from '../i18n/I18nContext';
 
 export function GameScene({ playerNickname }: { playerNickname: string }) {
   const { t } = useI18n();
-  const { game, startGame, gatherWood, gatherCrateLoot, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart } = useGameLoop();
+  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart } = useGameLoop();
   if (game.phase === 'menu') return <DifficultyScreen onSelect={startGame} />;
-  const interactionHandlers = { building: repairBase };
+  const interactionHandlers = { building: repairBase, food: gatherFood };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
     <main className="game-shell">

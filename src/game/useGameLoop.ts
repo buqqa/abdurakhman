@@ -28,11 +28,12 @@ export function useGameLoop() {
     if (kind === 'crate-water') {
       setGame((state) => ({ ...state, wood: state.wood + 2, water: state.water + 1, message: message.waterLoot }));
     } else if (kind === 'crate-food') {
-      setGame((state) => ({ ...state, wood: state.wood + 2, food: state.food + 1, message: message.foodLoot }));
+      setGame((state) => ({ ...state, wood: state.wood + 2, message: message.foodLoot }));
     } else {
       setGame((state) => ({ ...state, wood: state.wood + 8, message: message.stockLoot }));
     }
   };
+  const gatherFood = () => setGame((state) => ({ ...state, food: state.food + 1, message: language === 'en' ? 'Chicken added to the inventory.' : language === 'kk' ? 'Тауық еті қоржынға салынды.' : 'Курица добавлена в инвентарь.' }));
   const eatFood = () => {
     if (game.food > 0 && game.playerHealth < 100) playGameSound('eat');
     setGame((state) => {
@@ -87,5 +88,5 @@ export function useGameLoop() {
   });
   const restart = () => setGame(initialState);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart };
 }
