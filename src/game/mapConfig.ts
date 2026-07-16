@@ -10,15 +10,6 @@ export const PLAYER_ACCELERATION = 900;
 export const PLAYER_FRICTION = 0.82;
 export const BASE_POSITION = { x: 125, y: 120 } as const;
 export const PLAYER_START = { x: 125, y: 225 } as const;
-export const FENCE_CENTER = BASE_POSITION;
-
-export const FENCE_SLOTS = [
-  { x: 125, y: 38 }, { x: 166, y: 49 }, { x: 196, y: 79 },
-  { x: 207, y: 120 }, { x: 196, y: 161 }, { x: 166, y: 191 },
-  { x: 84, y: 191 }, { x: 54, y: 161 }, { x: 43, y: 120 },
-  { x: 54, y: 79 }, { x: 84, y: 49 },
-] as const;
-
 export const TREES = [
   { x: 260, y: 70 }, { x: 180, y: 350 }, { x: 665, y: 85 },
   { x: 700, y: 350 }, { x: 85, y: 235 }, { x: 580, y: 385 },

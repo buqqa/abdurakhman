@@ -21,9 +21,3 @@
 @keyframes zombie-walk { 50% { translate: 0 2px; } }
 .map-zombie .zombie-arm--top { animation: zombie-arms .42s steps(2) infinite; }
 @keyframes zombie-arms { 50% { transform: rotate(7deg); } }
-.fence-slot { position: absolute; width: 36px; height: 17px; z-index: 1; border: 1px dashed rgba(190, 194, 179, .48); border-radius: 3px; background: rgba(62, 69, 59, .32); }
-.map-fence { position: absolute; width: 38px; height: 18px; z-index: 2; border: 2px solid #3f433e; border-radius: 2px; background-color: #73786f; background-image: linear-gradient(90deg, transparent 45%, #4e534d 46% 52%, transparent 53%), linear-gradient(0deg, transparent 43%, #4e534d 44% 55%, transparent 56%); filter: drop-shadow(0 3px 1px #25321f); }
-.map-fence::before { content: ''; position: absolute; left: -2px; right: -2px; top: -8px; height: 8px; background: repeating-linear-gradient(90deg, #858a80 0 7px, transparent 8px 12px); border-bottom: 2px solid #3f433e; }
-.map-fence::after { content: ''; position: absolute; left: 3px; right: 3px; top: 7px; height: 4px; border: 1px solid #3f2b1e; background: linear-gradient(90deg, #6b492e, #9a6a3f); transform: rotate(-4deg); }
-.map-fence i { position: absolute; top: -5px; width: 6px; height: 24px; border: 1px solid #353936; background: linear-gradient(90deg, #626760, #92968c); z-index: 2; }
-.map-fence i:nth-child(1) { left: -3px; } .map-fence i:nth-child(2) { display: none; } .map-fence i:nth-child(3) { right: -3px; }

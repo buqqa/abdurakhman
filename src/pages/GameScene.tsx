@@ -14,7 +14,7 @@ import { PauseMenu } from '../components/PauseMenu';
 export function GameScene({ playerNickname }: { playerNickname: string }) {
   const { t } = useI18n();
   const [isPaused, setIsPaused] = useState(false);
-  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
+  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
   useEffect(() => {
     const togglePause = (event: KeyboardEvent) => {
       if (event.code !== 'Escape' || (game.phase !== 'day' && game.phase !== 'night')) return;
@@ -42,7 +42,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
       <GameHud game={game} />
       <PlayerStats health={game.playerHealth} />
       <GameWorld paused={isPaused} playerNickname={playerNickname} phase={game.phase} day={game.day} baseHealth={game.baseHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
-        onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot} fences={game.fences} onBuildFence={buildFence}
+        onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
         onPlayerDamage={damagePlayer} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} />
       <section className={`status ${isFinished ? 'status--result' : ''}`}>

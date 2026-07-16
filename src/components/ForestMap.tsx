@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BASE_POSITION, FENCE_CENTER, FENCE_SLOTS, MAP_HEIGHT, MAP_WIDTH, PLAYER_START } from '../game/mapConfig';
+import { BASE_POSITION, MAP_HEIGHT, MAP_WIDTH, PLAYER_START } from '../game/mapConfig';
 import { createDailyResources, HARVEST_DISTANCE, WORLD_OBJECTS, type CrateKind, type InteractionHandlers } from '../game/interactions';
 import { InteractionSystem } from '../game/systems/InteractionSystem';
 import { RepairSystem } from '../game/systems/RepairSystem';
@@ -8,8 +8,6 @@ import type { Phase, Weapon } from '../game/types';
 import { GameCamera } from './GameCamera';
 import { PlayerController, type Position } from './PlayerController';
 import { BaseStructure } from './BaseStructure';
-import { BuildSystem } from '../game/systems/BuildSystem';
-import type { Fence } from '../game/types';
 import { playGameSound } from '../lib/gameAudio';
 import { useZombieWave } from '../game/systems/useZombieWave';
 import { ZombieSprite } from './ZombieSprite';
@@ -19,14 +17,13 @@ import { createStructure, type StructureKind, type WorldStructure } from '../gam
 import { WaterBottle } from './WaterBottle';
 import { Merchant } from './Merchant';
 import { SPEAR_BONUS } from '../game/config';
+import { ChickenLeg } from './ChickenLeg';
 
 interface Footprint extends Position { id: number }
 
-const fenceRotation = (position: Position) => Math.atan2(position.y - FENCE_CENTER.y, position.x - FENCE_CENTER.x) * 180 / Math.PI + 90;
+interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
 
-interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
-
-export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
@@ -72,15 +69,6 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weap
     setFootprints((current) => [...current, footprint]);
     window.setTimeout(() => setFootprints((current) => current.filter((item) => item.id !== footprint.id)), 1000);
   }, []);
-  const buildFenceAtSlot = useCallback((position: Position) => {
-    const freeSlots = FENCE_SLOTS.filter((slot) => !fences.some((fence) => Math.hypot(fence.x - slot.x, fence.y - slot.y) < 8));
-    const nearest = freeSlots.reduce<{ slot?: Position; distance: number }>((result, slot) => {
-      const distance = Math.hypot(position.x - slot.x, position.y - slot.y);
-      return distance < result.distance ? { slot, distance } : result;
-    }, { distance: Number.POSITIVE_INFINITY });
-    if (!nearest.slot || nearest.distance > 90) return onUnavailable();
-    onBuildFence(nearest.slot);
-  }, [fences, onBuildFence, onUnavailable]);
   const collectObject = useCallback((object: { id: string; kind: string }) => {
     if (object.kind === 'food' || object.kind === 'water') setObjects((current) => current.filter((item) => item.id !== object.id));
   }, []);
@@ -139,7 +127,6 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weap
       attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_BONUS : HARVEST_DISTANCE}
       cooldown={phase === 'day' && weapon === 'spear' ? 450 * SPEAR_BONUS : 450}
       onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
-    <BuildSystem enabled={!paused && phase === 'day'} player={player} onBuild={buildFenceAtSlot} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
     <GameCamera player={player}>
@@ -153,15 +140,10 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weap
         </div>)}
         <WorldStructures structures={structures} />
         {crates.map((crate) => <LootCrate crate={crate} animation={crateAnimation?.id === crate.id ? crateAnimation.breaking ? 'break' : 'hit' : undefined} key={crate.id} />)}
-        {objects.filter((object) => object.kind === 'food').map((food) => <div className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id}>🍗</div>)}
+        {objects.filter((object) => object.kind === 'food').map((food) => <ChickenLeg className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id} />)}
         {objects.filter((object) => object.kind === 'water').map((water) => <WaterBottle className="map-water-bottle" key={water.id}
           style={{ left: water.x - 8, top: water.y - 14 }} />)}
         <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} />
-        {phase === 'day' && FENCE_SLOTS.filter((slot) => !fences.some((fence) => Math.hypot(fence.x - slot.x, fence.y - slot.y) < 8))
-          .map((slot) => <span className="fence-slot" style={{ left: slot.x - 18, top: slot.y - 8, transform: `rotate(${fenceRotation(slot)}deg)` }} key={`${slot.x}-${slot.y}`} />)}
-        {fences.map((fence) => <span className="map-fence" style={{ left: fence.x - 19, top: fence.y - 10, transform: `rotate(${fenceRotation(fence)}deg)` }} key={fence.id}>
-          <i /><i /><i />
-        </span>)}
         {footprints.map((footprint) => <span className="footprint" style={{ left: footprint.x + 8, top: footprint.y + 24 }} key={footprint.id} />)}
         {merchantVisible && <Merchant player={player} wood={wood} isOpen={isTradeOpen} onOpen={() => setIsTradeOpen(true)} onClose={() => setIsTradeOpen(false)} onBuy={onBuySpear} />}
         <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} weapon={weapon} />

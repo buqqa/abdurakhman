@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
-import { FENCE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, REPAIR_WOOD_COST, SPEAR_COST, WATER_HEAL } from './config';
-import type { Fence, GameState } from './types';
+import { FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, REPAIR_WOOD_COST, SPEAR_COST, WATER_HEAL } from './config';
+import type { GameState } from './types';
 import { playGameSound } from '../lib/gameAudio';
 import type { CrateKind } from './interactions';
 import { useI18n } from '../i18n/I18nContext';
@@ -8,7 +8,7 @@ import { gameMessages } from '../i18n/gameMessages';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', fences: [], weapon: 'axe', hasSpear: false, merchantDay: 5,
+  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'axe', hasSpear: false, merchantDay: 5,
 };
 
 export function useGameLoop() {
@@ -18,13 +18,11 @@ export function useGameLoop() {
   const startedAt = useRef(Date.now());
   const pausedAt = useRef<number>();
   const pausedTime = useRef(0);
-  const fenceId = useRef(0);
   const startGame = (maxNights: number, difficulty: string) => {
     playGameSound('start');
     startedAt.current = Date.now();
     pausedAt.current = undefined;
     pausedTime.current = 0;
-    fenceId.current = 0;
     const merchantDay = 5 + Math.floor(Math.random() * 6);
     setGame({ ...initialState, phase: 'day', maxNights, difficulty, merchantDay, message: message.prepare });
   };
@@ -79,13 +77,6 @@ export function useGameLoop() {
     const steps = Math.ceil((MAX_BASE_HEALTH - baseHealth) / REPAIR_PER_STEP);
     return { ...state, wood: state.wood - REPAIR_WOOD_COST, baseHealth, message: steps ? message.repairSteps(steps) : message.repaired };
   });
-  const buildFence = (position: { x: number; y: number }) => setGame((state) => {
-    if (state.wood < FENCE_COST) return { ...state, message: message.noWoodFence(FENCE_COST) };
-    if (state.fences.some((fence) => Math.hypot(fence.x - position.x, fence.y - position.y) < 8)) return { ...state, message: message.fenceBusy };
-    const fence: Fence = { id: fenceId.current++, x: position.x, y: position.y };
-    const fences = [...state.fences, fence];
-    return { ...state, wood: state.wood - FENCE_COST, fences, message: fences.length === 11 ? message.fenceDone : message.fenceBuilt(fences.length) };
-  });
   const startNight = () => {
     playGameSound('zombie');
     setGame((state) => ({ ...state, phase: 'night', message: message.night(state.day) }));
@@ -97,7 +88,6 @@ export function useGameLoop() {
   });
   const damageBase = (damage: number) => setGame((state) => {
     if (state.phase !== 'night') return state;
-    if (state.fences.length) return { ...state, fences: state.fences.slice(1), message: message.fenceHit };
     const baseHealth = Math.max(0, state.baseHealth - damage);
     return { ...state, baseHealth, phase: baseHealth ? state.phase : 'lost', message: baseHealth ? message.baseHit(damage) : message.baseLost };
   });
@@ -114,5 +104,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
 }
