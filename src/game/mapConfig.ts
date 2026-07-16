@@ -1,6 +1,6 @@
 export const MAP_WIDTH = 1200;
 export const MAP_HEIGHT = 720;
-export const MAP_BORDER = 14;
+export const MAP_BORDER = 0;
 export const PLAYER_SIZE = 30;
 export const PLAYER_EDGE_GAP = 6;
 export const PLAYABLE_WIDTH = MAP_WIDTH - MAP_BORDER * 2;
