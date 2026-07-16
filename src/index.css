@@ -167,13 +167,11 @@ button { font: inherit; }
 .player--walking .player__legs { animation: walk-legs .32s steps(2) infinite; }
 .player--walking .player__arm--left { animation: walk-arm-left .32s steps(2) infinite; }
 .player--walking .player__arm--right { animation: walk-arm-right .32s steps(2) infinite; }
-.player--hammer.player--walking .player__weapon--hammer { animation: walk-hammer .32s steps(2) infinite; }
 @keyframes walk-bob { 50% { translate: 0 -1px; } }
 @keyframes walk-body { 50% { translate: 0 1px; } }
 @keyframes walk-legs { 50% { border-left-width: 3px; border-right-width: 7px; transform: skewX(-8deg); } }
 @keyframes walk-arm-left { 50% { transform: rotate(-16deg); } }
 @keyframes walk-arm-right { 50% { transform: rotate(12deg); } }
-@keyframes walk-hammer { 50% { transform: rotate(0deg); } }
 .footprint { position: absolute; width: 5px; height: 8px; border-radius: 50%; background: rgba(37, 57, 31, .48); transform: rotate(18deg); animation: footprint-fade 1s linear forwards; }
 .footprint::after { content: ''; position: absolute; left: 7px; top: -4px; width: 5px; height: 8px; border-radius: 50%; background: inherit; transform: rotate(-32deg); }
 @keyframes footprint-fade { 70% { opacity: .65; } 100% { opacity: 0; } }
