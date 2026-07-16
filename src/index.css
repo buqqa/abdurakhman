@@ -149,7 +149,7 @@ button { font: inherit; }
 .player__arm--right { right: 3px; transform: rotate(-28deg); }
 .player__legs { position: absolute; left: 8px; bottom: -1px; width: 15px; height: 8px; border-left: 5px solid #34475a; border-right: 5px solid #34475a; z-index: 1; }
 .player__weapon { position: absolute; right: -5px; top: 7px; width: 4px; height: 19px; background: #7a5232; transform: rotate(-40deg); transform-origin: bottom; z-index: 3; }
-.player__weapon--hammer { border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); }
+.player__weapon--hammer { right: -8px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(-43deg); }
 .player__weapon--hammer i { position: absolute; left: -5px; top: -3px; width: 13px; height: 7px; border: 2px solid #354044; background: #8e9a98; z-index: 2; }
 .player__weapon--hammer::after { content: ''; position: absolute; left: -2px; top: 8px; width: 6px; height: 7px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }
 .player__weapon--spear { right: -10px; top: 8px; width: 4px; height: 31px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(-20deg); }
@@ -160,7 +160,7 @@ button { font: inherit; }
 .player--spear.player--attacking .player__weapon { animation: spear-thrust .26s ease-out; }
 @keyframes spear-thrust { 0% { translate: -2px 4px; } 55% { translate: 5px -7px; } 100% { translate: 0; } }
 .player--attacking .player__arm--right { animation: attack-arm .26s ease-out; }
-@keyframes axe-swing { 0% { transform: rotate(-88deg); } 55% { transform: rotate(28deg); } 100% { transform: rotate(-40deg); } }
+@keyframes axe-swing { 0% { transform: rotate(-88deg); } 55% { transform: rotate(28deg); } 100% { transform: rotate(-43deg); } }
 @keyframes attack-arm { 0% { transform: rotate(-52deg); } 55% { transform: rotate(18deg); } 100% { transform: rotate(-28deg); } }
 .player--walking .player__head, .player--walking .player__hair { animation: walk-bob .32s steps(2) infinite; }
 .player--walking .player__body { animation: walk-body .32s steps(2) infinite; }
