@@ -16,6 +16,7 @@ export function MobileControls({ enabled }: Props) {
     const viewport = document.querySelector('.map-viewport');
     viewport?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1, pointerType: 'touch', isPrimary: true }));
   };
+  const repair = () => document.querySelector('.base')?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 2 }));
   return <aside className="mobile-controls" aria-label="Мобильное управление">
     <div className="mobile-joystick">
       <DirectionButton code="KeyW" label="↑" enabled={enabled} /><DirectionButton code="KeyA" label="←" enabled={enabled} />
@@ -23,7 +24,9 @@ export function MobileControls({ enabled }: Props) {
       <DirectionButton code="KeyS" label="↓" enabled={enabled} />
     </div>
     <div className="mobile-actions">
-      <button className="mobile-inventory" disabled={!enabled} onClick={() => sendKey('KeyB', 'keydown')} aria-label="Открыть инвентарь">B</button>
+      <button className="mobile-interact" disabled={!enabled} onClick={() => sendKey('KeyE', 'keydown')} aria-label="Взаимодействовать">👆</button>
+      <button className="mobile-inventory" disabled={!enabled} onClick={() => sendKey('KeyB', 'keydown')} aria-label="Открыть инвентарь">🎒</button>
+      <button className="mobile-repair" disabled={!enabled} onClick={repair} aria-label="Ремонт базы">🔨</button>
       <button className="mobile-attack" disabled={!enabled} onPointerDown={(event) => { event.preventDefault(); attack(); }} aria-label="Удар">⚔</button>
     </div>
   </aside>;

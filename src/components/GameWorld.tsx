@@ -7,6 +7,7 @@ import { useI18n } from '../i18n/I18nContext';
 
 interface Props {
   paused: boolean;
+  mobileMode: boolean;
   playerNickname: string;
   phase: Phase;
   day: number;
@@ -27,11 +28,11 @@ interface Props {
   onNightCleared: () => void;
 }
 
-export function GameWorld({ paused, playerNickname, phase, day, difficulty, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const { t, language } = useI18n();
   return (
     <section>
-      <ForestMap paused={paused} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
+      <ForestMap paused={paused} mobileMode={mobileMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
       <p className="controls">{t('controls')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}</p>

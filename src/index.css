@@ -199,10 +199,11 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .mobile-direction { padding: 0; border-radius: 50%; font-size: 22px; background: rgba(65, 84, 60, .9); }
 .mobile-direction--↑ { grid-area: 1 / 2; }.mobile-direction--← { grid-area: 2 / 1; }.mobile-direction--→ { grid-area: 2 / 3; }.mobile-direction--↓ { grid-area: 3 / 2; }
 .mobile-joystick__center { grid-area: 2 / 2; border-radius: 50%; background: rgba(116, 135, 105, .45); }
-.mobile-actions { display: flex; align-items: end; gap: 14px; }
+.mobile-actions { width: 150px; display: grid; grid-template-columns: repeat(2, 58px); align-items: end; justify-content: end; gap: 10px; }
 .mobile-actions button { width: 58px; height: 58px; padding: 0; border-radius: 50%; font-size: 21px; font-weight: 800; box-shadow: 0 5px 14px rgba(0, 0, 0, .4); }
 .mobile-attack { width: 76px !important; height: 76px !important; border-color: #916057 !important; background: rgba(111, 59, 51, .94) !important; font-size: 30px !important; }
 .mobile-inventory { background: rgba(57, 76, 53, .94) !important; }
+.mobile-interact { background: rgba(64, 86, 60, .94) !important; }.mobile-repair { background: rgba(105, 76, 43, .94) !important; }
 @media (max-width: 640px) {
   .goal { display: none; } .game-hud { grid-template-columns: repeat(2, 1fr); }
   .status { align-items: stretch; flex-direction: column; } .actions { justify-content: stretch; }

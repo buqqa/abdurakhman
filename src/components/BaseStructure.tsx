@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { playGameSound } from '../lib/gameAudio';
 
-interface Props { health: number; x: number; y: number }
+interface Props { health: number; x: number; y: number; mobileRepair?: boolean }
 
-export function BaseStructure({ health, x, y }: Props) {
+export function BaseStructure({ health, x, y, mobileRepair }: Props) {
   const damage = health === 100 ? 'safe' : health > 50 ? 'damaged' : 'critical';
   const previousHealth = useRef(health);
   const [isRepairing, setIsRepairing] = useState(false);
@@ -33,6 +33,12 @@ export function BaseStructure({ health, x, y }: Props) {
 
   return (
     <div className={`base base--${damage} ${isHit ? 'base--hit' : ''} ${isRepairing ? `base--repairing base--repair-${repairSide}` : ''}`}
+      onPointerDown={(event) => {
+        if (!mobileRepair || event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 2 }));
+      }}
       style={{ left: x, top: y }} aria-label={`База, прочность ${health}%`}>
       <span className="base__tower base__tower--left" /><span className="base__tower base__tower--right" />
       <span className="base__wall" /><span className="base__battlements" />

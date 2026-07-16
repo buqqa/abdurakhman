@@ -21,9 +21,9 @@ import { ChickenLeg } from './ChickenLeg';
 
 interface Footprint extends Position { id: number }
 
-interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
+interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
 
-export function ForestMap({ paused, playerNickname, phase, day, difficulty, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
@@ -145,7 +145,7 @@ export function ForestMap({ paused, playerNickname, phase, day, difficulty, base
         {objects.filter((object) => object.kind === 'food').map((food) => <ChickenLeg className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id} />)}
         {objects.filter((object) => object.kind === 'water').map((water) => <WaterBottle className="map-water-bottle" key={water.id}
           style={{ left: water.x - 8, top: water.y - 14 }} />)}
-        <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} />
+        <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} mobileRepair={mobileMode} />
         {footprints.map((footprint) => <span className="footprint" style={{ left: footprint.x + 8, top: footprint.y + 24 }} key={footprint.id} />)}
         {merchantVisible && <Merchant player={player} wood={wood} isOpen={isTradeOpen} onOpen={() => setIsTradeOpen(true)} onClose={() => setIsTradeOpen(false)} onBuy={onBuySpear} />}
         <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} weapon={weapon} />
