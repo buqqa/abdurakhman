@@ -3,18 +3,27 @@ import { useI18n } from '../i18n/I18nContext';
 interface Difficulty { name: string; nights: number; icon: string }
 
 const difficulties: Difficulty[] = [
-  { name: 'PEACEFUL', nights: 15, icon: '🙂' },
-  { name: 'SURVIVOR', nights: 25, icon: '😤' },
-  { name: 'HARDCORE', nights: 50, icon: '💀' },
+  { name: 'PEACEFUL', nights: 15, icon: '🌿' },
+  { name: 'SURVIVOR', nights: 25, icon: '🔥' },
+  { name: 'HARDCORE', nights: 50, icon: '☠️' },
 ];
 
 export function DifficultyScreen({ onSelect }: { onSelect: (nights: number, name: string) => void }) {
   const { t, language } = useI18n();
   const describe = (difficulty: Difficulty) => {
-    const boss = difficulty.name === 'HARDCORE';
-    if (language === 'en') return `${difficulty.nights} nights. A boss appears every 5 nights.${boss ? ' Bosses have triple health and damage.' : ''}`;
-    if (language === 'kk') return `${difficulty.nights} түн. Әр 5 түн сайын босс шығады.${boss ? ' Босстың денсаулығы мен зақымы үш есе көп.' : ''}`;
-    return `${difficulty.nights} ночей. Каждые 5 ночей появляется босс.${boss ? ' У босса тройной запас здоровья и урон.' : ''}`;
+    if (language === 'en') {
+      if (difficulty.name === 'PEACEFUL') return 'A calm 15-night journey to explore, gather supplies and meet a boss every fifth night.';
+      if (difficulty.name === 'SURVIVOR') return '25 nights of growing pressure: tougher waves, scarce supplies and bosses every five nights.';
+      return 'A merciless 50-night marathon. Every fifth night brings a boss with triple health and damage.';
+    }
+    if (language === 'kk') {
+      if (difficulty.name === 'PEACEFUL') return 'Орманды зерттеп, қор жинауға арналған тыныш 15 түн. Әр бесінші түнде босс келеді.';
+      if (difficulty.name === 'SURVIVOR') return 'Қысымы арта беретін 25 түн: толқындар күшейеді, қор азаяды, әр бесінші түнде босс шығады.';
+      return 'Аяусыз 50 түндік сынақ. Әр бесінші түнде денсаулығы мен зақымы үш есе көп босс келеді.';
+    }
+    if (difficulty.name === 'PEACEFUL') return 'Спокойные 15 ночей для исследования леса и сбора припасов. Каждую пятую ночь приходит босс.';
+    if (difficulty.name === 'SURVIVOR') return '25 ночей нарастающего давления: волны сильнее, припасов меньше, а босс приходит каждые пять ночей.';
+    return 'Беспощадный марафон на 50 ночей. Каждую пятую ночь приходит босс с тройным здоровьем и уроном.';
   };
   return (
     <main className="difficulty-screen">
