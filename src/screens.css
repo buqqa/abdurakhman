@@ -8,6 +8,18 @@
 .difficulty-card strong { color: #e3c66f; font-size: 22px; letter-spacing: .08em; }
 .difficulty-card span { margin: 7px 0 15px; color: #eef0e7; }
 .difficulty-card small { max-width: 190px; color: #95a190; line-height: 1.4; }
+.device-screen { width: min(760px, 100%); min-height: 100vh; margin: auto; display: flex; flex-direction: column; justify-content: center; padding: 36px 20px; text-align: center; }
+.device-screen > p { margin: 0; color: #91a08b; text-transform: uppercase; letter-spacing: .18em; font-size: 12px; }
+.device-screen h1 { margin: 7px 0 28px; color: #e7d7a1; font-family: Georgia, serif; font-size: clamp(34px, 6vw, 54px); }
+.device-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.device-card { min-height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-color: #425540; background: #1a251a; }
+.device-card:hover { transform: translateY(-3px); border-color: #809477; background: #253525; }
+.device-card strong { margin: 14px 0 7px; color: #e3c66f; font-size: 20px; letter-spacing: .055em; }.device-card small { color: #95a190; }
+.device-phone { position: relative; display: block; width: 38px; height: 62px; border: 4px solid #303a31; border-radius: 8px; background: linear-gradient(145deg, #78906d, #263a2c 72%); box-shadow: inset 0 0 0 2px #b4c5a9, 5px 7px 5px rgba(0, 0, 0, .3); }
+.device-phone i { position: absolute; left: 11px; top: 3px; width: 10px; height: 2px; border-radius: 2px; background: #202920; }.device-phone b { position: absolute; left: 13px; bottom: 3px; width: 7px; height: 7px; border: 1px solid #a9b9a0; border-radius: 50%; }
+.device-monitor { position: relative; display: block; width: 78px; height: 51px; border: 5px solid #303a31; border-radius: 5px; background: linear-gradient(145deg, #87a07b, #293d2f 75%); box-shadow: inset 0 0 0 2px #b4c5a9, 6px 8px 6px rgba(0, 0, 0, .3); }
+.device-monitor i { position: absolute; left: 31px; bottom: -16px; width: 8px; height: 13px; background: #485449; }.device-monitor b { position: absolute; left: 19px; bottom: -20px; width: 33px; height: 5px; border-radius: 4px; background: #303a31; }
+.device-back { align-self: center; margin-top: 18px; color: #aeb9aa; background: transparent; }
 .victory-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(7, 14, 8, .82); z-index: 30; }
 .victory-screen { width: min(430px, 100%); padding: 34px; border: 1px solid #718369; border-radius: 14px; text-align: center; background: #1b291b; box-shadow: 0 24px 80px #050805; }
 .victory-jumper { position: relative; width: 30px; height: 30px; margin: 4px auto 12px; image-rendering: pixelated; filter: drop-shadow(0 3px 2px rgba(4, 8, 4, .65)); animation: victory-double-jump 2s ease-in-out 1; }
