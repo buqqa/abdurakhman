@@ -8,6 +8,7 @@ import { playGameSound } from '../../lib/gameAudio';
 interface Options {
   phase: Phase;
   day: number;
+  difficulty: string;
   paused: boolean;
   player: Position;
   onPlayerDamage: (damage: number) => void;
@@ -29,7 +30,7 @@ export function useZombieWave(options: Options) {
     window.clearTimeout(spawnTimer.current);
     if (options.phase !== 'night' || options.paused) return;
     if (spawnedNight.current !== options.day) {
-      const wave = createZombieWave(options.day);
+      const wave = createZombieWave(options.day, options.difficulty);
       spawnedNight.current = options.day;
       activeWave.current = true;
       zombiesRef.current = wave.slice(0, 1);
@@ -51,7 +52,7 @@ export function useZombieWave(options: Options) {
     };
     spawnNext();
     return () => window.clearTimeout(spawnTimer.current);
-  }, [options.day, options.paused, options.phase]);
+  }, [options.day, options.difficulty, options.paused, options.phase]);
 
   useEffect(() => {
     if (options.phase !== 'night' || options.paused) return;
@@ -72,7 +73,7 @@ export function useZombieWave(options: Options) {
         const attackDistance = targetsPlayer ? 20 : 68;
         if (distance <= attackDistance) {
           if (time - zombie.lastAttack >= 1050) {
-            const damage = targetsPlayer ? (zombie.isBoss || zombie.hasAxe ? 20 : 10) : zombie.damage;
+            const damage = targetsPlayer ? zombie.playerDamage : zombie.damage;
             attacks.push({ player: targetsPlayer, damage });
             return { ...zombie, lastAttack: time };
           }

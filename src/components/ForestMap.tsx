@@ -21,9 +21,9 @@ import { ChickenLeg } from './ChickenLeg';
 
 interface Footprint extends Position { id: number }
 
-interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
+interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
 
-export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, playerNickname, phase, day, difficulty, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
@@ -59,7 +59,7 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weap
     });
   }, [day, phase]);
   const updatePlayer = useCallback((position: Position) => setPlayer(position), []);
-  const { zombies, hitZombie } = useZombieWave({ phase, day, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
+  const { zombies, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
   const swingAxe = useCallback(() => {
     setIsSwinging(true);
     window.setTimeout(() => setIsSwinging(false), 260);

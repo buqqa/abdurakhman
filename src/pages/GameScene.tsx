@@ -41,7 +41,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
       <div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">{t('goal', { count: game.maxNights })}</span></div>
       <GameHud game={game} />
       <PlayerStats health={game.playerHealth} />
-      <GameWorld paused={isPaused} playerNickname={playerNickname} phase={game.phase} day={game.day} baseHealth={game.baseHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
+      <GameWorld paused={isPaused} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
         onPlayerDamage={damagePlayer} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} />
