@@ -7,11 +7,12 @@ interface Props {
   wood: number;
   food: number;
   water: number;
+  showHint?: boolean;
   onEat: () => void;
   onDrink: () => void;
 }
 
-export function InventoryPanel({ wood, food, water, onEat, onDrink }: Props) {
+export function InventoryPanel({ wood, food, water, showHint = true, onEat, onDrink }: Props) {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -24,7 +25,7 @@ export function InventoryPanel({ wood, food, water, onEat, onDrink }: Props) {
     return () => window.removeEventListener('keydown', toggleInventory);
   }, []);
 
-  if (!isOpen) return <div className="inventory-hint">{t('inventoryHint')}</div>;
+  if (!isOpen) return showHint ? <div className="inventory-hint">{t('inventoryHint')}</div> : null;
 
   return (
     <div className="inventory-backdrop" onClick={() => setIsOpen(false)}>

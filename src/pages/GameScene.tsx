@@ -62,7 +62,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
         onPlayerDamage={damagePlayer} onBaseDamage={damageBase} onNightCleared={finishNight} />
-      <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} />
+      <InventoryPanel wood={game.wood} food={game.food} water={game.water} showHint={device !== 'mobile'} onEat={eatFood} onDrink={drinkWater} />
       {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} />}
       <section className={`status ${isFinished ? 'status--result' : ''}`}>
         <p>{game.message}</p>
