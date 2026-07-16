@@ -32,6 +32,7 @@ button { font: inherit; }
 .inventory-slot .use-item { position: absolute; right: 9px; top: 9px; padding: 5px 8px; font-size: 12px; }
 .inventory-help { margin: 0; color: #7f8d7b; font-size: 12px; }
 .map-viewport { width: 100%; max-width: 900px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; }
+.game-shell:not(.game-shell--mobile) .map-viewport { outline: 3px solid #3b2a1b; outline-offset: 0; border-radius: 11px; box-shadow: 0 0 0 1px #85613d, 0 0 0 5px #241a12, 0 14px 30px rgba(4, 8, 4, .48), inset 0 0 0 2px rgba(221, 184, 112, .22); }
 .camera-world { width: max-content; height: max-content; transition: transform 60ms linear; }
 .forest-map { position: relative; overflow: hidden; border: 14px solid #293326; background-color: #49643e; background-image: radial-gradient(ellipse at 20% 25%, rgba(119, 146, 76, .28) 0 2px, transparent 3px), radial-gradient(ellipse at 72% 68%, rgba(34, 70, 37, .25) 0 3px, transparent 4px), linear-gradient(115deg, transparent 48%, rgba(216, 224, 146, .1) 49% 51%, transparent 52%); background-size: 37px 31px, 53px 47px, 19px 23px; transition: background-color .4s; }
 .forest-map::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .45; background-image: repeating-linear-gradient(78deg, transparent 0 24px, rgba(31, 75, 35, .35) 25px 26px, transparent 27px 42px); mix-blend-mode: multiply; }
