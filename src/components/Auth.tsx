@@ -8,7 +8,7 @@ type AuthProps = {
 };
 
 export function Auth({ onGuestLogin }: AuthProps) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
@@ -31,12 +31,21 @@ export function Auth({ onGuestLogin }: AuthProps) {
 
     setBusy(true);
     try {
-      const result = mode === 'signup'
-        ? await supabase.auth.signUp({ email, password, options: { data: { nickname: nickname.trim() } } })
-        : await supabase.auth.signInWithPassword({ email, password });
-      if (result.error) setMessage(result.error.message);
-      else if (mode === 'signup' && !result.data.session) {
-        setMessage('Аккаунт создан. Подтверди email через письмо и войди.');
+      if (mode === 'signup') {
+        const result = await supabase.auth.signUp({ email, password, options: { data: { nickname: nickname.trim() } } });
+        if (result.error) setMessage(result.error.message);
+        else {
+          if (result.data.session) await supabase.auth.signOut({ scope: 'local' });
+          setMode('signin');
+          setPassword('');
+          setPasswordRepeat('');
+          setMessage(language === 'en' ? 'Account created. Now sign in with your email and password.'
+            : language === 'kk' ? 'Аккаунт ашылды. Енді пошта мен құпиясөз арқылы кір.'
+              : 'Аккаунт создан. Теперь войди с помощью почты и пароля.');
+        }
+      } else {
+        const result = await supabase.auth.signInWithPassword({ email, password });
+        if (result.error) setMessage(result.error.message);
       }
     } catch {
       setMessage('Не получилось связаться с сервером. Попробуй ещё раз.');
