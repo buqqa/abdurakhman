@@ -75,8 +75,9 @@
 .trade-offer { display: flex; align-items: center; gap: 24px; margin: 20px 0; padding: 20px; border: 1px solid #3e5039; border-radius: 9px; background: #121a11; }
 .trade-offer p { margin: 0; color: #b8c1b2; font-size: 14px; line-height: 1.5; }
 .trade-offer .trade-penalty { margin-top: 8px; color: #df6861; font-size: 13px; }
-.trade-spear { position: relative; flex: 0 0 5px; width: 5px; height: 55px; margin-left: 10px; background: #91613a; transform: rotate(35deg); }
-.trade-spear i { position: absolute; left: -5px; top: -13px; width: 15px; height: 17px; background: #b9c2bf; clip-path: polygon(50% 0, 100% 100%, 50% 78%, 0 100%); }
+.trade-spear { position: relative; flex: 0 0 5px; width: 5px; height: 55px; margin-left: 10px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(35deg); }
+.trade-spear i { position: absolute; left: -6px; top: -16px; width: 15px; height: 19px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); }
+.trade-spear::after { content: ''; position: absolute; left: -2px; top: 8px; width: 7px; height: 12px; background: repeating-linear-gradient(0deg, #39251a 0 3px, #d0a35d 3px 4px); }
 .trade-buy { width: 100%; border-color: #8d733c; background: #6d582c; }
 .trade-buy:disabled { cursor: not-allowed; opacity: .45; }
 .lobby-settings { width: min(340px, 100%); display: grid; gap: 8px; margin-top: 18px; padding: 10px 12px; border: 1px solid #384735; border-radius: 9px; background: rgba(18, 27, 17, .72); }

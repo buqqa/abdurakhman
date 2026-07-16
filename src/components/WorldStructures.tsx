@@ -11,6 +11,8 @@ export function WorldStructures({ structures }: { structures: WorldStructure[] }
     <div className="abandoned-warehouse" style={{ left: structure.x, top: structure.y }} aria-label="Заброшенный склад" key={structure.id}>
       <span className="warehouse-roof" /><span className="warehouse-door" />
       <span className="warehouse-window" /><span className="warehouse-sign">СКЛАД</span>
+      <span className="tent-web warehouse-web warehouse-web--left"><i /><i /><i /></span>
+      <span className="tent-web warehouse-web warehouse-web--right"><i /><i /><i /></span>
     </div>
   ));
 }

@@ -72,7 +72,7 @@ export function useGameLoop() {
   });
   const repairBase = () => setGame((state) => {
     if (state.baseHealth === MAX_BASE_HEALTH) return { ...state, message: message.baseFine };
-    if (state.wood < REPAIR_WOOD_COST) return { ...state, message: language === 'en' ? 'You need 5 wood for one repair step.' : language === 'kk' ? 'Бір жөндеу қадамына 5 ағаш керек.' : 'Для одного шага ремонта нужно 5 дерева.' };
+    if (state.wood < REPAIR_WOOD_COST) return { ...state, message: language === 'en' ? 'You need 20 wood for one repair step.' : language === 'kk' ? 'Бір жөндеу қадамына 20 ағаш керек.' : 'Для одного шага ремонта нужно 20 дерева.' };
     const baseHealth = Math.min(MAX_BASE_HEALTH, state.baseHealth + REPAIR_PER_STEP);
     const steps = Math.ceil((MAX_BASE_HEALTH - baseHealth) / REPAIR_PER_STEP);
     return { ...state, wood: state.wood - REPAIR_WOOD_COST, baseHealth, message: steps ? message.repairSteps(steps) : message.repaired };
@@ -94,7 +94,7 @@ export function useGameLoop() {
   const finishNight = () => setGame((state) => {
     if (state.phase !== 'night') return state;
     if (state.day === state.maxNights) return { ...state, phase: 'won', message: message.won, completionTime: Math.floor((Date.now() - startedAt.current - pausedTime.current) / 1000) };
-    return { ...state, day: state.day + 1, phase: 'day', food: Math.max(0, state.food - 1), message: message.newDay };
+    return { ...state, day: state.day + 1, phase: 'day', message: message.newDay };
   });
   const restart = () => setGame(initialState);
   const pauseClock = useCallback(() => { pausedAt.current ??= Date.now(); }, []);
