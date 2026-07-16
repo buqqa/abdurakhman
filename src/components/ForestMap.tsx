@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BASE_POSITION, FENCE_CENTER, FENCE_SLOTS, MAP_HEIGHT, MAP_WIDTH, PLAYER_START } from '../game/mapConfig';
-import { createDailyResources, WORLD_OBJECTS, type CrateKind, type InteractionHandlers } from '../game/interactions';
+import { createDailyResources, HARVEST_DISTANCE, WORLD_OBJECTS, type CrateKind, type InteractionHandlers } from '../game/interactions';
 import { InteractionSystem } from '../game/systems/InteractionSystem';
 import { RepairSystem } from '../game/systems/RepairSystem';
 import { AttackSystem } from '../game/systems/AttackSystem';
-import type { Phase } from '../game/types';
+import type { Phase, Weapon } from '../game/types';
 import { GameCamera } from './GameCamera';
 import { PlayerController, type Position } from './PlayerController';
 import { BaseStructure } from './BaseStructure';
@@ -17,16 +17,20 @@ import { LootCrate } from './LootCrate';
 import { WorldStructures } from './WorldStructures';
 import { createStructure, type StructureKind, type WorldStructure } from '../game/structures';
 import { WaterBottle } from './WaterBottle';
+import { Merchant } from './Merchant';
+import { SPEAR_BONUS } from '../game/config';
 
 interface Footprint extends Position { id: number }
 
 const fenceRotation = (position: Position) => Math.atan2(position.y - FENCE_CENTER.y, position.x - FENCE_CENTER.x) * 180 / Math.PI + 90;
 
-interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
+interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; weapon: Weapon; merchantDay: number; wood: number; onBuySpear: () => void; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
 
-export function ForestMap({ paused, playerNickname, phase, day, baseHealth, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weapon, merchantDay, wood, onBuySpear, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const isNight = phase === 'night';
-  const canMove = !paused && (phase === 'day' || phase === 'night');
+  const [isTradeOpen, setIsTradeOpen] = useState(false);
+  const merchantVisible = phase === 'day' && day === merchantDay && weapon === 'axe';
+  const canMove = !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
   const [objects, setObjects] = useState(WORLD_OBJECTS);
   const treeHits = useRef<Record<string, number>>({});
@@ -100,8 +104,8 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, fenc
   const attackZombie = useCallback((target: { id: string }) => {
     swingAxe();
     playGameSound('chop');
-    hitZombie(target.id);
-  }, [hitZombie, swingAxe]);
+    hitZombie(target.id, weapon === 'spear' ? SPEAR_BONUS : 1);
+  }, [hitZombie, swingAxe, weapon]);
   const breakCrate = useCallback((crate: { id: string; kind: string }) => {
     if ((crateHits.current[crate.id] ?? 0) >= 3) return;
     swingAxe();
@@ -132,6 +136,8 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, fenc
     <><InteractionSystem enabled={canMove} player={player} objects={interactionObjects} handlers={handlers}
       onUnavailable={onUnavailable} onInteracted={collectObject} />
     <AttackSystem enabled={canMove} player={player} targets={phase === 'night' ? zombieTargets : [...trees, ...crates]}
+      attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_BONUS : HARVEST_DISTANCE}
+      cooldown={phase === 'day' && weapon === 'spear' ? 450 * SPEAR_BONUS : 450}
       onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
     <BuildSystem enabled={!paused && phase === 'day'} player={player} onBuild={buildFenceAtSlot} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
@@ -157,7 +163,8 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, fenc
           <i /><i /><i />
         </span>)}
         {footprints.map((footprint) => <span className="footprint" style={{ left: footprint.x + 8, top: footprint.y + 24 }} key={footprint.id} />)}
-        <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} />
+        {merchantVisible && <Merchant player={player} wood={wood} isOpen={isTradeOpen} onOpen={() => setIsTradeOpen(true)} onClose={() => setIsTradeOpen(false)} onBuy={onBuySpear} />}
+        <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} weapon={weapon} />
         {isNight && zombies.map((zombie) => <ZombieSprite zombie={zombie} key={zombie.id} />)}
         {isNight && <div className="night-overlay" />}
       </section>

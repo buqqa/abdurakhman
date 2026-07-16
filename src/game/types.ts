@@ -1,4 +1,5 @@
 export type Phase = 'menu' | 'day' | 'night' | 'won' | 'lost';
+export type Weapon = 'axe' | 'spear';
 
 export interface Fence { id: number; x: number; y: number }
 
@@ -15,4 +16,6 @@ export interface GameState {
   maxNights: number;
   difficulty: string;
   fences: Fence[];
+  weapon: Weapon;
+  merchantDay: number;
 }

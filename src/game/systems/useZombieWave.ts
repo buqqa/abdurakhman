@@ -93,8 +93,8 @@ export function useZombieWave(options: Options) {
     return () => cancelAnimationFrame(frame);
   }, [options.paused, options.phase]);
 
-  const hitZombie = (id: string) => {
-    const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - 1, hitAt: performance.now() } : zombie);
+  const hitZombie = (id: string, damage = 1) => {
+    const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: performance.now() } : zombie);
     const survivors = damaged.filter((zombie) => zombie.health > 0);
     zombiesRef.current = survivors;
     setZombies(survivors);

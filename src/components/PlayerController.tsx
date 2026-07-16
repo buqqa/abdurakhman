@@ -5,6 +5,7 @@ import {
   PLAYER_MAX_SPEED, PLAYER_SIZE,
 } from '../game/mapConfig';
 import { useMovementSystem } from '../game/systems/useMovementSystem';
+import type { Weapon } from '../game/types';
 
 export interface Position { x: number; y: number }
 
@@ -14,10 +15,11 @@ interface Props {
   onMove: (position: Position) => void;
   onFootstep?: (position: Position) => void;
   isAttacking?: boolean;
+  weapon: Weapon;
 }
 
 const start: Position = PLAYER_START;
-export function PlayerController({ nickname, canMove, onMove, onFootstep, isAttacking = false }: Props) {
+export function PlayerController({ nickname, canMove, onMove, onFootstep, isAttacking = false, weapon }: Props) {
   const [position, setPosition] = useState<Position>(start);
   const positionRef = useRef<Position>(start);
   const movement = useMovementSystem(canMove);
@@ -83,7 +85,7 @@ export function PlayerController({ nickname, canMove, onMove, onFootstep, isAtta
       <span className="player__sprite"><span className="player__hair" /><span className="player__head"><i /></span>
       <span className="player__arm player__arm--left" /><span className="player__body" />
       <span className="player__arm player__arm--right" /><span className="player__legs" />
-      <span className="player__axe"><i /></span></span>
+      <span className={`player__weapon player__weapon--${weapon}`}><i /></span></span>
       <span className="player__collider" />
     </div>
   );

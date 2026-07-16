@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { FENCE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, REPAIR_WOOD_COST, WATER_HEAL } from './config';
+import { FENCE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, REPAIR_WOOD_COST, SPEAR_COST, WATER_HEAL } from './config';
 import type { Fence, GameState } from './types';
 import { playGameSound } from '../lib/gameAudio';
 import type { CrateKind } from './interactions';
@@ -8,7 +8,7 @@ import { gameMessages } from '../i18n/gameMessages';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', fences: [],
+  message: '', completionTime: null, maxNights: 5, difficulty: '', fences: [], weapon: 'axe', merchantDay: 5,
 };
 
 export function useGameLoop() {
@@ -25,7 +25,8 @@ export function useGameLoop() {
     pausedAt.current = undefined;
     pausedTime.current = 0;
     fenceId.current = 0;
-    setGame({ ...initialState, phase: 'day', maxNights, difficulty, message: message.prepare });
+    const merchantDay = 5 + Math.floor(Math.random() * 6);
+    setGame({ ...initialState, phase: 'day', maxNights, difficulty, merchantDay, message: message.prepare });
   };
   const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: message.wood }));
   const gatherCrateLoot = (kind: CrateKind) => {
@@ -56,6 +57,11 @@ export function useGameLoop() {
   });
   const interactionUnavailable = () => setGame((state) => ({ ...state, message: message.closer }));
   const attack = () => setGame((state) => ({ ...state, message: message.miss }));
+  const buySpear = () => setGame((state) => {
+    if (state.weapon === 'spear') return state;
+    if (state.wood < SPEAR_COST) return { ...state, message: language === 'en' ? 'You need 50 wood for the spear.' : language === 'kk' ? 'Найзаға 50 ағаш керек.' : 'Для копья нужно 50 дерева.' };
+    return { ...state, wood: state.wood - SPEAR_COST, weapon: 'spear', message: language === 'en' ? 'The spear replaced your axe.' : language === 'kk' ? 'Найза балтаны алмастырды.' : 'Копьё заменило топор.' };
+  });
   const repairBase = () => setGame((state) => {
     if (state.baseHealth === MAX_BASE_HEALTH) return { ...state, message: message.baseFine };
     if (state.wood < REPAIR_WOOD_COST) return { ...state, message: language === 'en' ? 'You need 5 wood for one repair step.' : language === 'kk' ? 'Бір жөндеу қадамына 5 ағаш керек.' : 'Для одного шага ремонта нужно 5 дерева.' };
@@ -98,5 +104,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
 }

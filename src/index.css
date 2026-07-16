@@ -132,9 +132,11 @@ button { font: inherit; }
 .player__arm--left { left: 4px; transform: rotate(8deg); }
 .player__arm--right { right: 3px; transform: rotate(-28deg); }
 .player__legs { position: absolute; left: 8px; bottom: -1px; width: 15px; height: 8px; border-left: 5px solid #34475a; border-right: 5px solid #34475a; z-index: 1; }
-.player__axe { position: absolute; right: -5px; top: 7px; width: 4px; height: 19px; background: #7a5232; transform: rotate(-40deg); transform-origin: bottom; z-index: 3; }
-.player__axe i { position: absolute; left: -5px; top: -2px; width: 13px; height: 7px; border: 2px solid #354044; background: #8e9a98; }
-.player--attacking .player__axe { animation: axe-swing .26s ease-out; }
+.player__weapon { position: absolute; right: -5px; top: 7px; width: 4px; height: 19px; background: #7a5232; transform: rotate(-40deg); transform-origin: bottom; z-index: 3; }
+.player__weapon--axe i { position: absolute; left: -5px; top: -2px; width: 13px; height: 7px; border: 2px solid #354044; background: #8e9a98; }
+.player__weapon--spear { right: -7px; top: 1px; width: 3px; height: 28px; background: linear-gradient(90deg, #68452b, #a87745); }
+.player__weapon--spear i { position: absolute; left: -3px; top: -7px; width: 9px; height: 11px; border: 1px solid #303b3d; background: #aeb8b5; clip-path: polygon(50% 0, 100% 100%, 50% 77%, 0 100%); }
+.player--attacking .player__weapon { animation: axe-swing .26s ease-out; }
 .player--attacking .player__arm--right { animation: attack-arm .26s ease-out; }
 @keyframes axe-swing { 0% { transform: rotate(-88deg); } 55% { transform: rotate(28deg); } 100% { transform: rotate(-40deg); } }
 @keyframes attack-arm { 0% { transform: rotate(-52deg); } 55% { transform: rotate(18deg); } 100% { transform: rotate(-28deg); } }
@@ -153,6 +155,14 @@ button { font: inherit; }
 @keyframes footprint-fade { 70% { opacity: .65; } 100% { opacity: 0; } }
 .player__collider { position: absolute; inset: 0; border: 1px dashed rgba(234, 221, 180, .28); border-radius: 50%; }
 .controls { margin: 8px 2px 0; color: #8e9c89; font-size: 13px; }
+.merchant { position: absolute; width: 34px; height: 43px; z-index: 4; cursor: context-menu; filter: drop-shadow(0 3px 2px rgba(12, 18, 10, .65)); }
+.merchant__name, .merchant__hint { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 8px; background: rgba(19, 28, 17, .92); }
+.merchant__name { bottom: 48px; padding: 2px 7px; color: #f0d887; font-size: 10px; }
+.merchant__hint { top: 47px; padding: 3px 7px; color: #cbd4c5; font-size: 9px; }
+.merchant__head { position: absolute; left: 9px; top: 2px; width: 17px; height: 16px; border: 2px solid #513621; border-radius: 50%; background: #bd8d61; }
+.merchant__head::after { content: ''; position: absolute; left: -4px; top: -6px; width: 21px; height: 9px; border-radius: 50% 50% 2px 2px; background: #70512f; }
+.merchant__body { position: absolute; left: 7px; top: 17px; width: 22px; height: 25px; border: 2px solid #3a3024; border-radius: 4px; background: #7d613c; }
+.merchant__pack { position: absolute; left: -1px; top: 19px; width: 12px; height: 20px; border: 2px solid #3e2c1e; border-radius: 5px; background: #9a6b3e; }
 .status { display: flex; justify-content: space-between; align-items: center; gap: 20px; min-height: 92px; padding: 16px 0; }
 .actions { display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; }
 button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; cursor: pointer; color: #edf0e5; background: #2c3a2a; }
