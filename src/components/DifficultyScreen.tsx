@@ -6,7 +6,7 @@ interface Difficulty { name: string; nights: number; description: TranslationKey
 const difficulties: Difficulty[] = [
   { name: 'PEACEFUL', nights: 5, description: 'rookieInfo' },
   { name: 'SURVIVOR', nights: 10, description: 'survivorInfo' },
-  { name: 'NIGHTMARE', nights: 20, description: 'nightmareInfo' },
+  { name: 'HARDCORE', nights: 20, description: 'nightmareInfo' },
 ];
 
 export function DifficultyScreen({ onSelect }: { onSelect: (nights: number, name: string) => void }) {
