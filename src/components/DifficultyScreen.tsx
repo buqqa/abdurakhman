@@ -1,11 +1,11 @@
 import { useI18n } from '../i18n/I18nContext';
 
-interface Difficulty { name: string; nights: number; icon: string }
+interface Difficulty { name: string; nights: number }
 
 const difficulties: Difficulty[] = [
-  { name: 'PEACEFUL', nights: 15, icon: '🌿' },
-  { name: 'SURVIVOR', nights: 25, icon: '🔥' },
-  { name: 'HARDCORE', nights: 50, icon: '☠️' },
+  { name: 'PEACEFUL', nights: 15 },
+  { name: 'SURVIVOR', nights: 25 },
+  { name: 'HARDCORE', nights: 50 },
 ];
 
 export function DifficultyScreen({ onSelect }: { onSelect: (nights: number, name: string) => void }) {
@@ -32,7 +32,6 @@ export function DifficultyScreen({ onSelect }: { onSelect: (nights: number, name
       <div className="difficulty-grid">
         {difficulties.map((difficulty) => (
           <button className="difficulty-card" onClick={() => onSelect(difficulty.nights, difficulty.name)} key={difficulty.name}>
-            <i className="difficulty-icon" aria-hidden="true">{difficulty.icon}</i>
             <strong>{difficulty.name}</strong><span>{difficulty.nights} {t('nights')}</span><small>{describe(difficulty)}</small>
           </button>
         ))}
