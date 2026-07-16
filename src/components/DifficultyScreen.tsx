@@ -4,7 +4,7 @@ import type { TranslationKey } from '../i18n/translations';
 interface Difficulty { name: string; nights: number; description: TranslationKey }
 
 const difficulties: Difficulty[] = [
-  { name: 'ROOKIE — PEACEFUL', nights: 5, description: 'rookieInfo' },
+  { name: 'PEACEFUL', nights: 5, description: 'rookieInfo' },
   { name: 'SURVIVOR', nights: 10, description: 'survivorInfo' },
   { name: 'NIGHTMARE', nights: 20, description: 'nightmareInfo' },
 ];
