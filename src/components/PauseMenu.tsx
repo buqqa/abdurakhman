@@ -11,7 +11,7 @@ export function PauseMenu({ onContinue, onEnd }: Props) {
       : { title: 'ПАУЗА', continue: 'Продолжить', end: 'Завершить выживание' };
   return (
     <div className="pause-backdrop"><section className="pause-menu">
-      <span>Ⅱ</span><h2>{text.title}</h2>
+      <h2>{text.title}</h2>
       <button onClick={onContinue}>{text.continue}</button>
       <button className="pause-menu__end" onClick={onEnd}>{text.end}</button>
     </section></div>

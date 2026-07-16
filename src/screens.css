@@ -61,7 +61,6 @@
 .guest-button:hover { background: #263324; }
 .pause-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(6, 10, 7, .82); backdrop-filter: blur(3px); z-index: 40; }
 .pause-menu { width: min(330px, 100%); display: flex; flex-direction: column; gap: 10px; padding: 28px; border: 1px solid #687861; border-radius: 14px; text-align: center; background: #172117; box-shadow: 0 24px 80px #040704; }
-.pause-menu > span { color: #d6bd70; font-size: 30px; line-height: 1; }
 .pause-menu h2 { margin: 0 0 12px; color: #ede6cd; font-size: 27px; letter-spacing: .12em; }
 .pause-menu button { width: 100%; }
 .pause-menu .pause-menu__end { border-color: #7d4b45; color: #e7c6c1; background: #4f302d; }

@@ -28,7 +28,9 @@ export function useGameLoop() {
     const merchantDay = 5 + Math.floor(Math.random() * 6);
     setGame({ ...initialState, phase: 'day', maxNights, difficulty, merchantDay, message: message.prepare });
   };
-  const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: message.wood }));
+  const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: state.weapon === 'spear'
+    ? language === 'en' ? 'The spear yielded 2 wood.' : language === 'kk' ? 'Найзамен 2 ағаш алынды.' : 'Копьём добыто 2 дерева.'
+    : message.wood }));
   const gatherCrateLoot = (kind: CrateKind) => {
     if (kind === 'crate-wood') {
       setGame((state) => ({ ...state, wood: state.wood + 8, message: message.stockLoot }));
@@ -56,7 +58,9 @@ export function useGameLoop() {
     return { ...state, water: state.water - 1, playerHealth, message: message.waterHeal((playerHealth - state.playerHealth) / 10) };
   });
   const interactionUnavailable = () => setGame((state) => ({ ...state, message: message.closer }));
-  const attack = () => setGame((state) => ({ ...state, message: message.miss }));
+  const attack = () => setGame((state) => ({ ...state, message: state.weapon === 'spear'
+    ? language === 'en' ? 'The spear cannot reach the target.' : language === 'kk' ? 'Найза нысанаға жетпейді.' : 'Копьё не достаёт до цели.'
+    : message.miss }));
   const buySpear = () => setGame((state) => {
     if (state.hasSpear) return state;
     if (state.wood < SPEAR_COST) return { ...state, message: language === 'en' ? 'You need 50 wood for the spear.' : language === 'kk' ? 'Найзаға 50 ағаш керек.' : 'Для копья нужно 50 дерева.' };
