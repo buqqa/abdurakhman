@@ -18,6 +18,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
   const [isPaused, setIsPaused] = useState(false);
   const [pendingGame, setPendingGame] = useState<{ nights: number; difficulty: string }>();
   const [device, setDevice] = useState<DeviceMode>();
+  const [mobileHeight, setMobileHeight] = useState(() => window.innerHeight);
   const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
   useEffect(() => {
     const togglePause = (event: KeyboardEvent) => {
@@ -37,6 +38,13 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
     window.addEventListener('keydown', handleWeaponSwitch);
     return () => window.removeEventListener('keydown', handleWeaponSwitch);
   }, [isPaused, switchWeapon]);
+  useEffect(() => {
+    if (device !== 'mobile') return;
+    setMobileHeight(window.innerHeight);
+    const lockAfterRotation = () => window.setTimeout(() => setMobileHeight(window.innerHeight), 120);
+    window.addEventListener('orientationchange', lockAfterRotation);
+    return () => window.removeEventListener('orientationchange', lockAfterRotation);
+  }, [device]);
   const returnToMenu = () => { setPendingGame(undefined); setDevice(undefined); restart(); };
   if (game.phase === 'menu') {
     if (pendingGame) return <DeviceScreen onBack={() => setPendingGame(undefined)} onSelect={(selectedDevice) => {
@@ -48,7 +56,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
   const interactionHandlers = { building: repairBase, food: gatherFood, water: gatherWater };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
-    <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`}>
+    <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
       {device !== 'mobile' && <><div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">{t('goal', { count: game.maxNights })}</span></div>
       <GameHud game={game} /><PlayerStats health={game.playerHealth} /></>}
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}

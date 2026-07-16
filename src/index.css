@@ -193,8 +193,9 @@ button { font: inherit; }
 button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; cursor: pointer; color: #edf0e5; background: #2c3a2a; }
 button:hover { background: #3c5039; } button.danger { border-color: #82544b; background: #653e37; }
 .status--result { justify-content: center; flex-direction: column; font-size: 20px; }
-.game-shell--mobile { position: fixed; inset: 0; width: 100vw; height: 100dvh; padding: 0; overflow: hidden; overscroll-behavior: none; }
-.game-shell--mobile .map-viewport { position: relative; width: 100vw; max-width: none; height: 100dvh; margin: 0; border-radius: 0; }
+.game-shell--mobile { position: fixed; inset: 0; width: 100vw; padding: 0; overflow: hidden; overscroll-behavior: none; }
+.game-shell--mobile .map-viewport { position: relative; width: 100vw; max-width: none; height: 100%; margin: 0; border-radius: 0; }
+.game-shell--mobile .camera-world { transition: none; will-change: transform; }
 .game-shell--mobile .status { position: fixed; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 19; width: max-content; min-height: 0; padding: 0; transform: translateX(-50%); background: transparent; }
 .game-shell--mobile .status p { display: none; }.game-shell--mobile .status button { padding: 9px 13px; font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); }
 .game-shell--mobile .status .actions { width: 100%; justify-content: center; }
