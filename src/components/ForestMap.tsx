@@ -60,7 +60,7 @@ export function ForestMap({ paused, playerNickname, phase, day, difficulty, base
   }, [day, phase]);
   const updatePlayer = useCallback((position: Position) => setPlayer(position), []);
   const { zombies, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
-  const swingAxe = useCallback(() => {
+  const swingWeapon = useCallback(() => {
     setIsSwinging(true);
     window.setTimeout(() => setIsSwinging(false), 260);
   }, []);
@@ -80,23 +80,23 @@ export function ForestMap({ paused, playerNickname, phase, day, difficulty, base
     if ((treeHits.current[tree.id] ?? 0) >= 3) return;
     onHarvest();
     playGameSound('chop');
-    swingAxe();
+    swingWeapon();
     const hits = (treeHits.current[tree.id] ?? 0) + 1;
     treeHits.current[tree.id] = hits;
     const falling = hits >= 3;
     setTreeAnimation({ id: tree.id, falling });
     window.setTimeout(() => setTreeAnimation(undefined), falling ? 620 : 260);
     if (falling) window.setTimeout(() => setObjects((items) => items.filter((item) => item.id !== tree.id)), 600);
-  }, [onHarvest, swingAxe]);
+  }, [onHarvest, swingWeapon]);
   const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: 'zombie', x: zombie.x, y: zombie.y }));
   const attackZombie = useCallback((target: { id: string }) => {
-    swingAxe();
+    swingWeapon();
     playGameSound('chop');
     hitZombie(target.id, weapon === 'spear' ? SPEAR_BONUS : 1);
-  }, [hitZombie, swingAxe, weapon]);
+  }, [hitZombie, swingWeapon, weapon]);
   const breakCrate = useCallback((crate: { id: string; kind: string }) => {
     if ((crateHits.current[crate.id] ?? 0) >= 3) return;
-    swingAxe();
+    swingWeapon();
     playGameSound('chop');
     const hits = (crateHits.current[crate.id] ?? 0) + 1;
     crateHits.current[crate.id] = hits;
@@ -111,10 +111,12 @@ export function ForestMap({ paused, playerNickname, phase, day, difficulty, base
       const source = items.find((item) => item.id === crate.id);
       if (!source) return remaining;
       const drops = [{ id: `food-drop-${crate.id}`, kind: 'food', x: source.x - 8, y: source.y + 9 }];
-      if (Math.random() < .15) drops.push({ id: `water-drop-${crate.id}`, kind: 'water', x: source.x + 17, y: source.y + 9 });
+      const isTentCrate = crate.id.startsWith('structure-tent-crate-');
+      const dropsWater = isTentCrate ? crate.id.endsWith('-0') : Math.random() < .15;
+      if (dropsWater) drops.push({ id: `water-drop-${crate.id}`, kind: 'water', x: source.x + 17, y: source.y + 9 });
       return [...remaining, ...drops];
     }), 480);
-  }, [onCrateLoot, swingAxe]);
+  }, [onCrateLoot, swingWeapon]);
   const attackResource = useCallback((target: { id: string; kind: string }) => {
     if (target.kind === 'tree') harvestTree(target);
     else breakCrate(target);

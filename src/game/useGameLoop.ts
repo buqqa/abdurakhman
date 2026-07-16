@@ -8,7 +8,7 @@ import { gameMessages } from '../i18n/gameMessages';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'axe', hasSpear: false, merchantDay: 5,
+  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, merchantDay: 5,
 };
 
 export function useGameLoop() {
@@ -28,10 +28,10 @@ export function useGameLoop() {
   };
   const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: state.weapon === 'spear'
     ? language === 'en' ? 'The spear yielded 2 wood.' : language === 'kk' ? 'Найзамен 2 ағаш алынды.' : 'Копьём добыто 2 дерева.'
-    : message.wood }));
+    : language === 'en' ? 'The hammer yielded 2 wood.' : language === 'kk' ? 'Балғамен 2 ағаш алынды.' : 'Молотом добыто 2 дерева.' }));
   const gatherCrateLoot = (kind: CrateKind) => {
     if (kind === 'crate-wood') {
-      setGame((state) => ({ ...state, wood: state.wood + 8, message: message.stockLoot }));
+      setGame((state) => ({ ...state, wood: state.wood + 10, message: language === 'en' ? 'The warehouse crate contained 10 wood.' : language === 'kk' ? 'Қойма жәшігінен 10 ағаш табылды.' : 'В ящике склада найдено 10 дерева.' }));
     } else {
       const emptyText = language === 'en' ? 'The crate was empty. You received 2 wood from it.' : language === 'kk' ? 'Жәшік бос болды. Одан 2 ағаш алынды.' : 'Ящик оказался пустым. Получено 2 дерева от ящика.';
       setGame((state) => ({ ...state, wood: state.wood + 2, message: kind === 'crate-food' ? message.foodLoot : emptyText }));
@@ -58,7 +58,7 @@ export function useGameLoop() {
   const interactionUnavailable = () => setGame((state) => ({ ...state, message: message.closer }));
   const attack = () => setGame((state) => ({ ...state, message: state.weapon === 'spear'
     ? language === 'en' ? 'The spear cannot reach the target.' : language === 'kk' ? 'Найза нысанаға жетпейді.' : 'Копьё не достаёт до цели.'
-    : message.miss }));
+    : language === 'en' ? 'The hammer cannot reach the target.' : language === 'kk' ? 'Балға нысанаға жетпейді.' : 'Молот не достаёт до цели.' }));
   const buySpear = () => setGame((state) => {
     if (state.hasSpear) return state;
     if (state.wood < SPEAR_COST) return { ...state, message: language === 'en' ? 'You need 50 wood for the spear.' : language === 'kk' ? 'Найзаға 50 ағаш керек.' : 'Для копья нужно 50 дерева.' };
@@ -66,8 +66,8 @@ export function useGameLoop() {
   });
   const switchWeapon = () => setGame((state) => {
     if (!state.hasSpear || (state.phase !== 'day' && state.phase !== 'night')) return state;
-    const weapon = state.weapon === 'spear' ? 'axe' : 'spear';
-    const weaponName = language === 'en' ? (weapon === 'spear' ? 'Spear' : 'Axe') : language === 'kk' ? (weapon === 'spear' ? 'Найза' : 'Балта') : weapon === 'spear' ? 'Копьё' : 'Топор';
+    const weapon = state.weapon === 'spear' ? 'hammer' : 'spear';
+    const weaponName = language === 'en' ? (weapon === 'spear' ? 'Spear' : 'Hammer') : language === 'kk' ? (weapon === 'spear' ? 'Найза' : 'Балға') : weapon === 'spear' ? 'Копьё' : 'Молот';
     return { ...state, weapon, message: language === 'en' ? `${weaponName} equipped.` : language === 'kk' ? `${weaponName} жабдықталды.` : `${weaponName} экипирован.` };
   });
   const repairBase = () => setGame((state) => {

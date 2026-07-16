@@ -1,5 +1,5 @@
 export type Phase = 'menu' | 'day' | 'night' | 'won' | 'lost';
-export type Weapon = 'axe' | 'spear';
+export type Weapon = 'hammer' | 'spear';
 
 export interface GameState {
   day: number;
