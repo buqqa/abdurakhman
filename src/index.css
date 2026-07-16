@@ -193,6 +193,14 @@ button { font: inherit; }
 button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; cursor: pointer; color: #edf0e5; background: #2c3a2a; }
 button:hover { background: #3c5039; } button.danger { border-color: #82544b; background: #653e37; }
 .status--result { justify-content: center; flex-direction: column; font-size: 20px; }
+.game-shell--mobile { width: 100%; height: 100svh; padding: 0; overflow: hidden; }
+.game-shell--mobile .map-viewport { position: relative; width: 100%; max-width: none; height: 100svh; border-radius: 0; }
+.game-shell--mobile .status { position: fixed; left: 50%; bottom: 164px; z-index: 17; width: min(360px, calc(100% - 180px)); min-height: 0; padding: 8px 10px; transform: translateX(-50%); border: 1px solid rgba(84, 105, 79, .75); border-radius: 9px; background: rgba(17, 27, 16, .86); }
+.game-shell--mobile .status p { margin: 0; font-size: 11px; }.game-shell--mobile .status button { padding: 7px 9px; font-size: 11px; }
+.game-shell--mobile .inventory-hint { position: fixed; right: 16px; top: 72px; z-index: 17; }
+.mobile-game-hud { position: absolute; left: 12px; right: 12px; top: 10px; z-index: 14; padding: 9px 11px; border: 1px solid rgba(117, 138, 109, .72); border-radius: 9px; background: rgba(15, 24, 15, .84); box-shadow: 0 4px 14px rgba(0, 0, 0, .3); pointer-events: none; }
+.mobile-game-hud__row { display: flex; justify-content: space-between; align-items: center; color: #eceddc; font-size: 12px; }.mobile-game-hud__row span { color: #d8c77d; }
+.mobile-game-hud__health { height: 7px; margin-top: 7px; overflow: hidden; border-radius: 5px; background: #332927; }.mobile-game-hud__health i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a93d38, #dc5d50); transition: width .2s; }
 .mobile-controls { position: fixed; left: 0; right: 0; bottom: 18px; z-index: 18; display: flex; align-items: end; justify-content: space-between; padding: 0 20px; pointer-events: none; touch-action: none; }
 .mobile-controls button { pointer-events: auto; user-select: none; -webkit-user-select: none; touch-action: none; }
 .mobile-controls button:not(.mobile-attack) { border-color: #64785f !important; background: rgba(57, 76, 53, .94) !important; }

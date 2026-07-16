@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { MAP_HEIGHT, MAP_WIDTH, PLAYER_SIZE } from '../game/mapConfig';
 import type { Position } from './PlayerController';
 
-export function GameCamera({ player, children }: { player: Position; children: ReactNode }) {
+export function GameCamera({ player, children, overlay }: { player: Position; children: ReactNode; overlay?: ReactNode }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [viewport, setViewport] = useState({ width: 700, height: 400 });
 
@@ -19,5 +19,5 @@ export function GameCamera({ player, children }: { player: Position; children: R
   const cameraX = Math.max(0, Math.min(MAP_WIDTH - viewport.width, centerX - viewport.width / 2));
   const cameraY = Math.max(0, Math.min(MAP_HEIGHT - viewport.height, centerY - viewport.height / 2));
 
-  return <div className="map-viewport" ref={viewportRef}><div className="camera-world" style={{ transform: `translate(${-cameraX}px, ${-cameraY}px)` }}>{children}</div></div>;
+  return <div className="map-viewport" ref={viewportRef}><div className="camera-world" style={{ transform: `translate(${-cameraX}px, ${-cameraY}px)` }}>{children}</div>{overlay}</div>;
 }
