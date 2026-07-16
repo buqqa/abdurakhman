@@ -82,7 +82,7 @@ button { font: inherit; }
 .chicken-leg__bone { position: absolute; left: 15px; top: 12px; width: 10px; height: 5px; border: 1px solid #806b51; border-radius: 3px; background: #ead9b7; transform: rotate(18deg); }
 .chicken-leg__bone i, .chicken-leg__bone b { position: absolute; right: -4px; width: 6px; height: 6px; border: 1px solid #806b51; border-radius: 50%; background: #f1dfbc; }
 .chicken-leg__bone i { top: -3px; }.chicken-leg__bone b { bottom: -3px; }
-.inventory-chicken { margin: 4px 0 2px 3px; transform: rotate(-28deg) scale(1.15); transform-origin: left top; }
+.inventory-chicken { top: 5px; margin: 5px 0 7px 5px; transform: rotate(-28deg) scale(1.05); transform-origin: left top; }
 .map-food-drop { position: absolute; z-index: 2; animation: food-drop .45s ease-out; }
 .map-water-bottle { position: absolute; width: 16px; height: 28px; z-index: 2; filter: drop-shadow(2px 3px 2px rgba(19, 39, 48, .55)); animation: food-drop .45s ease-out; }
 .water-bottle__cap { position: absolute; left: 5px; top: 0; width: 7px; height: 5px; border: 1px solid #24485e; border-radius: 2px 2px 0 0; background: #63a9cc; }
