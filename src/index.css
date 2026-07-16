@@ -2,7 +2,7 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; }
 button { font: inherit; }
-.game-shell { width: min(920px, 100%); margin: auto; padding: 28px 20px 48px; }
+.game-shell { width: min(1080px, 100%); margin: auto; padding: 28px 20px 48px; }
 .title-row { display: flex; justify-content: space-between; align-items: end; margin-bottom: 18px; }
 .title-row p { margin: 0 0 3px; color: #91a08b; text-transform: uppercase; letter-spacing: .16em; font-size: 12px; }
 .title-row h1 { margin: 0; color: #e7d7a1; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 5vw, 50px); font-style: italic; letter-spacing: .025em; text-shadow: 0 2px #3b2c20, 0 5px 14px rgba(0, 0, 0, .38); }
@@ -31,7 +31,7 @@ button { font: inherit; }
 .inventory-slot strong { position: absolute; right: 12px; bottom: 10px; font-size: 22px; }
 .inventory-slot .use-item { position: absolute; right: 9px; top: 9px; padding: 5px 8px; font-size: 12px; }
 .inventory-help { margin: 0; color: #7f8d7b; font-size: 12px; }
-.map-viewport { width: 100%; max-width: 700px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; }
+.map-viewport { width: 100%; max-width: 900px; height: 520px; margin: 0 auto; overflow: hidden; border-radius: 10px; }
 .camera-world { width: max-content; height: max-content; transition: transform 60ms linear; }
 .forest-map { position: relative; overflow: hidden; border: 14px solid #293326; background-color: #49643e; background-image: radial-gradient(ellipse at 20% 25%, rgba(119, 146, 76, .28) 0 2px, transparent 3px), radial-gradient(ellipse at 72% 68%, rgba(34, 70, 37, .25) 0 3px, transparent 4px), linear-gradient(115deg, transparent 48%, rgba(216, 224, 146, .1) 49% 51%, transparent 52%); background-size: 37px 31px, 53px 47px, 19px 23px; transition: background-color .4s; }
 .forest-map::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .45; background-image: repeating-linear-gradient(78deg, transparent 0 24px, rgba(31, 75, 35, .35) 25px 26px, transparent 27px 42px); mix-blend-mode: multiply; }
