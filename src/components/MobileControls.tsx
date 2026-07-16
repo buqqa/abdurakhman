@@ -1,5 +1,13 @@
 interface Props { enabled: boolean }
 
+type IconKind = 'backpack' | 'interact' | 'repair';
+
+function MobileIcon({ kind }: { kind: IconKind }) {
+  if (kind === 'backpack') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V5c0-2 1.5-3 4-3s4 1 4 3v2M6 8h12c1.1 0 2 .9 2 2v10H4V10c0-1.1.9-2 2-2Zm2 6h8v6H8v-6ZM4 12H2v5h2m16-5h2v5h-2" /></svg>;
+  if (kind === 'interact') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v5-3a2 2 0 0 1 4 0v4-2a2 2 0 0 1 4 0v5c0 5-3 8-8 8h-1c-3 0-5-2-7-5l-2-3a2 2 0 0 1 3-2l3 3" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5-3 3 3-3 5-3-3-8 8 2 2-4 4-3-3 4-4 2 2 8-8-3-3Z" /></svg>;
+}
+
 function sendKey(code: string, type: 'keydown' | 'keyup') {
   window.dispatchEvent(new KeyboardEvent(type, { code, bubbles: true }));
 }
@@ -24,9 +32,9 @@ export function MobileControls({ enabled }: Props) {
       <DirectionButton code="KeyS" label="↓" enabled={enabled} />
     </div>
     <div className="mobile-actions">
-      <button className="mobile-interact" disabled={!enabled} onClick={() => sendKey('KeyE', 'keydown')} aria-label="Взаимодействовать">👆</button>
-      <button className="mobile-inventory" disabled={!enabled} onClick={() => sendKey('KeyB', 'keydown')} aria-label="Открыть инвентарь">🎒</button>
-      <button className="mobile-repair" disabled={!enabled} onClick={repair} aria-label="Ремонт базы">🔨</button>
+      <button className="mobile-interact" disabled={!enabled} onClick={() => sendKey('KeyE', 'keydown')} aria-label="Взаимодействовать"><MobileIcon kind="interact" /></button>
+      <button className="mobile-inventory" disabled={!enabled} onClick={() => sendKey('KeyB', 'keydown')} aria-label="Открыть инвентарь"><MobileIcon kind="backpack" /></button>
+      <button className="mobile-repair" disabled={!enabled} onClick={repair} aria-label="Ремонт базы"><MobileIcon kind="repair" /></button>
       <button className="mobile-attack" disabled={!enabled} onPointerDown={(event) => { event.preventDefault(); attack(); }} aria-label="Удар">⚔</button>
     </div>
   </aside>;
