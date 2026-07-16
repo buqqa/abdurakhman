@@ -108,12 +108,15 @@ export function playGameSound(sound: GameSound) {
     window.setTimeout(() => tone(context, 390, 780, .28, .075, 'triangle'), 150);
   } else if (sound === 'victory') {
     ambientGain?.gain.setTargetAtTime(masterVolume * .018, context.currentTime, .18);
-    [392, 494, 587, 784].forEach((note, index) => window.setTimeout(() => tone(context, note, note * 1.01, .55, .14, 'triangle'), index * 190));
+    [392, 494, 587, 659, 784, 988].forEach((note, index) => window.setTimeout(() => {
+      tone(context, note, note * 1.01, .48, .11, 'triangle');
+      if (index === 3 || index === 5) tone(context, note / 2, note / 2, .65, .055, 'sine');
+    }, index * 280));
   } else {
     ambientGain?.gain.setTargetAtTime(masterVolume * .012, context.currentTime, .18);
-    tone(context, 180, 42, .8, .16, 'sawtooth');
-    noise(context, .55, .075, 380);
-    window.setTimeout(() => tone(context, 130, 52, .9, .13, 'sawtooth'), 430);
-    window.setTimeout(() => tone(context, 92, 38, 1.1, .11, 'triangle'), 820);
+    [196, 165, 131, 98, 65].forEach((note, index) => window.setTimeout(() => {
+      tone(context, note, Math.max(38, note * .62), .72, .1, index < 3 ? 'sawtooth' : 'triangle');
+      if (index === 0 || index === 3) noise(context, .42, .045, 360 - index * 45);
+    }, index * 360));
   }
 }
