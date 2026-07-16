@@ -80,7 +80,7 @@ export function PlayerController({ nickname, canMove, onMove, onFootstep, isAtta
   }, [canMove, movement, onFootstep, onMove]);
 
   return (
-    <div className={`player ${facingRight ? 'player--mirrored' : ''} ${isWalking ? 'player--walking' : ''} ${isAttacking ? 'player--attacking' : ''}`} style={{ transform: `translate(${position.x}px, ${position.y}px)` }} aria-label="Игрок">
+    <div className={`player player--${weapon} ${facingRight ? 'player--mirrored' : ''} ${isWalking ? 'player--walking' : ''} ${isAttacking ? 'player--attacking' : ''}`} style={{ transform: `translate(${position.x}px, ${position.y}px)` }} aria-label="Игрок">
       <span className="player__nickname">{nickname}</span>
       <span className="player__sprite"><span className="player__hair" /><span className="player__head"><i /></span>
       <span className="player__arm player__arm--left" /><span className="player__body" />

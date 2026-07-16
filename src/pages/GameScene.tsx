@@ -14,7 +14,7 @@ import { PauseMenu } from '../components/PauseMenu';
 export function GameScene({ playerNickname }: { playerNickname: string }) {
   const { t } = useI18n();
   const [isPaused, setIsPaused] = useState(false);
-  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
+  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
   useEffect(() => {
     const togglePause = (event: KeyboardEvent) => {
       if (event.code !== 'Escape' || (game.phase !== 'day' && game.phase !== 'night')) return;
@@ -26,6 +26,13 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
     window.addEventListener('keydown', togglePause);
     return () => window.removeEventListener('keydown', togglePause);
   }, [game.phase, pauseClock, resumeClock]);
+  useEffect(() => {
+    const handleWeaponSwitch = (event: KeyboardEvent) => {
+      if (event.code === 'KeyQ' && !event.repeat && !isPaused) switchWeapon();
+    };
+    window.addEventListener('keydown', handleWeaponSwitch);
+    return () => window.removeEventListener('keydown', handleWeaponSwitch);
+  }, [isPaused, switchWeapon]);
   if (game.phase === 'menu') return <DifficultyScreen onSelect={startGame} />;
   const interactionHandlers = { building: repairBase, food: gatherFood, water: gatherWater };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
@@ -34,7 +41,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
       <div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">{t('goal', { count: game.maxNights })}</span></div>
       <GameHud game={game} />
       <PlayerStats health={game.playerHealth} />
-      <GameWorld paused={isPaused} playerNickname={playerNickname} phase={game.phase} day={game.day} baseHealth={game.baseHealth} weapon={game.weapon} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
+      <GameWorld paused={isPaused} playerNickname={playerNickname} phase={game.phase} day={game.day} baseHealth={game.baseHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot} fences={game.fences} onBuildFence={buildFence}
         onPlayerDamage={damagePlayer} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} />
@@ -45,7 +52,7 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={restart} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={restart} />}
       {isPaused && <PauseMenu onContinue={() => { resumeClock(); setIsPaused(false); }}
-        onRestart={() => { resumeClock(); setIsPaused(false); restart(); }} />}
+        onEnd={() => { resumeClock(); setIsPaused(false); restart(); }} />}
     </main>
   );
 }

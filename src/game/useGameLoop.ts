@@ -8,7 +8,7 @@ import { gameMessages } from '../i18n/gameMessages';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', fences: [], weapon: 'axe', merchantDay: 5,
+  message: '', completionTime: null, maxNights: 5, difficulty: '', fences: [], weapon: 'axe', hasSpear: false, merchantDay: 5,
 };
 
 export function useGameLoop() {
@@ -58,9 +58,15 @@ export function useGameLoop() {
   const interactionUnavailable = () => setGame((state) => ({ ...state, message: message.closer }));
   const attack = () => setGame((state) => ({ ...state, message: message.miss }));
   const buySpear = () => setGame((state) => {
-    if (state.weapon === 'spear') return state;
+    if (state.hasSpear) return state;
     if (state.wood < SPEAR_COST) return { ...state, message: language === 'en' ? 'You need 50 wood for the spear.' : language === 'kk' ? 'Найзаға 50 ағаш керек.' : 'Для копья нужно 50 дерева.' };
-    return { ...state, wood: state.wood - SPEAR_COST, weapon: 'spear', message: language === 'en' ? 'The spear replaced your axe.' : language === 'kk' ? 'Найза балтаны алмастырды.' : 'Копьё заменило топор.' };
+    return { ...state, wood: state.wood - SPEAR_COST, weapon: 'spear', hasSpear: true, message: language === 'en' ? 'Spear equipped. Press Q to switch weapons.' : language === 'kk' ? 'Найза жабдықталды. Қаруды ауыстыру үшін Q бас.' : 'Копьё экипировано. Нажми Q, чтобы сменить оружие.' };
+  });
+  const switchWeapon = () => setGame((state) => {
+    if (!state.hasSpear || (state.phase !== 'day' && state.phase !== 'night')) return state;
+    const weapon = state.weapon === 'spear' ? 'axe' : 'spear';
+    const weaponName = language === 'en' ? (weapon === 'spear' ? 'Spear' : 'Axe') : language === 'kk' ? (weapon === 'spear' ? 'Найза' : 'Балта') : weapon === 'spear' ? 'Копьё' : 'Топор';
+    return { ...state, weapon, message: language === 'en' ? `${weaponName} equipped.` : language === 'kk' ? `${weaponName} жабдықталды.` : `${weaponName} экипирован.` };
   });
   const repairBase = () => setGame((state) => {
     if (state.baseHealth === MAX_BASE_HEALTH) return { ...state, message: message.baseFine };
@@ -104,5 +110,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, buildFence, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
 }

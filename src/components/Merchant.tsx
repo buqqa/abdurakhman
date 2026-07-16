@@ -11,15 +11,15 @@ interface Props { player: Position; wood: number; isOpen: boolean; onOpen: () =>
 export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props) {
   const { language } = useI18n();
   const text = language === 'en'
-    ? { name: 'Merchant', hint: 'RMB — trade', title: 'Forest merchant', offer: 'Spear', details: '+10% attack range and damage · 10% slower wood gathering', buy: 'Trade for 50 wood', far: 'Come closer to trade' }
+    ? { name: 'Merchant', hint: 'RMB — trade', title: 'Forest merchant', offer: 'Spear', buff: '+20% attack range and damage', penalty: '20% slower wood gathering', buy: 'Trade for 50 wood' }
     : language === 'kk'
-      ? { name: 'Саудагер', hint: 'ОЖБ — айырбас', title: 'Орман саудагері', offer: 'Найза', details: '+10% шабуыл қашықтығы мен зақым · ағаш шабу 10% баяу', buy: '50 ағашқа айырбастау', far: 'Айырбас үшін жақында' }
-      : { name: 'Торговец', hint: 'ПКМ — обмен', title: 'Лесной торговец', offer: 'Копьё', details: '+10% к радиусу и урону · добыча дерева на 10% медленнее', buy: 'Обменять на 50 дерева', far: 'Подойди ближе для обмена' };
+      ? { name: 'Саудагер', hint: 'ОЖБ — айырбас', title: 'Орман саудагері', offer: 'Найза', buff: '+20% шабуыл қашықтығы мен зақым', penalty: 'Ағаш шабу 20% баяу', buy: '50 ағашқа айырбастау' }
+      : { name: 'Торговец', hint: 'ПКМ — обмен', title: 'Лесной торговец', offer: 'Копьё', buff: '+20% к радиусу и урону', penalty: 'Добыча дерева на 20% медленнее', buy: 'Обменять на 50 дерева' };
   const isNear = Math.hypot(player.x - MERCHANT_POSITION.x, player.y - MERCHANT_POSITION.y) <= TRADE_DISTANCE;
   const tradeWindow = isOpen ? createPortal(<div className="trade-backdrop" onContextMenu={(event) => event.preventDefault()} onClick={onClose}>
     <section className="trade-window" onClick={(event) => event.stopPropagation()}>
       <header><div><small>{text.title}</small><h2>{text.offer}</h2></div><button onClick={onClose}>×</button></header>
-      <div className="trade-offer"><span className="trade-spear"><i /></span><p>{text.details}</p></div>
+      <div className="trade-offer"><span className="trade-spear"><i /></span><div><p>{text.buff}</p><p className="trade-penalty">{text.penalty}</p></div></div>
       <button className="trade-buy" disabled={wood < SPEAR_COST} onClick={() => { onBuy(); if (wood >= SPEAR_COST) onClose(); }}>
         {text.buy} <strong>({wood}/{SPEAR_COST})</strong>
       </button>
@@ -28,7 +28,7 @@ export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props
   return <>
     <div className="merchant" style={{ left: MERCHANT_POSITION.x, top: MERCHANT_POSITION.y }} onContextMenu={(event) => { event.preventDefault(); if (isNear) onOpen(); }}>
       <span className="merchant__name">{text.name}</span><span className="merchant__head" /><span className="merchant__body" />
-      <span className="merchant__pack" /><span className="merchant__hint">{isNear ? text.hint : text.far}</span>
+      <span className="merchant__pack" />{isNear && <span className="merchant__hint">{text.hint}</span>}
     </div>
     {tradeWindow}
   </>;

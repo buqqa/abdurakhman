@@ -13,6 +13,7 @@ interface Props {
   day: number;
   baseHealth: number;
   weapon: Weapon;
+  hasSpear: boolean;
   merchantDay: number;
   wood: number;
   onBuySpear: () => void;
@@ -28,14 +29,14 @@ interface Props {
   onNightCleared: () => void;
 }
 
-export function GameWorld({ paused, playerNickname, phase, day, baseHealth, weapon, merchantDay, wood, onBuySpear, fences, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
-  const { t } = useI18n();
+export function GameWorld({ paused, playerNickname, phase, day, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, fences, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+  const { t, language } = useI18n();
   return (
     <section>
-      <ForestMap paused={paused} playerNickname={playerNickname} phase={phase} day={day} baseHealth={baseHealth} weapon={weapon} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} fences={fences} handlers={interactionHandlers} onUnavailable={onUnavailable}
+      <ForestMap paused={paused} playerNickname={playerNickname} phase={phase} day={day} baseHealth={baseHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} fences={fences} handlers={interactionHandlers} onUnavailable={onUnavailable}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onBuildFence={onBuildFence} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
-      <p className="controls">{t('controls')}</p>
+      <p className="controls">{t('controls')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}</p>
     </section>
   );
 }

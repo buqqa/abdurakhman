@@ -95,7 +95,7 @@ export function useZombieWave(options: Options) {
 
   const hitZombie = (id: string, damage = 1) => {
     const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: performance.now() } : zombie);
-    const survivors = damaged.filter((zombie) => zombie.health > 0);
+    const survivors = damaged.filter((zombie) => zombie.health > .001);
     zombiesRef.current = survivors;
     setZombies(survivors);
     if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {

@@ -17,5 +17,6 @@ export interface GameState {
   difficulty: string;
   fences: Fence[];
   weapon: Weapon;
+  hasSpear: boolean;
   merchantDay: number;
 }

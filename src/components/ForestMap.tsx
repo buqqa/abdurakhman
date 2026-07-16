@@ -24,12 +24,12 @@ interface Footprint extends Position { id: number }
 
 const fenceRotation = (position: Position) => Math.atan2(position.y - FENCE_CENTER.y, position.x - FENCE_CENTER.x) * 180 / Math.PI + 90;
 
-interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; weapon: Weapon; merchantDay: number; wood: number; onBuySpear: () => void; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
+interface Props { paused: boolean; playerNickname: string; phase: Phase; day: number; baseHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; fences: Fence[]; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onBuildFence: (position: Position) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
 
-export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weapon, merchantDay, wood, onBuySpear, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, fences, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onBuildFence, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
-  const merchantVisible = phase === 'day' && day === merchantDay && weapon === 'axe';
+  const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
   const canMove = !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
   const [objects, setObjects] = useState(WORLD_OBJECTS);
@@ -123,7 +123,7 @@ export function ForestMap({ paused, playerNickname, phase, day, baseHealth, weap
       const source = items.find((item) => item.id === crate.id);
       if (!source) return remaining;
       const drops = [{ id: `food-drop-${crate.id}`, kind: 'food', x: source.x - 8, y: source.y + 9 }];
-      if (Math.random() < .25) drops.push({ id: `water-drop-${crate.id}`, kind: 'water', x: source.x + 17, y: source.y + 9 });
+      if (Math.random() < .15) drops.push({ id: `water-drop-${crate.id}`, kind: 'water', x: source.x + 17, y: source.y + 9 });
       return [...remaining, ...drops];
     }), 480);
   }, [onCrateLoot, swingAxe]);
