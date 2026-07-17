@@ -23,6 +23,6 @@ export default function App() {
     ? savedNickname.trim()
     : typeof googleName === 'string' && googleName.trim() ? googleName.trim() : session?.user.email?.split('@')[0];
   return session || guestNickname
-    ? <GameScene playerNickname={playerNickname ?? guestNickname ?? t('guestName')} />
+    ? <GameScene playerNickname={playerNickname ?? guestNickname ?? t('guestName')} isRegistered={Boolean(session)} />
     : <StartMenu onGuestLogin={() => setGuestNickname(t('guestName'))} />;
 }

@@ -8,7 +8,7 @@ const difficulties: Difficulty[] = [
   { name: 'HARDCORE', nights: 50 },
 ];
 
-export function DifficultyScreen({ onSelect }: { onSelect: (nights: number, name: string) => void }) {
+export function DifficultyScreen({ onSelect, onBack }: { onSelect: (nights: number, name: string) => void; onBack?: () => void }) {
   const { t, language } = useI18n();
   const describe = (difficulty: Difficulty) => {
     if (language === 'en') {
@@ -36,6 +36,7 @@ export function DifficultyScreen({ onSelect }: { onSelect: (nights: number, name
           </button>
         ))}
       </div>
+      {onBack && <button className="device-back" onClick={onBack}>{language === 'en' ? 'Back' : language === 'kk' ? 'Артқа' : 'Назад'}</button>}
     </main>
   );
 }

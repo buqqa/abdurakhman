@@ -12,11 +12,14 @@ import { useI18n } from '../i18n/I18nContext';
 import { PauseMenu } from '../components/PauseMenu';
 import { DeviceScreen, type DeviceMode } from '../components/DeviceScreen';
 import { MobileControls } from '../components/MobileControls';
+import { PlayModeScreen } from '../components/PlayModeScreen';
+import { PartyScreen } from '../components/PartyScreen';
 
-export function GameScene({ playerNickname }: { playerNickname: string }) {
+export function GameScene({ playerNickname, isRegistered }: { playerNickname: string; isRegistered: boolean }) {
   const { t } = useI18n();
   const [isPaused, setIsPaused] = useState(false);
   const [pendingGame, setPendingGame] = useState<{ nights: number; difficulty: string }>();
+  const [playMode, setPlayMode] = useState<'solo' | 'friend' | undefined>(() => isRegistered ? undefined : 'solo');
   const [device, setDevice] = useState<DeviceMode>();
   const [mobileHeight, setMobileHeight] = useState(() => window.innerHeight);
   const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
@@ -45,13 +48,15 @@ export function GameScene({ playerNickname }: { playerNickname: string }) {
     window.addEventListener('orientationchange', lockAfterRotation);
     return () => window.removeEventListener('orientationchange', lockAfterRotation);
   }, [device]);
-  const returnToMenu = () => { setPendingGame(undefined); setDevice(undefined); restart(); };
+  const returnToMenu = () => { setPendingGame(undefined); setPlayMode(isRegistered ? undefined : 'solo'); setDevice(undefined); restart(); };
   if (game.phase === 'menu') {
     if (pendingGame) return <DeviceScreen onBack={() => setPendingGame(undefined)} onSelect={(selectedDevice) => {
       setDevice(selectedDevice);
       startGame(pendingGame.nights, pendingGame.difficulty);
     }} />;
-    return <DifficultyScreen onSelect={(nights, difficulty) => setPendingGame({ nights, difficulty })} />;
+    if (!playMode) return <PlayModeScreen onSolo={() => setPlayMode('solo')} onFriend={() => setPlayMode('friend')} />;
+    if (playMode === 'friend') return <PartyScreen onBack={() => setPlayMode(undefined)} onReady={({ nights, difficulty }) => setPendingGame({ nights, difficulty })} />;
+    return <DifficultyScreen onBack={isRegistered ? () => setPlayMode(undefined) : undefined} onSelect={(nights, difficulty) => setPendingGame({ nights, difficulty })} />;
   }
   const interactionHandlers = { building: repairBase, food: gatherFood, water: gatherWater };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
