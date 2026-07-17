@@ -16,7 +16,7 @@ import { WorldStructures } from './WorldStructures';
 import { createStructure, type StructureKind, type WorldStructure } from '../game/structures';
 import { WaterBottle } from './WaterBottle';
 import { Merchant } from './Merchant';
-import { SPEAR_BONUS } from '../game/config';
+import { SPEAR_BONUS, SPEAR_GATHER_SPEED } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { MobileGameHud } from './MobileGameHud';
 
@@ -135,7 +135,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
       onUnavailable={onUnavailable} onInteracted={collectObject} />
     <AttackSystem enabled={canMove} player={player} targets={phase === 'night' ? zombieTargets : [...trees, ...crates]}
       attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_BONUS : HARVEST_DISTANCE}
-      cooldown={phase === 'day' && weapon === 'spear' ? 450 * SPEAR_BONUS : 450}
+      cooldown={phase === 'day' && weapon === 'spear' ? 450 / SPEAR_GATHER_SPEED : 450}
       onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}

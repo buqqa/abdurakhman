@@ -5,3 +5,4 @@ export const WATER_HEAL = 30;
 export const FOOD_HEAL = 5;
 export const SPEAR_COST = 50;
 export const SPEAR_BONUS = 1.3;
+export const SPEAR_GATHER_SPEED = 0.7;
