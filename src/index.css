@@ -30,6 +30,8 @@ button { font: inherit; }
 .inventory-slot p { margin: 8px 0 0; color: #aeb7a8; }
 .inventory-slot strong { position: absolute; right: 12px; bottom: 10px; font-size: 22px; }
 .inventory-slot .use-item { position: absolute; right: 9px; top: 9px; padding: 5px 8px; font-size: 12px; }
+.shared-drop { position: absolute; z-index: 4; font-size: 20px; filter: drop-shadow(0 3px 2px #172017); animation: shared-drop-land .28s ease-out; }
+@keyframes shared-drop-land { from { translate: 0 -18px; scale: .7; } to { translate: 0; scale: 1; } }
 .inventory-help { margin: 0; color: #7f8d7b; font-size: 12px; }
 .map-viewport { width: 100%; max-width: 900px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; }
 .game-shell:not(.game-shell--mobile) .map-viewport { outline: 3px solid #3b2a1b; outline-offset: 0; border-radius: 11px; box-shadow: 0 0 0 1px #85613d, 0 0 0 5px #241a12, 0 14px 30px rgba(4, 8, 4, .48), inset 0 0 0 2px rgba(221, 184, 112, .22); }

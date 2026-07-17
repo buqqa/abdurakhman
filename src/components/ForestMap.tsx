@@ -20,12 +20,16 @@ import { Merchant } from './Merchant';
 import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { MobileGameHud } from './MobileGameHud';
+import { RemotePlayer } from './RemotePlayer';
+import type { RemotePlayer as RemotePlayerState } from '../game/multiplayer';
+import type { Zombie } from '../game/zombies';
+import type { SharedDrop } from '../game/multiplayer';
 
 interface Footprint extends Position { id: number }
 
-interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void }
+interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void; remotePlayers: RemotePlayerState[]; onPlayerMove: (position: Position) => void; authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void; sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void }
 
-export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared }: Props) {
+export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
@@ -67,8 +71,8 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
       setObjects((current) => [...current, spawn.marker, ...spawn.crates]);
     });
   }, [day, phase]);
-  const updatePlayer = useCallback((position: Position) => setPlayer(position), []);
-  const { zombies, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
+  const updatePlayer = useCallback((position: Position) => { setPlayer(position); onPlayerMove(position); }, [onPlayerMove]);
+  const { zombies, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, onZombiesChange, onRemoteHit: onZombieHit });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
     window.setTimeout(() => setIsSwinging(false), 260);
@@ -85,6 +89,8 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   const trees = objects.filter((object) => object.kind === 'tree');
   const crates = objects.filter((object) => object.kind.startsWith('crate-'));
   const interactionObjects = objects.filter((object) => object.kind !== 'tree' && !object.kind.startsWith('crate-') && !object.kind.startsWith('structure-'));
+  const sharedDropObjects = sharedDrops.map((drop) => ({ ...drop, kind: 'shared-drop' }));
+  const sharedHandlers = { ...handlers, 'shared-drop': (object: { id: string }) => { const drop = sharedDrops.find((item) => item.id === object.id); if (drop) onTakeDrop(drop); } };
   const harvestTree = useCallback((tree: { id: string }) => {
     const hitsToFell = weapon === 'spear' ? 4 : 3;
     if ((treeHits.current[tree.id] ?? 0) >= hitsToFell) return;
@@ -133,7 +139,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   }, [breakCrate, harvestTree]);
 
   return (
-    <><InteractionSystem enabled={canMove} player={player} objects={interactionObjects} handlers={handlers}
+    <><InteractionSystem enabled={canMove} player={player} objects={[...interactionObjects, ...sharedDropObjects]} handlers={sharedHandlers}
       onUnavailable={onUnavailable} onInteracted={collectObject} />
     <AttackSystem enabled={canMove} player={player} targets={phase === 'night' ? zombieTargets : [...trees, ...crates]}
       attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_RANGE_BONUS : HARVEST_DISTANCE}
@@ -155,10 +161,12 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
         {objects.filter((object) => object.kind === 'food').map((food) => <ChickenLeg className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id} />)}
         {objects.filter((object) => object.kind === 'water').map((water) => <WaterBottle className="map-water-bottle" key={water.id}
           style={{ left: water.x - 8, top: water.y - 14 }} />)}
+        {sharedDrops.map((drop) => <span className={`shared-drop shared-drop--${drop.kind}`} style={{ left: drop.x, top: drop.y }} key={drop.id}>{drop.kind === 'wood' ? '🪵' : drop.kind === 'food' ? '🍗' : '💧'}</span>)}
         <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} mobileRepair={mobileMode} />
         {footprints.map((footprint) => <span className="footprint" style={{ left: footprint.x + 8, top: footprint.y + 24 }} key={footprint.id} />)}
         {merchantVisible && <Merchant player={player} wood={wood} isOpen={isTradeOpen} onOpen={() => setIsTradeOpen(true)} onClose={() => setIsTradeOpen(false)} onBuy={onBuySpear} />}
         <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} weapon={weapon} />
+        {remotePlayers.map((remote) => <RemotePlayer player={remote} key={remote.id} />)}
         {isNight && zombies.map((zombie) => <ZombieSprite zombie={zombie} key={zombie.id} />)}
         {isNight && explosions.map((explosion) => <ZombieExplosion explosion={explosion} key={explosion.id} />)}
         {isNight && <div className="night-overlay" />}

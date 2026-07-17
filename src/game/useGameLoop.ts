@@ -5,6 +5,8 @@ import { playGameSound } from '../lib/gameAudio';
 import type { CrateKind } from './interactions';
 import { useI18n } from '../i18n/I18nContext';
 import { gameMessages } from '../i18n/gameMessages';
+import type { SharedGame } from './multiplayer';
+import type { ResourceKind } from './multiplayer';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
@@ -97,6 +99,9 @@ export function useGameLoop() {
     return { ...state, day: state.day + 1, phase: 'day', message: message.newDay };
   });
   const restart = () => setGame(initialState);
+  const dropResource = (kind: ResourceKind) => setGame((state) => ({ ...state, [kind]: Math.max(0, state[kind] - 1) }));
+  const receiveResource = (kind: ResourceKind) => setGame((state) => ({ ...state, [kind]: state[kind] + 1 }));
+  const syncSharedGame = useCallback((shared: SharedGame) => setGame((state) => ({ ...state, ...shared })), []);
   const pauseClock = useCallback(() => { pausedAt.current ??= Date.now(); }, []);
   const resumeClock = useCallback(() => {
     if (!pausedAt.current) return;
@@ -104,5 +109,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
 }

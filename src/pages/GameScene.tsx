@@ -13,16 +13,30 @@ import { PauseMenu } from '../components/PauseMenu';
 import { DeviceScreen, type DeviceMode } from '../components/DeviceScreen';
 import { MobileControls } from '../components/MobileControls';
 import { PlayModeScreen } from '../components/PlayModeScreen';
-import { PartyScreen } from '../components/PartyScreen';
+import { PartyScreen, type PartyGameSettings } from '../components/PartyScreen';
+import { useMultiplayerRoom } from '../game/multiplayer';
 
 export function GameScene({ playerNickname, isRegistered }: { playerNickname: string; isRegistered: boolean }) {
   const { t } = useI18n();
   const [isPaused, setIsPaused] = useState(false);
   const [pendingGame, setPendingGame] = useState<{ nights: number; difficulty: string }>();
   const [playMode, setPlayMode] = useState<'solo' | 'friend' | undefined>(() => isRegistered ? undefined : 'solo');
+  const [party, setParty] = useState<PartyGameSettings>();
   const [device, setDevice] = useState<DeviceMode>();
   const [mobileHeight, setMobileHeight] = useState(() => window.innerHeight);
-  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, pauseClock, resumeClock } = useGameLoop();
+  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock } = useGameLoop();
+  const multiplayer = useMultiplayerRoom(party?.code, playerNickname);
+  useEffect(() => {
+    if (!party || game.phase === 'menu') return;
+    if (party.role === 'host') multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay });
+    else if (multiplayer.sharedGame) syncSharedGame(multiplayer.sharedGame);
+  }, [game.baseHealth, game.day, game.difficulty, game.maxNights, game.merchantDay, game.phase, multiplayer.sendGame, multiplayer.sharedGame, party, syncSharedGame]);
+  useEffect(() => {
+    if (party?.role !== 'host' || !multiplayer.stateRequest) return;
+    multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay });
+    multiplayer.sendZombies(multiplayer.zombies);
+    multiplayer.sendDrops(multiplayer.drops);
+  }, [multiplayer.stateRequest]);
   useEffect(() => {
     const togglePause = (event: KeyboardEvent) => {
       if (event.code !== 'Escape' || (game.phase !== 'day' && game.phase !== 'night')) return;
@@ -48,14 +62,14 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     window.addEventListener('orientationchange', lockAfterRotation);
     return () => window.removeEventListener('orientationchange', lockAfterRotation);
   }, [device]);
-  const returnToMenu = () => { setPendingGame(undefined); setPlayMode(isRegistered ? undefined : 'solo'); setDevice(undefined); restart(); };
+  const returnToMenu = () => { setPendingGame(undefined); setParty(undefined); setPlayMode(isRegistered ? undefined : 'solo'); setDevice(undefined); restart(); };
   if (game.phase === 'menu') {
     if (pendingGame) return <DeviceScreen onBack={() => setPendingGame(undefined)} onSelect={(selectedDevice) => {
       setDevice(selectedDevice);
       startGame(pendingGame.nights, pendingGame.difficulty);
     }} />;
     if (!playMode) return <PlayModeScreen onSolo={() => setPlayMode('solo')} onFriend={() => setPlayMode('friend')} />;
-    if (playMode === 'friend') return <PartyScreen onBack={() => setPlayMode(undefined)} onReady={({ nights, difficulty }) => setPendingGame({ nights, difficulty })} />;
+    if (playMode === 'friend') return <PartyScreen onBack={() => setPlayMode(undefined)} onReady={(settings) => { setParty(settings); setPendingGame(settings); }} />;
     return <DifficultyScreen onBack={isRegistered ? () => setPlayMode(undefined) : undefined} onSelect={(nights, difficulty) => setPendingGame({ nights, difficulty })} />;
   }
   const interactionHandlers = { building: repairBase, food: gatherFood, water: gatherWater };
@@ -65,13 +79,16 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       {device !== 'mobile' && <><div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">{t('goal', { count: game.maxNights })}</span></div>
       <GameHud game={game} /><PlayerStats health={game.playerHealth} /></>}
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
+        remotePlayers={multiplayer.players} onPlayerMove={(position) => multiplayer.sendPosition(position, game.weapon)}
+        authoritative={!party || party.role === 'host'} sharedZombies={multiplayer.zombies} zombieHit={multiplayer.zombieHit} onZombiesChange={multiplayer.sendZombies} onZombieHit={multiplayer.sendZombieHit}
+        sharedDrops={multiplayer.drops} onTakeDrop={(drop) => { multiplayer.takeResource(drop.id); receiveResource(drop.kind); }}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
         onPlayerDamage={damagePlayer} onBaseDamage={damageBase} onNightCleared={finishNight} />
-      <InventoryPanel wood={game.wood} food={game.food} water={game.water} showHint={device !== 'mobile'} onEat={eatFood} onDrink={drinkWater} />
+      <InventoryPanel wood={game.wood} food={game.food} water={game.water} showHint={device !== 'mobile'} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => { if (game[kind] < 1) return; dropResource(kind); multiplayer.dropResource(kind); } : undefined} />
       {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} />}
       <section className={`status ${isFinished ? 'status--result' : ''}`}>
         <p>{game.message}</p>
-        <GameActions phase={game.phase} onNext={startNight} onRestart={returnToMenu} />
+        <GameActions phase={game.phase} canStart={!party || party.role === 'host'} onNext={startNight} onRestart={returnToMenu} />
       </section>
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={returnToMenu} />}

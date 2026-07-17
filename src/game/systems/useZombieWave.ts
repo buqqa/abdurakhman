@@ -19,6 +19,11 @@ interface Options {
   onPlayerDamage: (damage: number) => void;
   onBaseDamage: (damage: number) => void;
   onCleared: () => void;
+  authoritative?: boolean;
+  externalZombies?: Zombie[];
+  onZombiesChange?: (zombies: Zombie[]) => void;
+  onRemoteHit?: (id: string, damage: number) => void;
+  remoteHit?: { id: string; damage: number; nonce: string };
 }
 
 export function useZombieWave(options: Options) {
@@ -32,10 +37,13 @@ export function useZombieWave(options: Options) {
   const waitingZombies = useRef<Zombie[]>([]);
   const spawnTimer = useRef<number>();
   optionsRef.current = options;
+  useEffect(() => {
+    if (options.authoritative === false) setZombies(options.externalZombies ?? []);
+  }, [options.authoritative, options.externalZombies]);
 
   useEffect(() => {
     window.clearTimeout(spawnTimer.current);
-    if (options.phase !== 'night' || options.paused) return;
+    if (options.authoritative === false || options.phase !== 'night' || options.paused) return;
     if (spawnedNight.current !== options.day) {
       const wave = createZombieWave(options.day, options.difficulty);
       spawnedNight.current = options.day;
@@ -43,6 +51,7 @@ export function useZombieWave(options: Options) {
       zombiesRef.current = wave.slice(0, 1).map((zombie) => ({ ...zombie, spawnedAt: performance.now() }));
       waitingZombies.current = wave.slice(1);
       setZombies(zombiesRef.current);
+      optionsRef.current.onZombiesChange?.(zombiesRef.current);
     }
     const spawnNext = () => {
       if (!waitingZombies.current.length) return;
@@ -55,6 +64,7 @@ export function useZombieWave(options: Options) {
         playGameSound('zombieSpawn');
         zombiesRef.current = [...zombiesRef.current, ...group];
         setZombies(zombiesRef.current);
+        optionsRef.current.onZombiesChange?.(zombiesRef.current);
         spawnNext();
       }, 650 + Math.random() * 1700);
     };
@@ -63,7 +73,7 @@ export function useZombieWave(options: Options) {
   }, [options.day, options.difficulty, options.paused, options.phase]);
 
   useEffect(() => {
-    if (options.phase !== 'night' || options.paused) return;
+    if (options.authoritative === false || options.phase !== 'night' || options.paused) return;
     let frame = 0;
     let previous = performance.now();
     const update = (time: number) => {
@@ -95,6 +105,7 @@ export function useZombieWave(options: Options) {
       const survivors = next.filter((zombie) => zombie.health > .001);
       zombiesRef.current = survivors;
       setZombies(survivors);
+      optionsRef.current.onZombiesChange?.(survivors);
       attacks.forEach((attack) => attack.player ? optionsRef.current.onPlayerDamage(attack.damage) : optionsRef.current.onBaseDamage(attack.damage));
       if (attacks.length) playGameSound('zombieAttack');
       if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
@@ -108,11 +119,13 @@ export function useZombieWave(options: Options) {
   }, [options.paused, options.phase]);
 
   const hitZombie = (id: string, damage = 1) => {
+    if (optionsRef.current.authoritative === false) return optionsRef.current.onRemoteHit?.(id, damage);
     const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: performance.now() } : zombie);
     const killedExplosive = damaged.find((zombie) => zombie.id === id && zombie.isExplosive && zombie.health <= .001);
     const survivors = damaged.filter((zombie) => zombie.health > .001);
     zombiesRef.current = survivors;
     setZombies(survivors);
+    optionsRef.current.onZombiesChange?.(survivors);
     if (killedExplosive) {
       const explosion = { id: explosionId.current++, x: killedExplosive.x, y: killedExplosive.y };
       setExplosions((current) => [...current, explosion]);
@@ -127,6 +140,9 @@ export function useZombieWave(options: Options) {
       window.setTimeout(() => optionsRef.current.onCleared(), 350);
     }
   };
+  useEffect(() => {
+    if (options.authoritative !== false && options.remoteHit) hitZombie(options.remoteHit.id, options.remoteHit.damage);
+  }, [options.remoteHit?.nonce]);
 
   return { zombies, explosions, hitZombie };
 }

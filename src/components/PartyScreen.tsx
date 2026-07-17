@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../i18n/I18nContext';
 
-export interface PartyGameSettings { nights: number; difficulty: string; maxPlayers: number; code: string }
+export interface PartyGameSettings { nights: number; difficulty: string; maxPlayers: number; code: string; role: 'host' | 'guest' }
 interface Props { onBack: () => void; onReady: (settings: PartyGameSettings) => void }
 type View = 'choose' | 'create' | 'join';
 const difficulties = [{ name: 'PEACEFUL', nights: 15, code: 'P' }, { name: 'SURVIVOR', nights: 25, code: 'S' }, { name: 'HARDCORE', nights: 50, code: 'H' }];
@@ -26,8 +26,8 @@ export function PartyScreen({ onBack, onReady }: Props) {
     const normalized = joinCode.trim().toUpperCase();
     const selected = difficulties.find((item) => item.code === normalized[0]);
     const players = Number(normalized[1]);
-    if (!selected || normalized.length !== 6 || players < 2 || players > 4) return setError(text.invalid);
-    onReady({ nights: selected.nights, difficulty: selected.name, maxPlayers: players, code: normalized });
+    if (!selected || normalized.length !== 6 || players < 2 || players > 3) return setError(text.invalid);
+    onReady({ nights: selected.nights, difficulty: selected.name, maxPlayers: players, code: normalized, role: 'guest' });
   };
   if (view === 'choose') return <main className="setup-screen"><p>Forest Base</p><h1>{text.title}</h1><div className="setup-grid">
     <button className="setup-card" onClick={() => setView('create')}><strong>{text.create}</strong><small>{text.hostInfo}</small></button>
@@ -36,9 +36,9 @@ export function PartyScreen({ onBack, onReady }: Props) {
   return <main className="party-screen"><p>Forest Base</p><h1>{view === 'create' ? text.create : text.join}</h1>
     {view === 'create' ? <>
       <label>{text.difficulty}<span className="party-options">{difficulties.map((item) => <button className={difficulty.name === item.name ? 'active' : ''} onClick={() => setDifficulty(item)} key={item.name}>{item.name}</button>)}</span></label>
-      <label>{text.players}<span className="party-options">{[2, 3, 4].map((count) => <button className={maxPlayers === count ? 'active' : ''} onClick={() => setMaxPlayers(count)} key={count}>{count}</button>)}</span></label>
+      <label>{text.players}<span className="party-options">{[2, 3].map((count) => <button className={maxPlayers === count ? 'active' : ''} onClick={() => setMaxPlayers(count)} key={count}>{count}</button>)}</span></label>
       <div className="party-code"><small>{text.code}</small><strong>{code}</strong></div>
-      <button onClick={() => onReady({ nights: difficulty.nights, difficulty: difficulty.name, maxPlayers, code })}>{text.continue}</button>
+      <button onClick={() => onReady({ nights: difficulty.nights, difficulty: difficulty.name, maxPlayers, code, role: 'host' })}>{text.continue}</button>
     </> : <><p className="party-note">{text.waiting}</p><input value={joinCode} maxLength={6} placeholder={text.input} onChange={(event) => { setJoinCode(event.target.value.toUpperCase()); setError(''); }} />{error && <small className="party-error">{error}</small>}<button onClick={join}>{text.join}</button></>}
     <button className="device-back" onClick={goBack}>{text.back}</button>
   </main>;
