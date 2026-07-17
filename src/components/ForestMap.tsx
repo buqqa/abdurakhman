@@ -11,6 +11,7 @@ import { BaseStructure } from './BaseStructure';
 import { playGameSound } from '../lib/gameAudio';
 import { useZombieWave } from '../game/systems/useZombieWave';
 import { ZombieSprite } from './ZombieSprite';
+import { ZombieExplosion } from './ZombieExplosion';
 import { LootCrate } from './LootCrate';
 import { WorldStructures } from './WorldStructures';
 import { createStructure, type StructureKind, type WorldStructure } from '../game/structures';
@@ -67,7 +68,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
     });
   }, [day, phase]);
   const updatePlayer = useCallback((position: Position) => setPlayer(position), []);
-  const { zombies, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
+  const { zombies, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
     window.setTimeout(() => setIsSwinging(false), 260);
@@ -159,6 +160,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
         {merchantVisible && <Merchant player={player} wood={wood} isOpen={isTradeOpen} onOpen={() => setIsTradeOpen(true)} onClose={() => setIsTradeOpen(false)} onBuy={onBuySpear} />}
         <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} weapon={weapon} />
         {isNight && zombies.map((zombie) => <ZombieSprite zombie={zombie} key={zombie.id} />)}
+        {isNight && explosions.map((explosion) => <ZombieExplosion explosion={explosion} key={explosion.id} />)}
         {isNight && <div className="night-overlay" />}
       </section>
     </GameCamera></>

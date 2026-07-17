@@ -4,6 +4,7 @@ import type { Phase } from '../types';
 import { createZombieWave, type Zombie } from '../zombies';
 import type { Position } from '../../components/PlayerController';
 import { playGameSound } from '../../lib/gameAudio';
+import type { Explosion } from '../../components/ZombieExplosion';
 
 const EXPLOSION_RADIUS = 75;
 const EXPLOSION_PLAYER_DAMAGE = 20;
@@ -22,6 +23,8 @@ interface Options {
 
 export function useZombieWave(options: Options) {
   const [zombies, setZombies] = useState<Zombie[]>([]);
+  const [explosions, setExplosions] = useState<Explosion[]>([]);
+  const explosionId = useRef(0);
   const zombiesRef = useRef<Zombie[]>([]);
   const optionsRef = useRef(options);
   const activeWave = useRef(false);
@@ -110,6 +113,10 @@ export function useZombieWave(options: Options) {
     zombiesRef.current = survivors;
     setZombies(survivors);
     if (killedExplosive) {
+      const explosion = { id: explosionId.current++, x: killedExplosive.x, y: killedExplosive.y };
+      setExplosions((current) => [...current, explosion]);
+      window.setTimeout(() => setExplosions((current) => current.filter((item) => item.id !== explosion.id)), 520);
+      playGameSound('zombieAttack');
       const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
       if (Math.hypot(player.x - killedExplosive.x, player.y - killedExplosive.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
       if (Math.hypot(BASE_POSITION.x - killedExplosive.x, BASE_POSITION.y - killedExplosive.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
@@ -120,5 +127,5 @@ export function useZombieWave(options: Options) {
     }
   };
 
-  return { zombies, hitZombie };
+  return { zombies, explosions, hitZombie };
 }
