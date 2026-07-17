@@ -25,7 +25,8 @@ function spawnPoint(index: number) {
 export function createZombieWave(night: number, difficulty: string) {
   const maxCount = Math.min(10, 2 + Math.ceil(night * .8));
   const count = 1 + Math.floor(Math.random() * maxCount);
-  const normalHealth = 4;
+  const normalHealth = 6;
+  const bossBaseHealth = 4;
   const normalDamage = 3 + Math.floor((night - 1) / 5);
 
   return Array.from({ length: count }, (_, index): Zombie => {
@@ -33,7 +34,7 @@ export function createZombieWave(night: number, difficulty: string) {
     const hasHammer = !isBoss && Math.random() < .1;
     const isExplosive = !isBoss && !hasHammer && Math.random() < .1;
     const bossMultiplier = difficulty === 'HARDCORE' ? 3 : 2;
-    const health = normalHealth * (isBoss ? bossMultiplier : 1);
+    const health = isBoss ? bossBaseHealth * bossMultiplier : normalHealth;
     return {
       id: `zombie-${night}-${index}`, ...spawnPoint(index), health, maxHealth: health,
       damage: hasHammer ? 20 : normalDamage * (isBoss ? bossMultiplier : 1),
