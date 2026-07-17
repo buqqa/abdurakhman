@@ -16,7 +16,7 @@ import { WorldStructures } from './WorldStructures';
 import { createStructure, type StructureKind, type WorldStructure } from '../game/structures';
 import { WaterBottle } from './WaterBottle';
 import { Merchant } from './Merchant';
-import { SPEAR_BONUS, SPEAR_GATHER_SPEED } from '../game/config';
+import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { MobileGameHud } from './MobileGameHud';
 
@@ -85,22 +85,23 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   const crates = objects.filter((object) => object.kind.startsWith('crate-'));
   const interactionObjects = objects.filter((object) => object.kind !== 'tree' && !object.kind.startsWith('crate-') && !object.kind.startsWith('structure-'));
   const harvestTree = useCallback((tree: { id: string }) => {
-    if ((treeHits.current[tree.id] ?? 0) >= 3) return;
+    const hitsToFell = weapon === 'spear' ? 4 : 3;
+    if ((treeHits.current[tree.id] ?? 0) >= hitsToFell) return;
     onHarvest();
     playGameSound('chop');
     swingWeapon();
     const hits = (treeHits.current[tree.id] ?? 0) + 1;
     treeHits.current[tree.id] = hits;
-    const falling = hits >= 3;
+    const falling = hits >= hitsToFell;
     setTreeAnimation({ id: tree.id, falling });
     window.setTimeout(() => setTreeAnimation(undefined), falling ? 620 : 260);
     if (falling) window.setTimeout(() => setObjects((items) => items.filter((item) => item.id !== tree.id)), 600);
-  }, [onHarvest, swingWeapon]);
+  }, [onHarvest, swingWeapon, weapon]);
   const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: 'zombie', x: zombie.x, y: zombie.y }));
   const attackZombie = useCallback((target: { id: string }) => {
     swingWeapon();
     playGameSound('chop');
-    hitZombie(target.id, weapon === 'spear' ? SPEAR_BONUS : 1);
+    hitZombie(target.id, weapon === 'spear' ? SPEAR_DAMAGE : 1);
   }, [hitZombie, swingWeapon, weapon]);
   const breakCrate = useCallback((crate: { id: string; kind: string }) => {
     if ((crateHits.current[crate.id] ?? 0) >= 3) return;
@@ -134,8 +135,8 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
     <><InteractionSystem enabled={canMove} player={player} objects={interactionObjects} handlers={handlers}
       onUnavailable={onUnavailable} onInteracted={collectObject} />
     <AttackSystem enabled={canMove} player={player} targets={phase === 'night' ? zombieTargets : [...trees, ...crates]}
-      attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_BONUS : HARVEST_DISTANCE}
-      cooldown={phase === 'day' && weapon === 'spear' ? 450 / SPEAR_GATHER_SPEED : 450}
+      attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_RANGE_BONUS : HARVEST_DISTANCE}
+      cooldown={450}
       onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
