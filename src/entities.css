@@ -25,6 +25,11 @@
 .zombie-hammer::after { content: ''; position: absolute; left: -2px; top: 8px; width: 6px; height: 7px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }
 .zombie-tnt { position: absolute; right: -10px; top: 15px; width: 13px; height: 17px; border: 2px solid #48201c; border-radius: 2px; background: #c74736; color: #fff4dc; font: 900 5px/17px sans-serif; text-align: center; z-index: 4; transform: rotate(8deg); box-shadow: inset 3px 0 #e76b50; }
 .zombie-tnt::before { content: ''; position: absolute; left: 5px; top: -7px; width: 5px; height: 7px; border-left: 2px solid #352a21; transform: rotate(25deg); }
+.map-zombie--sprinter .zombie-body { background: #3f586f; }
+.map-zombie--sprinter::before { content: '≡'; position: absolute; left: -13px; top: 15px; color: #d8e4c4; font-size: 16px; font-weight: 900; opacity: .7; animation: sprinter-speed .3s steps(2) infinite; }
+.zombie-headband { position: absolute; left: 6px; top: 8px; width: 19px; height: 4px; border: 1px solid #4d1f1b; background: #cf5546; z-index: 4; }
+.zombie-headband::after { content: ''; position: absolute; right: -7px; top: 1px; width: 8px; height: 3px; background: #cf5546; transform: rotate(18deg); }
+@keyframes sprinter-speed { 50% { translate: -4px 0; opacity: .25; } }
 .zombie-explosion { position: absolute; width: 1px; height: 1px; z-index: 8; pointer-events: none; }
 .zombie-explosion__flash, .zombie-explosion__smoke { position: absolute; left: 0; top: 0; border-radius: 50%; transform: translate(-50%, -50%); }
 .zombie-explosion__flash { width: 70px; height: 70px; background: radial-gradient(circle, #fff8b5 0 12%, #ffc52f 13% 34%, #ed5b25 35% 55%, transparent 57%); animation: zombie-blast .5s ease-out forwards; }
