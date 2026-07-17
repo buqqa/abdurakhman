@@ -78,7 +78,7 @@ export function useGameLoop() {
     return { ...state, wood: state.wood - REPAIR_WOOD_COST, baseHealth, message: steps ? message.repairSteps(steps) : message.repaired };
   });
   const startNight = () => {
-    playGameSound('zombie');
+    playGameSound('zombieSpawn');
     setGame((state) => ({ ...state, phase: 'night', message: message.night(state.day) }));
   };
   const damagePlayer = (damage: number) => setGame((state) => {

@@ -52,7 +52,7 @@ export function useZombieWave(options: Options) {
         const group = waitingZombies.current.splice(0, groupSize)
           .map((zombie) => ({ ...zombie, spawnedAt: performance.now() }));
         if (!group.length) return;
-        playGameSound('zombie');
+        playGameSound('zombieSpawn');
         zombiesRef.current = [...zombiesRef.current, ...group];
         setZombies(zombiesRef.current);
         spawnNext();

@@ -1,4 +1,4 @@
-export type GameSound = 'zombie' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 'start' | 'victory' | 'defeat';
+export type GameSound = 'zombie' | 'zombieSpawn' | 'zombieAttack' | 'repair' | 'eat' | 'chop' | 'start' | 'victory' | 'defeat';
 
 let audioContext: AudioContext | undefined;
 let ambientGain: GainNode | undefined;
@@ -89,6 +89,13 @@ export function playGameSound(sound: GameSound) {
   if (sound === 'zombie') {
     tone(context, 105, 48, .42, .11, 'sawtooth');
     noise(context, .34, .035, 420);
+  } else if (sound === 'zombieSpawn') {
+    tone(context, 72, 38, .48, .16, 'triangle');
+    noise(context, .42, .13, 260);
+    window.setTimeout(() => {
+      tone(context, 115, 52, .16, .1, 'square');
+      noise(context, .12, .09, 720);
+    }, 230);
   } else if (sound === 'zombieAttack') {
     tone(context, 145, 58, .2, .15, 'sawtooth');
     noise(context, .13, .08, 520);
