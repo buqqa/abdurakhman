@@ -14,7 +14,7 @@ button { font: inherit; }
 .player-health { display: flex; align-items: center; gap: 14px; padding: 10px 14px; margin-bottom: 10px; border: 1px solid #334132; border-radius: 8px; background: #1a231a; }
 .player-health__label { color: #aeb7a8; font-size: 13px; }
 .hearts { display: flex; gap: 3px; filter: drop-shadow(0 2px 1px #090b08); }
-.heart { font-family: Georgia, serif; font-size: 23px; line-height: 1; -webkit-text-stroke: 1px #5d211f; }
+.heart { font-family: Arial, sans-serif; font-size: 22px; line-height: 1; -webkit-text-stroke: 1px #5d211f; }
 .heart--full { color: #d94a43; }
 .heart--half { color: transparent; background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); background-clip: text; -webkit-background-clip: text; }
 .heart--empty { color: #302b29; }

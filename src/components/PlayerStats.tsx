@@ -14,7 +14,7 @@ export function PlayerStats({ health }: Props) {
         {Array.from({ length: HEART_COUNT }, (_, index) => {
           const healthInHeart = health - index * HEALTH_PER_HEART;
           const state = healthInHeart >= HEALTH_PER_HEART ? 'full' : healthInHeart > 0 ? 'half' : 'empty';
-          return <span className={`heart heart--${state}`} key={index}>♥</span>;
+          return <span className={`heart heart--${state}`} key={index}>❤</span>;
         })}
       </div>
     </section>
