@@ -15,6 +15,7 @@ export interface Zombie {
   lastAttack: number;
   facingLeft: boolean;
   hitAt: number;
+  spawnedAt: number;
 }
 
 function spawnPoint(index: number) {
@@ -39,7 +40,7 @@ export function createZombieWave(night: number, difficulty: string) {
       id: `zombie-${night}-${index}`, ...spawnPoint(index), health, maxHealth: health,
       damage: hasHammer ? 20 : normalDamage * (isBoss ? bossMultiplier : 1),
       playerDamage: hasHammer ? 20 : isBoss ? 10 * bossMultiplier : 10, speed: 25 + Math.min(night, 12),
-      isBoss, hasHammer, isExplosive, lastAttack: 0, facingLeft: false, hitAt: 0,
+      isBoss, hasHammer, isExplosive, lastAttack: 0, facingLeft: false, hitAt: 0, spawnedAt: 0,
     };
   });
 }

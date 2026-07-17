@@ -40,7 +40,7 @@ export function useZombieWave(options: Options) {
       const wave = createZombieWave(options.day, options.difficulty);
       spawnedNight.current = options.day;
       activeWave.current = true;
-      zombiesRef.current = wave.slice(0, 1);
+      zombiesRef.current = wave.slice(0, 1).map((zombie) => ({ ...zombie, spawnedAt: performance.now() }));
       waitingZombies.current = wave.slice(1);
       setZombies(zombiesRef.current);
     }
@@ -49,7 +49,8 @@ export function useZombieWave(options: Options) {
       spawnTimer.current = window.setTimeout(() => {
         const groupRoll = Math.random();
         const groupSize = groupRoll < .05 ? 3 : groupRoll < .2 ? 2 : 1;
-        const group = waitingZombies.current.splice(0, groupSize);
+        const group = waitingZombies.current.splice(0, groupSize)
+          .map((zombie) => ({ ...zombie, spawnedAt: performance.now() }));
         if (!group.length) return;
         playGameSound('zombie');
         zombiesRef.current = [...zombiesRef.current, ...group];
