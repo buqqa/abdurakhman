@@ -50,11 +50,18 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   }, [day, phase]);
   useEffect(() => {
     if (phase !== 'day') return;
+    const expiredIds = structures.filter((structure) => structure.spawnedDay < day).map((structure) => structure.id);
+    if (!expiredIds.length) return;
+    setStructures((current) => current.filter((structure) => !expiredIds.includes(structure.id)));
+    setObjects((current) => current.filter((object) => !expiredIds.some((id) => object.id.startsWith(`${id}-`))));
+  }, [day, phase, structures]);
+  useEffect(() => {
+    if (phase !== 'day') return;
     const ready = (['tent', 'warehouse'] as const).filter((kind) => day >= structureDays.current[kind] && !spawnedStructures.current.has(kind));
     if (!ready.length) return;
     ready.forEach((kind) => {
       spawnedStructures.current.add(kind);
-      const spawn = createStructure(kind, objects);
+      const spawn = createStructure(kind, objects, day);
       setStructures((current) => [...current, spawn.structure]);
       setObjects((current) => [...current, spawn.marker, ...spawn.crates]);
     });

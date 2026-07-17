@@ -8,11 +8,12 @@ export interface WorldStructure {
   kind: StructureKind;
   x: number;
   y: number;
+  spawnedDay: number;
 }
 
 const randomCrate = (choices: CrateKind[]) => choices[Math.floor(Math.random() * choices.length)];
 
-export function createStructure(kind: StructureKind, occupied: InteractableObject[]) {
+export function createStructure(kind: StructureKind, occupied: InteractableObject[], spawnedDay: number) {
   const width = kind === 'tent' ? 170 : 190;
   const height = kind === 'tent' ? 100 : 120;
   let position = { x: kind === 'tent' ? 470 : 850, y: kind === 'tent' ? 500 : 180 };
@@ -28,7 +29,7 @@ export function createStructure(kind: StructureKind, occupied: InteractableObjec
     if (farFromBase && hasSpace) { position = candidate; break; }
   }
 
-  const structure: WorldStructure = { id: `structure-${kind}`, kind, ...position };
+  const structure: WorldStructure = { id: `structure-${kind}`, kind, spawnedDay, ...position };
   const kinds: CrateKind[] = kind === 'tent'
     ? ['crate-food', 'crate-food', 'crate-food']
     : ['crate-wood', 'crate-wood', randomCrate(['crate-wood', 'crate-food'])];

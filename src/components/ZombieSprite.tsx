@@ -8,6 +8,7 @@ export function ZombieSprite({ zombie }: { zombie: Zombie }) {
       <span className="zombie-health"><i style={{ width: `${health}%` }} /></span>
       <span className="zombie-sprite"><span className="zombie-arm zombie-arm--top" /><span className="zombie-arm zombie-arm--bottom" />
         {zombie.hasHammer && <span className="zombie-hammer" aria-hidden="true" />}
+        {zombie.isExplosive && <span className="zombie-tnt" aria-hidden="true">TNT</span>}
         <span className="zombie-head"><i /><b /></span><span className="zombie-body">{zombie.isBoss && <i className="zombie-vest" />}</span>
         <span className="zombie-leg zombie-leg--one" /><span className="zombie-leg zombie-leg--two" />
       </span>

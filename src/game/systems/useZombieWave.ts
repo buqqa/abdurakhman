@@ -5,6 +5,10 @@ import { createZombieWave, type Zombie } from '../zombies';
 import type { Position } from '../../components/PlayerController';
 import { playGameSound } from '../../lib/gameAudio';
 
+const EXPLOSION_RADIUS = 75;
+const EXPLOSION_PLAYER_DAMAGE = 2;
+const EXPLOSION_BASE_DAMAGE = 20;
+
 interface Options {
   phase: Phase;
   day: number;
@@ -64,6 +68,7 @@ export function useZombieWave(options: Options) {
       const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
       const base = BASE_POSITION;
       const attacks: Array<{ player: boolean; damage: number }> = [];
+      const detonations: Zombie[] = [];
       const next = zombiesRef.current.map((zombie) => {
         const playerDistance = Math.hypot(player.x - zombie.x, player.y - zombie.y);
         const baseDistance = Math.hypot(base.x - zombie.x, base.y - zombie.y);
@@ -72,6 +77,10 @@ export function useZombieWave(options: Options) {
         const distance = targetsPlayer ? playerDistance : baseDistance;
         const attackDistance = targetsPlayer ? 20 : 68;
         if (distance <= attackDistance) {
+          if (zombie.isExplosive) {
+            detonations.push(zombie);
+            return { ...zombie, health: 0 };
+          }
           if (time - zombie.lastAttack >= 1050) {
             const damage = targetsPlayer ? zombie.playerDamage : zombie.damage;
             attacks.push({ player: targetsPlayer, damage });
@@ -84,10 +93,19 @@ export function useZombieWave(options: Options) {
         const y = zombie.y + (target.y - zombie.y) / distance * step;
         return { ...zombie, facingLeft: target.x < zombie.x, x: Math.max(25, Math.min(MAP_WIDTH - 35, x)), y: Math.max(25, Math.min(MAP_HEIGHT - 40, y)) };
       });
-      zombiesRef.current = next;
-      setZombies(next);
+      const survivors = next.filter((zombie) => zombie.health > .001);
+      zombiesRef.current = survivors;
+      setZombies(survivors);
       attacks.forEach((attack) => attack.player ? optionsRef.current.onPlayerDamage(attack.damage) : optionsRef.current.onBaseDamage(attack.damage));
+      detonations.forEach((zombie) => {
+        if (Math.hypot(player.x - zombie.x, player.y - zombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
+        if (Math.hypot(base.x - zombie.x, base.y - zombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
+      });
       if (attacks.length) playGameSound('zombieAttack');
+      if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
+        activeWave.current = false;
+        window.setTimeout(() => optionsRef.current.onCleared(), 350);
+      }
       frame = requestAnimationFrame(update);
     };
     frame = requestAnimationFrame(update);
@@ -96,9 +114,15 @@ export function useZombieWave(options: Options) {
 
   const hitZombie = (id: string, damage = 1) => {
     const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: performance.now() } : zombie);
+    const killedExplosive = damaged.find((zombie) => zombie.id === id && zombie.isExplosive && zombie.health <= .001);
     const survivors = damaged.filter((zombie) => zombie.health > .001);
     zombiesRef.current = survivors;
     setZombies(survivors);
+    if (killedExplosive) {
+      const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
+      if (Math.hypot(player.x - killedExplosive.x, player.y - killedExplosive.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
+      if (Math.hypot(BASE_POSITION.x - killedExplosive.x, BASE_POSITION.y - killedExplosive.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
+    }
     if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
       activeWave.current = false;
       window.setTimeout(() => optionsRef.current.onCleared(), 350);

@@ -20,6 +20,8 @@
 .zombie-vest::before { left: 2px; }.zombie-vest::after { right: 2px; }
 .zombie-hammer { position: absolute; right: -6px; top: 7px; width: 4px; height: 19px; border-radius: 1px; background: #7a5232; transform: rotate(55deg); transform-origin: bottom; z-index: 3; }
 .zombie-hammer::after { content: ''; position: absolute; left: -6px; top: -3px; width: 16px; height: 8px; border: 2px solid #303a3d; border-radius: 2px; background: linear-gradient(180deg, #aab4b3, #687577); }
+.zombie-tnt { position: absolute; right: -10px; top: 15px; width: 13px; height: 17px; border: 2px solid #48201c; border-radius: 2px; background: #c74736; color: #fff4dc; font: 900 5px/17px sans-serif; text-align: center; z-index: 4; transform: rotate(8deg); box-shadow: inset 3px 0 #e76b50; }
+.zombie-tnt::before { content: ''; position: absolute; left: 5px; top: -7px; width: 5px; height: 7px; border-left: 2px solid #352a21; transform: rotate(25deg); }
 @keyframes zombie-walk { 50% { translate: 0 2px; } }
 .map-zombie .zombie-arm--top { animation: zombie-arms .42s steps(2) infinite; }
 @keyframes zombie-arms { 50% { transform: rotate(7deg); } }
