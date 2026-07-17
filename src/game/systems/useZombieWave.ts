@@ -6,7 +6,7 @@ import type { Position } from '../../components/PlayerController';
 import { playGameSound } from '../../lib/gameAudio';
 
 const EXPLOSION_RADIUS = 75;
-const EXPLOSION_PLAYER_DAMAGE = 2;
+const EXPLOSION_PLAYER_DAMAGE = 20;
 const EXPLOSION_BASE_DAMAGE = 20;
 
 interface Options {
@@ -68,7 +68,6 @@ export function useZombieWave(options: Options) {
       const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
       const base = BASE_POSITION;
       const attacks: Array<{ player: boolean; damage: number }> = [];
-      const detonations: Zombie[] = [];
       const next = zombiesRef.current.map((zombie) => {
         const playerDistance = Math.hypot(player.x - zombie.x, player.y - zombie.y);
         const baseDistance = Math.hypot(base.x - zombie.x, base.y - zombie.y);
@@ -77,10 +76,6 @@ export function useZombieWave(options: Options) {
         const distance = targetsPlayer ? playerDistance : baseDistance;
         const attackDistance = targetsPlayer ? 20 : 68;
         if (distance <= attackDistance) {
-          if (zombie.isExplosive) {
-            detonations.push(zombie);
-            return { ...zombie, health: 0 };
-          }
           if (time - zombie.lastAttack >= 1050) {
             const damage = targetsPlayer ? zombie.playerDamage : zombie.damage;
             attacks.push({ player: targetsPlayer, damage });
@@ -97,10 +92,6 @@ export function useZombieWave(options: Options) {
       zombiesRef.current = survivors;
       setZombies(survivors);
       attacks.forEach((attack) => attack.player ? optionsRef.current.onPlayerDamage(attack.damage) : optionsRef.current.onBaseDamage(attack.damage));
-      detonations.forEach((zombie) => {
-        if (Math.hypot(player.x - zombie.x, player.y - zombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
-        if (Math.hypot(base.x - zombie.x, base.y - zombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
-      });
       if (attacks.length) playGameSound('zombieAttack');
       if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
         activeWave.current = false;
