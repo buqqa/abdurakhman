@@ -12,10 +12,10 @@ interface Props { player: Position; wood: number; isOpen: boolean; onOpen: () =>
 export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props) {
   const { language } = useI18n();
   const text = language === 'en'
-    ? { name: 'Merchant', title: 'Forest merchant', offer: 'Spear', buff: '+25% attack range and damage', penalty: '25% slower wood gathering', buy: 'Trade for 50 wood' }
+    ? { name: 'Merchant', title: 'Forest merchant', offer: 'Spear', buff: '+30% attack range and damage', penalty: '30% slower wood gathering', buy: 'Trade for 50 wood' }
     : language === 'kk'
-      ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Найза', buff: '+25% шабуыл қашықтығы мен зақым', penalty: 'Ағаш шабу 25% баяу', buy: '50 ағашқа айырбастау' }
-      : { name: 'Торговец', title: 'Лесной торговец', offer: 'Копьё', buff: '+25% к радиусу и урону', penalty: 'Добыча дерева на 25% медленнее', buy: 'Обменять на 50 дерева' };
+      ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Найза', buff: '+30% шабуыл қашықтығы мен зақым', penalty: 'Ағаш шабу 30% баяу', buy: '50 ағашқа айырбастау' }
+      : { name: 'Торговец', title: 'Лесной торговец', offer: 'Копьё', buff: '+30% к радиусу и урону', penalty: 'Добыча дерева на 30% медленнее', buy: 'Обменять на 50 дерева' };
   const isNear = Math.hypot(player.x - MERCHANT_POSITION.x, player.y - MERCHANT_POSITION.y) <= TRADE_DISTANCE;
   useEffect(() => {
     const handleTrade = (event: KeyboardEvent) => {
