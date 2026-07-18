@@ -42,7 +42,6 @@ button { font: inherit; }
 .forest-map--night { background-color: #49643e; }
 .forest-map--night::after { opacity: 1; }
 .night-overlay { position: absolute; inset: 0; z-index: 10; pointer-events: none; background: rgba(8, 14, 24, .56); }
-.sun { position: absolute; right: 18px; top: 12px; font-size: 30px; color: #e7ddab; }
 .map-tree { position: absolute; width: 56px; height: 65px; z-index: 1; filter: drop-shadow(0 3px 2px rgba(14, 30, 15, .45)); }
 .tree-shadow { position: absolute; left: 5px; bottom: -5px; width: 49px; height: 13px; border-radius: 50%; background: rgba(22, 44, 23, .48); transform: skewX(-18deg); }
 .tree-trunk { position: absolute; left: 23px; bottom: 3px; width: 12px; height: 35px; border: 3px solid #503723; border-radius: 4px; background: linear-gradient(90deg, #765033, #a27547 55%, #604128); }
@@ -178,6 +177,11 @@ button { font: inherit; }
 .footprint::after { content: ''; position: absolute; left: 7px; top: -4px; width: 5px; height: 8px; border-radius: 50%; background: inherit; transform: rotate(-32deg); }
 @keyframes footprint-fade { 70% { opacity: .65; } 100% { opacity: 0; } }
 .player__collider { position: absolute; inset: 0; border: 1px dashed rgba(234, 221, 180, .28); border-radius: 50%; }
+.player--downed .player__sprite { transform: translate(5px, 13px) rotate(90deg); filter: grayscale(.7) brightness(.7); }
+.player--downed .player__nickname { bottom: 25px; color: #e4aaa3; border-color: rgba(202, 99, 88, .7); }
+.player--downed .player__weapon, .player--downed .player__collider { display: none; }
+.party-game-badge { position: fixed; left: 18px; top: 18px; z-index: 30; display: grid; min-width: 136px; padding: 9px 12px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .92); box-shadow: 0 5px 16px rgba(0, 0, 0, .35); }
+.party-game-badge span, .party-game-badge small { font-size: 10px; letter-spacing: .06em; }.party-game-badge strong { color: #f1d77f; font-size: 18px; letter-spacing: .14em; }
 .controls { margin: 8px 2px 0; color: #8e9c89; font-size: 13px; }
 .merchant { position: absolute; width: 30px; height: 34px; z-index: 4; image-rendering: pixelated; filter: drop-shadow(0 2px 1px #0a0d09); }
 .merchant__sprite { position: absolute; inset: 0; }
@@ -198,6 +202,7 @@ button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; curs
 button:hover { background: #3c5039; } button.danger { border-color: #82544b; background: #653e37; }
 .status--result { justify-content: center; flex-direction: column; font-size: 20px; }
 .game-shell--mobile { position: fixed; inset: 0; width: 100vw; padding: 0; overflow: hidden; overscroll-behavior: none; }
+.game-shell--mobile .party-game-badge { left: 8px; top: 8px; min-width: 112px; padding: 6px 9px; }.game-shell--mobile .party-game-badge strong { font-size: 15px; }
 .game-shell--mobile .map-viewport { position: relative; width: 100vw; max-width: none; height: 100%; margin: 0; border-radius: 0; box-shadow: inset 0 0 0 3px #241a12, inset 0 0 0 5px #85613d, inset 0 0 14px rgba(4, 8, 4, .5); }
 .game-shell--mobile .camera-world { transition: none; will-change: transform; }
 .game-shell--mobile .status { position: fixed; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 19; width: max-content; min-height: 0; padding: 0; transform: translateX(-50%); background: transparent; }
@@ -210,14 +215,14 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .mobile-controls { position: fixed; left: 0; right: 0; bottom: 18px; z-index: 18; display: flex; align-items: end; justify-content: space-between; padding: 0 20px; pointer-events: none; touch-action: none; }
 .mobile-controls button { pointer-events: auto; user-select: none; -webkit-user-select: none; touch-action: none; }
 .mobile-controls button:not(.mobile-attack) { border-color: #64785f !important; background: rgba(57, 76, 53, .94) !important; }
-.mobile-actions .mobile-interact, .mobile-actions .mobile-inventory, .mobile-actions .mobile-repair, .mobile-actions .mobile-attack { border-color: #303a31 !important; background: linear-gradient(145deg, #87a07b, #293d2f 75%) !important; box-shadow: inset 0 0 0 2px rgba(180, 197, 169, .35), 0 5px 14px rgba(0, 0, 0, .4); }
-.mobile-actions svg { width: 27px; height: 27px; fill: none; stroke: #e2ecd9; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.mobile-joystick { width: 132px; height: 132px; display: grid; grid-template: repeat(3, 42px) / repeat(3, 42px); gap: 3px; padding: 0; border-radius: 50%; background: rgba(12, 19, 12, .62); }
-.mobile-direction { padding: 0; border-radius: 50%; font-size: 22px; background: rgba(65, 84, 60, .9); }
+.mobile-actions .mobile-interact, .mobile-actions .mobile-inventory, .mobile-actions .mobile-repair, .mobile-actions .mobile-revive, .mobile-actions .mobile-attack { border-color: #303a31 !important; background: linear-gradient(145deg, #87a07b, #293d2f 75%) !important; box-shadow: inset 0 0 0 2px rgba(180, 197, 169, .35), 0 5px 14px rgba(0, 0, 0, .4); }
+.mobile-actions svg { width: 22px; height: 22px; fill: none; stroke: #e2ecd9; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mobile-joystick { width: 108px; height: 108px; display: grid; grid-template: repeat(3, 34px) / repeat(3, 34px); gap: 3px; padding: 0; border-radius: 50%; background: rgba(12, 19, 12, .62); }
+.mobile-direction { padding: 0; border-radius: 50%; font-size: 18px; background: rgba(65, 84, 60, .9); }
 .mobile-direction--↑ { grid-area: 1 / 2; }.mobile-direction--← { grid-area: 2 / 1; }.mobile-direction--→ { grid-area: 2 / 3; }.mobile-direction--↓ { grid-area: 3 / 2; }
 .mobile-joystick__center { grid-area: 2 / 2; border-radius: 50%; background: rgba(116, 135, 105, .45); }
-.mobile-actions { width: 150px; display: grid; grid-template-columns: repeat(2, 58px); align-items: end; justify-content: end; gap: 10px; }
-.mobile-actions button { width: 58px; height: 58px; padding: 0; border-radius: 50%; font-size: 21px; font-weight: 800; box-shadow: 0 5px 14px rgba(0, 0, 0, .4); }
+.mobile-actions { width: 158px; display: grid; grid-template-columns: repeat(3, 48px); align-items: end; justify-content: end; gap: 7px; }
+.mobile-actions button { width: 48px; height: 48px; padding: 0; border-radius: 50%; font-size: 18px; font-weight: 800; box-shadow: 0 5px 14px rgba(0, 0, 0, .4); }
 @media (max-width: 640px) {
   .goal { display: none; } .game-hud { grid-template-columns: repeat(2, 1fr); }
   .status { align-items: stretch; flex-direction: column; } .actions { justify-content: stretch; }

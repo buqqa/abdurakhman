@@ -34,21 +34,23 @@ interface Props {
   onNightCleared: () => void;
   remotePlayers: RemotePlayer[];
   onPlayerMove: (position: Position) => void;
+  onRevivePlayer: (id: string) => void;
   authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void;
   sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void;
 }
 
-export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
+export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const { t, language } = useI18n();
   return (
     <section>
       <ForestMap paused={paused} mobileMode={mobileMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
-        remotePlayers={remotePlayers} onPlayerMove={onPlayerMove}
+        remotePlayers={remotePlayers} onPlayerMove={onPlayerMove} onRevivePlayer={onRevivePlayer}
         authoritative={authoritative} sharedZombies={sharedZombies} zombieHit={zombieHit} onZombiesChange={onZombiesChange} onZombieHit={onZombieHit}
         sharedDrops={sharedDrops} onTakeDrop={onTakeDrop}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
-      {!mobileMode && <p className="controls">{t('controls')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}</p>}
+      {!mobileMode && <p className="controls">{t('controls')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}
+        {remotePlayers.some((player) => player.downed) && ` · V — ${language === 'en' ? 'revive teammate' : language === 'kk' ? 'одақтасты емдеу' : 'вылечить союзника'}`}</p>}
     </section>
   );
 }

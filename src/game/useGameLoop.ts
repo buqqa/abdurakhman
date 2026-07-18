@@ -83,11 +83,13 @@ export function useGameLoop() {
     playGameSound('zombieSpawn');
     setGame((state) => ({ ...state, phase: 'night', message: message.night(state.day) }));
   };
-  const damagePlayer = (damage: number) => setGame((state) => {
+  const damagePlayer = (damage: number, canBeRevived = false) => setGame((state) => {
     if (state.phase !== 'night') return state;
     const playerHealth = Math.max(0, state.playerHealth - damage);
-    return { ...state, playerHealth, phase: playerHealth ? state.phase : 'lost', message: playerHealth ? message.playerHit(damage) : message.playerLost };
+    return { ...state, playerHealth, phase: playerHealth || canBeRevived ? state.phase : 'lost', message: playerHealth ? message.playerHit(damage) : canBeRevived ? 'Вы ранены. Друг может поднять вас клавишей V.' : message.playerLost };
   });
+  const revivePlayer = () => setGame((state) => state.playerHealth > 0 ? state : ({ ...state, playerHealth: 50, message: 'Друг вылечил вас. Здоровье восстановлено до 50.' }));
+  const payReviveCost = () => setGame((state) => ({ ...state, playerHealth: Math.max(1, Math.ceil(state.playerHealth / 2)), message: 'Вы отдали половину здоровья, чтобы спасти друга.' }));
   const damageBase = (damage: number) => setGame((state) => {
     if (state.phase !== 'night') return state;
     const baseHealth = Math.max(0, state.baseHealth - damage);
@@ -109,5 +111,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
 }
