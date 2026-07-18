@@ -14,9 +14,9 @@ function sendKey(code: string, type: 'keydown' | 'keyup') {
   window.dispatchEvent(new KeyboardEvent(type, { code, bubbles: true }));
 }
 
-function DirectionButton({ code, label, enabled }: { code: string; label: string; enabled: boolean }) {
+function DirectionButton({ code, label, direction, enabled }: { code: string; label: string; direction: 'up' | 'left' | 'right' | 'down'; enabled: boolean }) {
   const release = () => sendKey(code, 'keyup');
-  return <button className={`mobile-direction mobile-direction--${label}`} disabled={!enabled}
+  return <button className={`mobile-direction mobile-direction--${direction}`} disabled={!enabled}
     onPointerDown={(event) => { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); sendKey(code, 'keydown'); }}
     onPointerUp={release} onPointerCancel={release} onPointerLeave={(event) => { if (event.buttons) release(); }}>{label}</button>;
 }
@@ -29,9 +29,9 @@ export function MobileControls({ enabled }: Props) {
   const repair = () => document.querySelector('.base')?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 2 }));
   return <aside className="mobile-controls" aria-label="Мобильное управление">
     <div className="mobile-joystick">
-      <DirectionButton code="KeyW" label="↑" enabled={enabled} /><DirectionButton code="KeyA" label="←" enabled={enabled} />
-      <span className="mobile-joystick__center" /><DirectionButton code="KeyD" label="→" enabled={enabled} />
-      <DirectionButton code="KeyS" label="↓" enabled={enabled} />
+      <DirectionButton code="KeyW" label="↑" direction="up" enabled={enabled} /><DirectionButton code="KeyA" label="←" direction="left" enabled={enabled} />
+      <span className="mobile-joystick__center" /><DirectionButton code="KeyD" label="→" direction="right" enabled={enabled} />
+      <DirectionButton code="KeyS" label="↓" direction="down" enabled={enabled} />
     </div>
     <div className="mobile-actions">
       <button className="mobile-interact" disabled={!enabled} onClick={() => sendKey('KeyE', 'keydown')} aria-label="Взаимодействовать"><MobileIcon kind="interact" /></button>

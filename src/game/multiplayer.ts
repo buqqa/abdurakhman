@@ -11,7 +11,7 @@ export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNi
 export type ResourceKind = 'wood' | 'food' | 'water';
 export interface SharedDrop extends Position { id: string; kind: ResourceKind }
 
-const POSITION_INTERVAL = 100;
+const POSITION_INTERVAL = 66;
 const POSITION_HEARTBEAT = 1000;
 const ZOMBIE_INTERVAL = 100;
 
