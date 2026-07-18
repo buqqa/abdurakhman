@@ -11,6 +11,7 @@ export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNi
 export type ResourceKind = 'wood' | 'food' | 'water';
 export interface SharedDrop extends Position { id: string; kind: ResourceKind }
 export interface WorldHit { id: string; hitsToFell: number; nonce: string }
+export interface ZombieDeath { zombie: Zombie; nonce: string }
 
 const POSITION_INTERVAL = 66;
 const POSITION_HEARTBEAT = 1000;
@@ -35,6 +36,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const [roomFull, setRoomFull] = useState(false);
   const [reviveSignal, setReviveSignal] = useState(0);
   const [worldHit, setWorldHit] = useState<WorldHit>();
+  const [zombieDeath, setZombieDeath] = useState<ZombieDeath>();
   const lastPosition = useRef<Position>({ x: 100, y: 100 });
 
   useEffect(() => {
@@ -61,6 +63,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       setPlayers((current) => current.map((player) => player.id === action.id ? { ...player, attackNonce: action.nonce } : player));
     });
     channel.on('broadcast', { event: 'world-hit' }, ({ payload }) => setWorldHit(payload as WorldHit));
+    channel.on('broadcast', { event: 'zombie-death' }, ({ payload }) => setZombieDeath(payload as ZombieDeath));
     channel.on('presence', { event: 'sync' }, () => {
       const members = Object.values(channel.presenceState()).flat() as unknown as PresencePayload[];
       const admitted = [...members].sort((a, b) => a.joinedAt - b.joinedAt || a.id.localeCompare(b.id)).slice(0, maxPlayers);
@@ -121,6 +124,9 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const sendWorldHit = useCallback((id: string, hitsToFell: number) => {
     void channelRef.current?.send({ type: 'broadcast', event: 'world-hit', payload: { id, hitsToFell, nonce: crypto.randomUUID() } });
   }, []);
+  const sendZombieDeath = useCallback((zombie: Zombie) => {
+    void channelRef.current?.send({ type: 'broadcast', event: 'zombie-death', payload: { zombie, nonce: crypto.randomUUID() } });
+  }, []);
 
-  return { players, sharedGame, zombies, zombieHit, drops, stateRequest, memberCount, roomFull, reviveSignal, worldHit, sendPosition, sendGame, sendZombies, sendZombieHit, dropResource, takeResource, sendDrops, revivePlayer, sendPlayerAttack, sendWorldHit };
+  return { players, sharedGame, zombies, zombieHit, zombieDeath, drops, stateRequest, memberCount, roomFull, reviveSignal, worldHit, sendPosition, sendGame, sendZombies, sendZombieHit, sendZombieDeath, dropResource, takeResource, sendDrops, revivePlayer, sendPlayerAttack, sendWorldHit };
 }

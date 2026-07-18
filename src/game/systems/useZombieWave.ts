@@ -4,7 +4,8 @@ import type { Phase } from '../types';
 import { createZombieWave, type Zombie } from '../zombies';
 import type { Position } from '../../components/PlayerController';
 import { playGameSound } from '../../lib/gameAudio';
-import type { Explosion } from '../../components/ZombieExplosion';
+import type { ZombieDeath } from '../multiplayer';
+import { useZombieDeathEffects } from './useZombieDeathEffects';
 
 const EXPLOSION_RADIUS = 75;
 const EXPLOSION_PLAYER_DAMAGE = 20;
@@ -24,12 +25,13 @@ interface Options {
   onZombiesChange?: (zombies: Zombie[]) => void;
   onRemoteHit?: (id: string, damage: number) => void;
   remoteHit?: { id: string; damage: number; nonce: string };
+  remoteDeath?: ZombieDeath;
+  onZombieDeath?: (zombie: Zombie) => void;
 }
 
 export function useZombieWave(options: Options) {
   const [zombies, setZombies] = useState<Zombie[]>([]);
-  const [explosions, setExplosions] = useState<Explosion[]>([]);
-  const explosionId = useRef(0);
+  const { deaths, explosions, showDeath } = useZombieDeathEffects(options.authoritative, options.remoteDeath);
   const zombiesRef = useRef<Zombie[]>([]);
   const optionsRef = useRef(options);
   const activeWave = useRef(false);
@@ -48,7 +50,7 @@ export function useZombieWave(options: Options) {
       const wave = createZombieWave(options.day, options.difficulty);
       spawnedNight.current = options.day;
       activeWave.current = true;
-      zombiesRef.current = wave.slice(0, 1).map((zombie) => ({ ...zombie, spawnedAt: performance.now() }));
+      zombiesRef.current = wave.slice(0, 1).map((zombie) => ({ ...zombie, spawnedAt: Date.now() }));
       waitingZombies.current = wave.slice(1);
       setZombies(zombiesRef.current);
       optionsRef.current.onZombiesChange?.(zombiesRef.current);
@@ -59,7 +61,7 @@ export function useZombieWave(options: Options) {
         const groupRoll = Math.random();
         const groupSize = groupRoll < .05 ? 3 : groupRoll < .2 ? 2 : 1;
         const group = waitingZombies.current.splice(0, groupSize)
-          .map((zombie) => ({ ...zombie, spawnedAt: performance.now() }));
+          .map((zombie) => ({ ...zombie, spawnedAt: Date.now() }));
         if (!group.length) return;
         playGameSound('zombieSpawn');
         zombiesRef.current = [...zombiesRef.current, ...group];
@@ -120,20 +122,20 @@ export function useZombieWave(options: Options) {
 
   const hitZombie = (id: string, damage = 1) => {
     if (optionsRef.current.authoritative === false) return optionsRef.current.onRemoteHit?.(id, damage);
-    const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: performance.now() } : zombie);
-    const killedExplosive = damaged.find((zombie) => zombie.id === id && zombie.isExplosive && zombie.health <= .001);
+    const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: Date.now() } : zombie);
+    const killedZombie = damaged.find((zombie) => zombie.id === id && zombie.health <= .001);
     const survivors = damaged.filter((zombie) => zombie.health > .001);
     zombiesRef.current = survivors;
     setZombies(survivors);
     optionsRef.current.onZombiesChange?.(survivors);
-    if (killedExplosive) {
-      const explosion = { id: explosionId.current++, x: killedExplosive.x, y: killedExplosive.y };
-      setExplosions((current) => [...current, explosion]);
-      window.setTimeout(() => setExplosions((current) => current.filter((item) => item.id !== explosion.id)), 520);
-      playGameSound('zombieAttack');
+    if (killedZombie) {
+      showDeath(killedZombie);
+      optionsRef.current.onZombieDeath?.(killedZombie);
+    }
+    if (killedZombie?.isExplosive) {
       const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
-      if (Math.hypot(player.x - killedExplosive.x, player.y - killedExplosive.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
-      if (Math.hypot(BASE_POSITION.x - killedExplosive.x, BASE_POSITION.y - killedExplosive.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
+      if (Math.hypot(player.x - killedZombie.x, player.y - killedZombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
+      if (Math.hypot(BASE_POSITION.x - killedZombie.x, BASE_POSITION.y - killedZombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
     }
     if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
       activeWave.current = false;
@@ -143,6 +145,5 @@ export function useZombieWave(options: Options) {
   useEffect(() => {
     if (options.authoritative !== false && options.remoteHit) hitZombie(options.remoteHit.id, options.remoteHit.damage);
   }, [options.remoteHit?.nonce]);
-
-  return { zombies, explosions, hitZombie };
+  return { zombies, deaths, explosions, hitZombie };
 }

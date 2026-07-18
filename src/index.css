@@ -33,7 +33,7 @@ button { font: inherit; }
 .shared-drop { position: absolute; z-index: 4; font-size: 20px; filter: drop-shadow(0 3px 2px #172017); animation: shared-drop-land .28s ease-out; }
 @keyframes shared-drop-land { from { translate: 0 -18px; scale: .7; } to { translate: 0; scale: 1; } }
 .inventory-help { margin: 0; color: #7f8d7b; font-size: 12px; }
-.map-viewport { width: 100%; max-width: 900px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; }
+.map-viewport { width: 100%; max-width: 900px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; background: #263b2b; }
 .game-shell:not(.game-shell--mobile) .map-viewport { outline: 3px solid #3b2a1b; outline-offset: 0; border-radius: 11px; box-shadow: 0 0 0 1px #85613d, 0 0 0 5px #241a12, 0 14px 30px rgba(4, 8, 4, .48), inset 0 0 0 2px rgba(221, 184, 112, .22); }
 .camera-world { width: max-content; height: max-content; transition: transform 60ms linear; }
 .forest-map { position: relative; overflow: hidden; background-color: #49643e; background-image: radial-gradient(ellipse at 20% 25%, rgba(119, 146, 76, .28) 0 2px, transparent 3px), radial-gradient(ellipse at 72% 68%, rgba(34, 70, 37, .25) 0 3px, transparent 4px), linear-gradient(115deg, transparent 48%, rgba(216, 224, 146, .1) 49% 51%, transparent 52%); background-size: 37px 31px, 53px 47px, 19px 23px; transition: background-color .4s; }

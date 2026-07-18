@@ -21,16 +21,16 @@ import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { MobileGameHud } from './MobileGameHud';
 import { RemotePlayer } from './RemotePlayer';
-import type { RemotePlayer as RemotePlayerState, WorldHit } from '../game/multiplayer';
+import type { RemotePlayer as RemotePlayerState, WorldHit, ZombieDeath } from '../game/multiplayer';
 import type { Zombie } from '../game/zombies';
 import type { SharedDrop } from '../game/multiplayer';
 import { ReviveSystem } from '../game/systems/ReviveSystem';
 import { useFootprints } from '../game/systems/useFootprints';
 import { useTreeHarvest } from '../game/systems/useTreeHarvest';
 
-interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void; remotePlayers: RemotePlayerState[]; onPlayerMove: (position: Position) => void; onRevivePlayer: (id: string) => void; onPlayerAttack: () => void; onWorldHit: (id: string, hitsToFell: number) => void; worldHit?: WorldHit; authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void; sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void }
+interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void; remotePlayers: RemotePlayerState[]; onPlayerMove: (position: Position) => void; onRevivePlayer: (id: string) => void; onPlayerAttack: () => void; onWorldHit: (id: string, hitsToFell: number) => void; worldHit?: WorldHit; zombieDeath?: ZombieDeath; onZombieDeath: (zombie: Zombie) => void; authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void; sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void }
 
-export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
+export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, zombieDeath, onZombieDeath, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
@@ -69,7 +69,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
     });
   }, [day, phase]);
   const updatePlayer = useCallback((position: Position) => { setPlayer(position); onPlayerMove(position); }, [onPlayerMove]);
-  const { zombies, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, onZombiesChange, onRemoteHit: onZombieHit });
+  const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
     onPlayerAttack();
@@ -130,7 +130,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
       onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
-    <GameCamera player={player} overlay={mobileMode ? <MobileGameHud phase={phase} day={day} maxNights={maxNights} baseHealth={baseHealth} playerHealth={playerHealth} /> : undefined}>
+    <GameCamera player={player} lookAheadY={mobileMode ? 95 : 0} overlay={mobileMode ? <MobileGameHud phase={phase} day={day} maxNights={maxNights} baseHealth={baseHealth} playerHealth={playerHealth} /> : undefined}>
       <section className={`forest-map ${isNight ? 'forest-map--night' : ''}`} style={{ width: MAP_WIDTH, height: MAP_HEIGHT }} aria-label="Карта леса">
         {trees.map((tree) => <div className={`map-tree ${treeAnimation?.id === tree.id ? treeAnimation.falling ? 'map-tree--fall' : 'map-tree--hit' : ''}`}
           style={{ left: tree.x - 25, top: tree.y - 50 }} key={tree.id}>
@@ -150,6 +150,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
         <PlayerController nickname={playerNickname} canMove={canMove} onMove={updatePlayer} onFootstep={addFootprint} isAttacking={isSwinging} downed={playerHealth <= 0} weapon={weapon} />
         {remotePlayers.map((remote) => <RemotePlayer player={remote} key={remote.id} />)}
         {isNight && zombies.map((zombie) => <ZombieSprite zombie={zombie} key={zombie.id} />)}
+        {isNight && deaths.map((zombie) => <ZombieSprite zombie={zombie} dying key={`death-${zombie.id}`} />)}
         {isNight && explosions.map((explosion) => <ZombieExplosion explosion={explosion} key={explosion.id} />)}
         {isNight && <div className="night-overlay" />}
       </section>

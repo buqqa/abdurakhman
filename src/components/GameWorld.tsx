@@ -4,7 +4,7 @@ import type { InteractionHandlers } from '../game/interactions';
 import type { Weapon } from '../game/types';
 import type { CrateKind } from '../game/interactions';
 import { useI18n } from '../i18n/I18nContext';
-import type { RemotePlayer, WorldHit } from '../game/multiplayer';
+import type { RemotePlayer, WorldHit, ZombieDeath } from '../game/multiplayer';
 import type { Position } from './PlayerController';
 import type { Zombie } from '../game/zombies';
 import type { SharedDrop } from '../game/multiplayer';
@@ -38,16 +38,19 @@ interface Props {
   onPlayerAttack: () => void;
   onWorldHit: (id: string, hitsToFell: number) => void;
   worldHit?: WorldHit;
+  zombieDeath?: ZombieDeath;
+  onZombieDeath: (zombie: Zombie) => void;
   authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void;
   sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void;
 }
 
-export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
+export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, zombieDeath, onZombieDeath, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const { t, language } = useI18n();
   return (
     <section>
       <ForestMap paused={paused} mobileMode={mobileMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
         remotePlayers={remotePlayers} onPlayerMove={onPlayerMove} onRevivePlayer={onRevivePlayer} onPlayerAttack={onPlayerAttack} onWorldHit={onWorldHit} worldHit={worldHit}
+        zombieDeath={zombieDeath} onZombieDeath={onZombieDeath}
         authoritative={authoritative} sharedZombies={sharedZombies} zombieHit={zombieHit} onZombiesChange={onZombiesChange} onZombieHit={onZombieHit}
         sharedDrops={sharedDrops} onTakeDrop={onTakeDrop}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onPlayerDamage={onPlayerDamage}
