@@ -9,7 +9,7 @@ export function RemotePlayer({ player }: { player: RemotePlayerState }) {
     const timer = window.setTimeout(() => setAttacking(false), 260);
     return () => window.clearTimeout(timer);
   }, [player.attackNonce]);
-  return <div className={`player player--remote player--${player.weapon} ${player.walking ? 'player--walking' : ''} ${attacking ? 'player--attacking' : ''} ${player.downed ? 'player--downed' : ''}`} style={{ transform: `translate(${player.x}px, ${player.y}px)` }}>
+  return <div className={`player player--remote player--${player.weapon} ${player.facingRight ? 'player--mirrored' : ''} ${player.walking ? 'player--walking' : ''} ${attacking ? 'player--attacking' : ''} ${player.downed ? 'player--downed' : ''}`} style={{ transform: `translate(${player.x}px, ${player.y}px)` }}>
     <span className="player__nickname">{player.nickname}</span>
     <span className="player__sprite"><span className="player__hair" /><span className="player__head"><i /></span>
       <span className="player__arm player__arm--left" /><span className="player__body" />

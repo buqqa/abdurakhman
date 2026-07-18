@@ -1,6 +1,6 @@
 .map-water { position: absolute; z-index: 2; font-size: 25px; filter: drop-shadow(0 3px 2px #244457); animation: water-float 1.4s ease-in-out infinite; }
 @keyframes water-float { 50% { translate: 0 -3px; } }
-.map-zombie { position: absolute; left: 0; top: 0; width: 30px; height: 36px; z-index: 3; filter: drop-shadow(0 3px 2px #111a12); animation: zombie-walk .42s steps(2) infinite; }
+.map-zombie { position: absolute; left: 0; top: 0; width: 30px; height: 36px; z-index: 3; filter: drop-shadow(0 3px 2px #111a12); animation: zombie-walk .42s steps(2) infinite; transition: transform 110ms linear; will-change: transform; }
 .zombie-sprite { position: absolute; inset: 0; transform-origin: center; }
 .map-zombie--left .zombie-sprite { transform: scaleX(-1); }
 .zombie-head { position: absolute; left: 7px; top: 5px; width: 17px; height: 14px; border: 2px solid #263326; border-radius: 3px; background: #75915c; }
@@ -14,8 +14,8 @@
 .zombie-health { position: absolute; left: -1px; top: -7px; width: 32px; height: 6px; overflow: hidden; border: 2px solid #171b17; border-radius: 1px; background: repeating-linear-gradient(90deg, #372b29 0 4px, #221c1b 4px 5px); box-shadow: 0 2px 0 #101310, inset 0 1px #55413d; }
 .zombie-health i { display: block; height: 100%; background: repeating-linear-gradient(90deg, #7fb05d 0 4px, #5d8b43 4px 5px); box-shadow: inset 0 1px #b4d47b; transition: width .12s steps(2); }
 .map-zombie--hit .zombie-sprite { filter: brightness(2) sepia(1) saturate(4); }
-.map-zombie--dying { pointer-events: none; animation: zombie-death .55s ease-out forwards; }
-.map-zombie--dying .zombie-sprite { animation: zombie-fall .55s ease-out forwards; transform-origin: center bottom; }
+.map-zombie.map-zombie--dying { pointer-events: none; animation: zombie-death .55s ease-out forwards; }
+.map-zombie.map-zombie--dying .zombie-sprite { animation: zombie-fall .55s ease-out forwards; transform-origin: center bottom; }
 @keyframes zombie-death { 70% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes zombie-fall { 100% { transform: rotate(82deg) translate(8px, 5px); filter: grayscale(1) brightness(.55); } }
 .map-zombie--spawning .zombie-sprite { animation: zombie-rise 1s ease-out both; }

@@ -40,11 +40,12 @@ interface Props {
   worldHit?: WorldHit;
   zombieDeath?: ZombieDeath;
   onZombieDeath: (zombie: Zombie) => void;
+  multiplayerMode: boolean;
   authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void;
   sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void;
 }
 
-export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, zombieDeath, onZombieDeath, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
+export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, zombieDeath, onZombieDeath, multiplayerMode, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const { t, language } = useI18n();
   return (
     <section>
@@ -56,7 +57,7 @@ export function GameWorld({ paused, mobileMode, playerNickname, phase, day, diff
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
       {!mobileMode && <p className="controls">{t('controls')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}
-        {remotePlayers.some((player) => player.downed) && ` · V — ${language === 'en' ? 'revive teammate' : language === 'kk' ? 'одақтасты емдеу' : 'вылечить союзника'}`}</p>}
+        {multiplayerMode && ` · ${language === 'en' ? 'V — revive teammate' : language === 'kk' ? 'V — одақтасты емдеу' : 'V — лечить союзника'}`}</p>}
     </section>
   );
 }

@@ -4,8 +4,8 @@ import type { Position } from '../components/PlayerController';
 import type { GameState, Weapon } from './types';
 import type { Zombie } from './zombies';
 
-export interface RemotePlayer extends Position { id: string; nickname: string; weapon: Weapon; health: number; downed: boolean; walking: boolean; attackNonce?: string; updatedAt: number }
-interface PlayerPayload { id: string; nickname: string; x: number; y: number; weapon: Weapon; health: number; downed: boolean; walking: boolean }
+export interface RemotePlayer extends Position { id: string; nickname: string; weapon: Weapon; health: number; downed: boolean; walking: boolean; facingRight: boolean; attackNonce?: string; updatedAt: number }
+interface PlayerPayload { id: string; nickname: string; x: number; y: number; weapon: Weapon; health: number; downed: boolean; walking: boolean; facingRight: boolean }
 interface PresencePayload { id: string; nickname: string; joinedAt: number }
 export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNights' | 'difficulty' | 'merchantDay'>;
 export type ResourceKind = 'wood' | 'food' | 'water';
@@ -24,6 +24,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const lastWeapon = useRef<Weapon>();
   const lastHealth = useRef(100);
   const lastWalking = useRef(false);
+  const lastFacingRight = useRef(false);
   const lastZombieSent = useRef(0);
   const latestZombies = useRef<Zombie[]>([]);
   const [players, setPlayers] = useState<RemotePlayer[]>([]);
@@ -46,7 +47,10 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     channel.on('broadcast', { event: 'player-move' }, ({ payload }) => {
       const player = payload as PlayerPayload;
       if (player.id === id.current) return;
-      setPlayers((current) => [...current.filter((item) => item.id !== player.id), { ...player, updatedAt: Date.now() }]);
+      setPlayers((current) => {
+        const existing = current.find((item) => item.id === player.id);
+        return [...current.filter((item) => item.id !== player.id), { ...existing, ...player, updatedAt: Date.now() }];
+      });
     });
     channel.on('broadcast', { event: 'game-state' }, ({ payload }) => setSharedGame(payload as SharedGame));
     channel.on('broadcast', { event: 'zombie-state' }, ({ payload }) => setZombies(payload as Zombie[]));
@@ -83,6 +87,8 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const sendPosition = useCallback((position: Position, weapon: Weapon, health: number) => {
     const now = performance.now();
     const moved = Math.hypot(position.x - lastPosition.current.x, position.y - lastPosition.current.y) >= 2;
+    const horizontalMove = position.x - lastPosition.current.x;
+    if (Math.abs(horizontalMove) >= 1) lastFacingRight.current = horizontalMove > 0;
     const heartbeatDue = now - lastSent.current >= POSITION_HEARTBEAT;
     const walkingChanged = moved !== lastWalking.current;
     if (!channelRef.current || now - lastSent.current < POSITION_INTERVAL || (!moved && !walkingChanged && weapon === lastWeapon.current && health === lastHealth.current && !heartbeatDue)) return;
@@ -91,7 +97,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     lastWeapon.current = weapon;
     lastHealth.current = health;
     lastWalking.current = moved;
-    void channelRef.current.send({ type: 'broadcast', event: 'player-move', payload: { id: id.current, nickname, ...position, weapon, health, downed: health <= 0, walking: moved } });
+    void channelRef.current.send({ type: 'broadcast', event: 'player-move', payload: { id: id.current, nickname, ...position, weapon, health, downed: health <= 0, walking: moved, facingRight: lastFacingRight.current } });
   }, [nickname]);
 
   const sendGame = useCallback((game: SharedGame) => {
