@@ -21,29 +21,25 @@ import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { MobileGameHud } from './MobileGameHud';
 import { RemotePlayer } from './RemotePlayer';
-import type { RemotePlayer as RemotePlayerState } from '../game/multiplayer';
+import type { RemotePlayer as RemotePlayerState, WorldHit } from '../game/multiplayer';
 import type { Zombie } from '../game/zombies';
 import type { SharedDrop } from '../game/multiplayer';
 import { ReviveSystem } from '../game/systems/ReviveSystem';
+import { useFootprints } from '../game/systems/useFootprints';
+import { useTreeHarvest } from '../game/systems/useTreeHarvest';
 
-interface Footprint extends Position { id: number }
+interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void; remotePlayers: RemotePlayerState[]; onPlayerMove: (position: Position) => void; onRevivePlayer: (id: string) => void; onPlayerAttack: () => void; onWorldHit: (id: string, hitsToFell: number) => void; worldHit?: WorldHit; authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void; sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void }
 
-interface Props { paused: boolean; mobileMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void; remotePlayers: RemotePlayerState[]; onPlayerMove: (position: Position) => void; onRevivePlayer: (id: string) => void; authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void; sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void }
-
-export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
+export function ForestMap({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
   const canMove = playerHealth > 0 && !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
   const [objects, setObjects] = useState(WORLD_OBJECTS);
-  const treeHits = useRef<Record<string, number>>({});
-  const [treeAnimation, setTreeAnimation] = useState<{ id: string; falling: boolean }>();
   const crateHits = useRef<Record<string, number>>({});
   const [crateAnimation, setCrateAnimation] = useState<{ id: string; breaking: boolean }>();
   const [isSwinging, setIsSwinging] = useState(false);
-  const [footprints, setFootprints] = useState<Footprint[]>([]);
-  const footprintId = useRef(0);
   const spawnedDays = useRef(new Set<number>());
   const structureDays = useRef({ tent: 5 + Math.floor(Math.random() * 6), warehouse: 10 + Math.floor(Math.random() * 11) });
   const spawnedStructures = useRef(new Set<StructureKind>());
@@ -76,13 +72,10 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   const { zombies, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, paused, onPlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, onZombiesChange, onRemoteHit: onZombieHit });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
+    onPlayerAttack();
     window.setTimeout(() => setIsSwinging(false), 260);
-  }, []);
-  const addFootprint = useCallback((position: Position) => {
-    const footprint = { ...position, id: footprintId.current++ };
-    setFootprints((current) => [...current, footprint]);
-    window.setTimeout(() => setFootprints((current) => current.filter((item) => item.id !== footprint.id)), 1000);
-  }, []);
+  }, [onPlayerAttack]);
+  const { footprints, addFootprint } = useFootprints(remotePlayers);
   const collectObject = useCallback((object: { id: string; kind: string }) => {
     if (object.kind === 'food' || object.kind === 'water') setObjects((current) => current.filter((item) => item.id !== object.id));
   }, []);
@@ -92,19 +85,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   const interactionObjects = objects.filter((object) => object.kind !== 'tree' && !object.kind.startsWith('crate-') && !object.kind.startsWith('structure-'));
   const sharedDropObjects = sharedDrops.map((drop) => ({ ...drop, kind: 'shared-drop' }));
   const sharedHandlers = { ...handlers, 'shared-drop': (object: { id: string }) => { const drop = sharedDrops.find((item) => item.id === object.id); if (drop) onTakeDrop(drop); } };
-  const harvestTree = useCallback((tree: { id: string }) => {
-    const hitsToFell = weapon === 'spear' ? 4 : 3;
-    if ((treeHits.current[tree.id] ?? 0) >= hitsToFell) return;
-    onHarvest();
-    playGameSound('chop');
-    swingWeapon();
-    const hits = (treeHits.current[tree.id] ?? 0) + 1;
-    treeHits.current[tree.id] = hits;
-    const falling = hits >= hitsToFell;
-    setTreeAnimation({ id: tree.id, falling });
-    window.setTimeout(() => setTreeAnimation(undefined), falling ? 620 : 260);
-    if (falling) window.setTimeout(() => setObjects((items) => items.filter((item) => item.id !== tree.id)), 600);
-  }, [onHarvest, swingWeapon, weapon]);
+  const { treeAnimation, harvestTree } = useTreeHarvest({ weapon, worldHit, setObjects, onHarvest, onSwing: swingWeapon, onWorldHit });
   const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: 'zombie', x: zombie.x, y: zombie.y }));
   const attackZombie = useCallback((target: { id: string }) => {
     swingWeapon();
