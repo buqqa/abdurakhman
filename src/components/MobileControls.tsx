@@ -18,7 +18,7 @@ function DirectionButton({ code, label, direction, enabled }: { code: string; la
   const release = () => sendKey(code, 'keyup');
   return <button className={`mobile-direction mobile-direction--${direction}`} disabled={!enabled}
     onPointerDown={(event) => { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); sendKey(code, 'keydown'); }}
-    onPointerUp={release} onPointerCancel={release} onPointerLeave={(event) => { if (event.buttons) release(); }}>{label}</button>;
+    onPointerUp={release} onPointerCancel={release}>{label}</button>;
 }
 
 export function MobileControls({ enabled }: Props) {

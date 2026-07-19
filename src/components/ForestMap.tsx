@@ -38,6 +38,7 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
   const worldReady = authoritative || Boolean(sharedWorld);
   const canMove = worldReady && playerHealth > 0 && !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
+  const lastMapFrame = useRef(0);
   const [objects, setObjects] = useState(WORLD_OBJECTS);
   const [isSwinging, setIsSwinging] = useState(false);
   const spawnedDays = useRef(new Set<number>());
@@ -79,7 +80,13 @@ export function ForestMap({ paused, mobileMode, playerNickname, phase, day, diff
       setObjects((current) => [...current, spawn.marker, ...spawn.crates]);
     });
   }, [authoritative, day, phase]);
-  const updatePlayer = useCallback((position: Position) => { setPlayer(position); onPlayerMove(position); }, [onPlayerMove]);
+  const updatePlayer = useCallback((position: Position) => {
+    onPlayerMove(position);
+    const now = performance.now();
+    if (now - lastMapFrame.current < 32) return;
+    lastMapFrame.current = now;
+    setPlayer(position);
+  }, [onPlayerMove]);
   const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, playerHealth, teammates: remotePlayers, paused, onPlayerDamage, onRemotePlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);

@@ -76,10 +76,17 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   }, [isPaused, switchWeapon]);
   useEffect(() => {
     if (device !== 'mobile') return;
-    setMobileHeight(window.innerHeight);
-    const lockAfterRotation = () => window.setTimeout(() => setMobileHeight(window.innerHeight), 120);
+    const updateHeight = () => setMobileHeight(window.visualViewport?.height ?? window.innerHeight);
+    updateHeight();
+    const lockAfterRotation = () => window.setTimeout(updateHeight, 120);
     window.addEventListener('orientationchange', lockAfterRotation);
-    return () => window.removeEventListener('orientationchange', lockAfterRotation);
+    window.addEventListener('resize', updateHeight);
+    window.visualViewport?.addEventListener('resize', updateHeight);
+    return () => {
+      window.removeEventListener('orientationchange', lockAfterRotation);
+      window.removeEventListener('resize', updateHeight);
+      window.visualViewport?.removeEventListener('resize', updateHeight);
+    };
   }, [device]);
   const returnToMenu = () => { setPendingGame(undefined); setParty(undefined); setPlayMode(isRegistered ? undefined : 'solo'); setDevice(undefined); restart(); };
   if (game.phase === 'menu') {

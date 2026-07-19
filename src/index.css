@@ -206,7 +206,7 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .game-shell--mobile { position: fixed; inset: 0; width: 100vw; padding: 0; overflow: hidden; overscroll-behavior: none; }
 .game-shell--mobile .party-game-badge { left: 12px; top: 62px; display: flex; align-items: center; gap: 7px; min-width: 0; padding: 4px 7px; border-radius: 6px; }.game-shell--mobile .party-game-badge span { display: none; }.game-shell--mobile .party-game-badge strong { font-size: 12px; letter-spacing: .1em; }.game-shell--mobile .party-game-badge small { font-size: 9px; }
 .game-shell--mobile .map-viewport { position: relative; width: 100vw; max-width: none; height: 100%; margin: 0; border-radius: 0; box-shadow: inset 0 0 0 3px #241a12, inset 0 0 0 5px #85613d, inset 0 0 14px rgba(4, 8, 4, .5); }
-.game-shell--mobile .camera-world { transition: none; will-change: transform; }
+.game-shell--mobile .camera-world { transition: transform 40ms linear; will-change: transform; }
 .game-shell--mobile .status { position: fixed; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 19; width: max-content; min-height: 0; padding: 0; transform: translateX(-50%); background: transparent; }
 .game-shell--mobile .status p { display: none; }.game-shell--mobile .status button { padding: 9px 13px; font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); }
 .game-shell--mobile .status .actions { width: 100%; justify-content: center; }
