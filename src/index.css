@@ -40,6 +40,7 @@ button { font: inherit; }
 .forest-map::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .45; background-image: repeating-linear-gradient(78deg, transparent 0 24px, rgba(31, 75, 35, .35) 25px 26px, transparent 27px 42px); mix-blend-mode: multiply; }
 .forest-map::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .25; box-shadow: inset 0 0 70px rgba(20, 37, 22, .38); }
 .forest-map--night { background-color: #49643e; }
+.forest-map--paused, .forest-map--paused * { animation-play-state: paused !important; }
 .forest-map--night::after { opacity: 1; }
 .night-overlay { position: absolute; inset: 0; z-index: 10; pointer-events: none; background: rgba(8, 14, 24, .56); }
 .map-tree { position: absolute; width: 56px; height: 65px; z-index: 1; filter: drop-shadow(0 3px 2px rgba(14, 30, 15, .45)); }

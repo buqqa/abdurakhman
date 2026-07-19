@@ -39,19 +39,26 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     if (multiplayer.reviveSignal) revivePlayer();
   }, [multiplayer.reviveSignal]);
   useEffect(() => {
+    if (multiplayer.playerDamage) damagePlayer(multiplayer.playerDamage.damage, true);
+  }, [multiplayer.playerDamage?.nonce]);
+  useEffect(() => {
     if (!party || game.phase === 'menu') return;
-    if (party.role === 'host') multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay });
-    else if (multiplayer.sharedGame) syncSharedGame(multiplayer.sharedGame);
-  }, [game.baseHealth, game.day, game.difficulty, game.maxNights, game.merchantDay, game.phase, multiplayer.sendGame, multiplayer.sharedGame, party, syncSharedGame]);
+    if (party.role === 'host') multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay, completionTime: game.completionTime, paused: isPaused });
+    else if (multiplayer.sharedGame) {
+      syncSharedGame(multiplayer.sharedGame);
+      setIsPaused(multiplayer.sharedGame.paused);
+    }
+  }, [game.baseHealth, game.completionTime, game.day, game.difficulty, game.maxNights, game.merchantDay, game.phase, isPaused, multiplayer.sendGame, multiplayer.sharedGame, party, syncSharedGame]);
   useEffect(() => {
     if (party?.role !== 'host' || !multiplayer.stateRequest) return;
-    multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay });
+    multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay, completionTime: game.completionTime, paused: isPaused });
     multiplayer.sendZombies();
     multiplayer.sendDrops(multiplayer.drops);
+    multiplayer.sendWorld();
   }, [multiplayer.stateRequest]);
   useEffect(() => {
     const togglePause = (event: KeyboardEvent) => {
-      if (event.code !== 'Escape' || (game.phase !== 'day' && game.phase !== 'night')) return;
+      if (event.code !== 'Escape' || party?.role === 'guest' || (game.phase !== 'day' && game.phase !== 'night')) return;
       setIsPaused((paused) => {
         if (paused) resumeClock(); else pauseClock();
         return !paused;
@@ -59,7 +66,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     };
     window.addEventListener('keydown', togglePause);
     return () => window.removeEventListener('keydown', togglePause);
-  }, [game.phase, pauseClock, resumeClock]);
+  }, [game.phase, party?.role, pauseClock, resumeClock]);
   useEffect(() => {
     const handleWeaponSwitch = (event: KeyboardEvent) => {
       if (event.code === 'KeyQ' && !event.repeat && !isPaused) switchWeapon();
@@ -97,7 +104,9 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         multiplayerMode={Boolean(party)}
         remotePlayers={multiplayer.players} onPlayerMove={sendPlayerPosition} onRevivePlayer={reviveTeammate} onPlayerAttack={multiplayer.sendPlayerAttack} onWorldHit={multiplayer.sendWorldHit} worldHit={multiplayer.worldHit}
+        sharedWorld={multiplayer.sharedWorld} worldTake={multiplayer.worldTake} onWorldState={multiplayer.sendWorld} onWorldTake={multiplayer.takeWorldObject}
         zombieDeath={multiplayer.zombieDeath} onZombieDeath={multiplayer.sendZombieDeath}
+        onRemotePlayerDamage={multiplayer.damageRemotePlayer}
         authoritative={!party || party.role === 'host'} sharedZombies={multiplayer.zombies} zombieHit={multiplayer.zombieHit} onZombiesChange={multiplayer.sendZombies} onZombieHit={multiplayer.sendZombieHit}
         sharedDrops={multiplayer.drops} onTakeDrop={(drop) => { multiplayer.takeResource(drop.id); receiveResource(drop.kind); }}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
@@ -110,8 +119,9 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       </section>
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={returnToMenu} />}
-      {isPaused && <PauseMenu onContinue={() => { resumeClock(); setIsPaused(false); }}
-        onEnd={() => { resumeClock(); setIsPaused(false); returnToMenu(); }} />}
+      {isPaused && (party?.role === 'guest'
+        ? <div className="pause-backdrop"><section className="pause-menu"><h2>ПАУЗА</h2><p>Владелец комнаты приостановил игру</p></section></div>
+        : <PauseMenu onContinue={() => { resumeClock(); setIsPaused(false); }} onEnd={() => { resumeClock(); setIsPaused(false); returnToMenu(); }} />)}
     </main>
   );
 }

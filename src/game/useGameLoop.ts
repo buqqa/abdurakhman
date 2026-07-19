@@ -103,7 +103,10 @@ export function useGameLoop() {
   const restart = () => setGame(initialState);
   const dropResource = (kind: ResourceKind) => setGame((state) => ({ ...state, [kind]: Math.max(0, state[kind] - 1) }));
   const receiveResource = (kind: ResourceKind) => setGame((state) => ({ ...state, [kind]: state[kind] + 1 }));
-  const syncSharedGame = useCallback((shared: SharedGame) => setGame((state) => ({ ...state, ...shared })), []);
+  const syncSharedGame = useCallback((shared: SharedGame) => setGame((state) => {
+    const { paused: _paused, ...nextGame } = shared;
+    return { ...state, ...nextGame };
+  }), []);
   const pauseClock = useCallback(() => { pausedAt.current ??= Date.now(); }, []);
   const resumeClock = useCallback(() => {
     if (!pausedAt.current) return;

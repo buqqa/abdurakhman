@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { BASE_POSITION, MAP_HEIGHT, MAP_WIDTH, PLAYER_SIZE } from '../mapConfig';
+import { BASE_POSITION, PLAYER_SIZE } from '../mapConfig';
 import type { Phase } from '../types';
 import { createZombieWave, type Zombie } from '../zombies';
 import type { Position } from '../../components/PlayerController';
 import { playGameSound } from '../../lib/gameAudio';
-import type { ZombieDeath } from '../multiplayer';
+import type { RemotePlayer, ZombieDeath } from '../multiplayer';
 import { useZombieDeathEffects } from './useZombieDeathEffects';
+import { moveZombies } from './zombieMovement';
 
 const EXPLOSION_RADIUS = 75;
 const EXPLOSION_PLAYER_DAMAGE = 20;
@@ -17,7 +18,10 @@ interface Options {
   difficulty: string;
   paused: boolean;
   player: Position;
+  playerHealth: number;
+  teammates: RemotePlayer[];
   onPlayerDamage: (damage: number) => void;
+  onRemotePlayerDamage: (id: string, damage: number) => void;
   onBaseDamage: (damage: number) => void;
   onCleared: () => void;
   authoritative?: boolean;
@@ -81,34 +85,16 @@ export function useZombieWave(options: Options) {
     const update = (time: number) => {
       const delta = Math.min((time - previous) / 1000, 0.04);
       previous = time;
-      const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
-      const base = BASE_POSITION;
-      const attacks: Array<{ player: boolean; damage: number }> = [];
-      const next = zombiesRef.current.map((zombie) => {
-        const playerDistance = Math.hypot(player.x - zombie.x, player.y - zombie.y);
-        const baseDistance = Math.hypot(base.x - zombie.x, base.y - zombie.y);
-        const targetsPlayer = playerDistance < baseDistance;
-        const target = targetsPlayer ? player : base;
-        const distance = targetsPlayer ? playerDistance : baseDistance;
-        const attackDistance = targetsPlayer ? 20 : 68;
-        if (distance <= attackDistance) {
-          if (time - zombie.lastAttack >= 1050) {
-            const damage = targetsPlayer ? zombie.playerDamage : zombie.damage;
-            attacks.push({ player: targetsPlayer, damage });
-            return { ...zombie, lastAttack: time };
-          }
-          return zombie;
-        }
-        const step = Math.min(distance, zombie.speed * delta);
-        const x = zombie.x + (target.x - zombie.x) / distance * step;
-        const y = zombie.y + (target.y - zombie.y) / distance * step;
-        return { ...zombie, facingLeft: target.x < zombie.x, x: Math.max(25, Math.min(MAP_WIDTH - 35, x)), y: Math.max(25, Math.min(MAP_HEIGHT - 40, y)) };
-      });
+      const { next, attacks } = moveZombies({ zombies: zombiesRef.current, player: optionsRef.current.player, playerHealth: optionsRef.current.playerHealth, teammates: optionsRef.current.teammates, time, delta });
       const survivors = next.filter((zombie) => zombie.health > .001);
       zombiesRef.current = survivors;
       setZombies(survivors);
       optionsRef.current.onZombiesChange?.(survivors);
-      attacks.forEach((attack) => attack.player ? optionsRef.current.onPlayerDamage(attack.damage) : optionsRef.current.onBaseDamage(attack.damage));
+      attacks.forEach((attack) => {
+        if (attack.kind === 'local') optionsRef.current.onPlayerDamage(attack.damage);
+        else if (attack.kind === 'remote' && attack.id) optionsRef.current.onRemotePlayerDamage(attack.id, attack.damage);
+        else optionsRef.current.onBaseDamage(attack.damage);
+      });
       if (attacks.length) playGameSound('zombieAttack');
       if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
         activeWave.current = false;
@@ -121,6 +107,7 @@ export function useZombieWave(options: Options) {
   }, [options.paused, options.phase]);
 
   const hitZombie = (id: string, damage = 1) => {
+    if (optionsRef.current.paused || optionsRef.current.phase !== 'night') return;
     if (optionsRef.current.authoritative === false) return optionsRef.current.onRemoteHit?.(id, damage);
     const damaged = zombiesRef.current.map((zombie) => zombie.id === id ? { ...zombie, health: zombie.health - damage, hitAt: Date.now() } : zombie);
     const killedZombie = damaged.find((zombie) => zombie.id === id && zombie.health <= .001);
@@ -135,6 +122,8 @@ export function useZombieWave(options: Options) {
     if (killedZombie?.isExplosive) {
       const player = { x: optionsRef.current.player.x + PLAYER_SIZE / 2, y: optionsRef.current.player.y + PLAYER_SIZE / 2 };
       if (Math.hypot(player.x - killedZombie.x, player.y - killedZombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onPlayerDamage(EXPLOSION_PLAYER_DAMAGE);
+      optionsRef.current.teammates.filter((teammate) => !teammate.downed && Math.hypot(teammate.x + PLAYER_SIZE / 2 - killedZombie.x, teammate.y + PLAYER_SIZE / 2 - killedZombie.y) <= EXPLOSION_RADIUS)
+        .forEach((teammate) => optionsRef.current.onRemotePlayerDamage(teammate.id, EXPLOSION_PLAYER_DAMAGE));
       if (Math.hypot(BASE_POSITION.x - killedZombie.x, BASE_POSITION.y - killedZombie.y) <= EXPLOSION_RADIUS) optionsRef.current.onBaseDamage(EXPLOSION_BASE_DAMAGE);
     }
     if (activeWave.current && survivors.length === 0 && waitingZombies.current.length === 0) {
