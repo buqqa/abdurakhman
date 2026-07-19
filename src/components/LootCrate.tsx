@@ -6,12 +6,10 @@ interface Props {
 }
 
 export function LootCrate({ crate, animation }: Props) {
-  const marker = crate.kind === 'crate-wood' ? '▥' : '';
   return (
-    <div className={`loot-crate ${crate.kind === 'crate-food' ? 'loot-crate--food' : ''} ${animation ? `loot-crate--${animation}` : ''}`}
+    <div className={`loot-crate ${animation ? `loot-crate--${animation}` : ''}`}
       style={{ left: crate.x - 18, top: crate.y - 15 }} aria-label="Ящик с припасами">
       <span className="loot-crate__lid" /><span className="loot-crate__plank" />
-      {marker && <i>{marker}</i>}
     </div>
   );
 }
