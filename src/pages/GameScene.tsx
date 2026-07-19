@@ -75,6 +75,15 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     return () => window.removeEventListener('keydown', handleWeaponSwitch);
   }, [isPaused, switchWeapon]);
   useEffect(() => {
+    const handleStartNight = (event: KeyboardEvent) => {
+      if (event.code !== 'Space' || event.repeat || device !== 'desktop' || isPaused || game.phase !== 'day' || party?.role === 'guest') return;
+      event.preventDefault();
+      startNight();
+    };
+    window.addEventListener('keydown', handleStartNight);
+    return () => window.removeEventListener('keydown', handleStartNight);
+  }, [device, game.phase, isPaused, party?.role, startNight]);
+  useEffect(() => {
     if (device !== 'mobile') return;
     const updateHeight = () => setMobileHeight(window.visualViewport?.height ?? window.innerHeight);
     updateHeight();
@@ -122,7 +131,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} />}
       <section className={`status ${isFinished ? 'status--result' : ''}`}>
         <p>{game.message}</p>
-        <GameActions phase={game.phase} canStart={!party || party.role === 'host'} onNext={startNight} onRestart={returnToMenu} />
+        <GameActions phase={game.phase} onRestart={returnToMenu} />
       </section>
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={returnToMenu} />}
