@@ -36,7 +36,7 @@ export function createStructure(kind: StructureKind, occupied: InteractableObjec
   const crates = kinds.map<InteractableObject>((crateKind, index) => ({
     id: `${structure.id}-crate-${index}`,
     kind: crateKind,
-    x: position.x + (kind === 'car' ? 111 : 48 + index * 46),
+    x: position.x + (kind === 'car' ? 29 : 48 + index * 46),
     y: position.y + height - (kind === 'car' ? 17 : 13),
   }));
   const marker: InteractableObject = { id: `${structure.id}-marker`, kind: `structure-${kind}`, x: position.x + width / 2, y: position.y + height / 2 };

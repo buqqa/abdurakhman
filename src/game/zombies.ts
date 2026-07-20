@@ -28,10 +28,10 @@ const hasSpawnSpace = (position: SpawnPosition, occupied: SpawnPosition[]) => oc
 
 export function createCarGuards(night: number, x: number, y: number, occupied: SpawnPosition[] = []): Zombie[] {
   const positions = [...occupied];
-  return Array.from({ length: 5 }, (_, index) => {
+  return Array.from({ length: 3 }, (_, index) => {
     let position = { x, y };
     for (let attempt = 0; attempt < 20; attempt += 1) {
-      const angle = (index + attempt / 5) / 5 * Math.PI * 2;
+      const angle = (index + attempt / 3) / 3 * Math.PI * 2;
       const radius = 72 + attempt % 3 * 12;
       const candidate = { x: x + Math.cos(angle) * radius, y: y + Math.sin(angle) * radius * .72 };
       if (hasSpawnSpace(candidate, positions)) { position = candidate; break; }
