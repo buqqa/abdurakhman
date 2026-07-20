@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { controlLabel, type ControlAction, useControls } from '../game/controls';
 import { useI18n } from '../i18n/I18nContext';
 import { LobbySettings } from './LobbySettings';
@@ -14,6 +14,7 @@ export function GameSettings({ onBack }: { onBack: () => void }) {
   const { language } = useI18n();
   const { bindings, setBinding, resetBindings } = useControls();
   const [waiting, setWaiting] = useState<ControlAction>();
+  const suppressBindingClickUntil = useRef(0);
   const text = language === 'en' ? { title: 'Settings', press: 'Press a key or mouse button', reset: 'Reset controls', back: 'Back' }
     : language === 'kk' ? { title: 'Баптаулар', press: 'Пернені немесе тінтуір батырмасын бас', reset: 'Басқаруды қалпына келтіру', back: 'Артқа' }
       : { title: 'Настройки', press: 'Нажми клавишу или кнопку мыши', reset: 'Сбросить управление', back: 'Назад' };
@@ -31,6 +32,7 @@ export function GameSettings({ onBack }: { onBack: () => void }) {
       event.preventDefault();
       event.stopImmediatePropagation();
       if (waiting !== 'attack' && waiting !== 'repair') return;
+      suppressBindingClickUntil.current = performance.now() + 350;
       setBinding(waiting, `Mouse${event.button}`);
       setWaiting(undefined);
     };
@@ -44,7 +46,7 @@ export function GameSettings({ onBack }: { onBack: () => void }) {
     <LobbySettings />
     <div className="controls-settings">{actions.map((action, index) => <label key={action}>
       <span>{labels[language][index]}</span>
-      <button className={waiting === action ? 'active' : ''} onClick={() => setWaiting(action)}>
+      <button className={waiting === action ? 'active' : ''} onClick={() => { if (performance.now() >= suppressBindingClickUntil.current) setWaiting(action); }}>
         {waiting === action ? text.press : controlLabel(bindings[action])}
       </button>
     </label>)}</div>
