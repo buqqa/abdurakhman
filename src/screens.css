@@ -96,6 +96,14 @@
 .pause-menu h2 { margin: 0 0 12px; color: #ede6cd; font-size: 27px; letter-spacing: .12em; }
 .pause-menu button { width: 100%; }
 .pause-menu .pause-menu__end { border-color: #7d4b45; color: #e7c6c1; background: #4f302d; }
+.game-settings { width: min(620px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; padding: 22px; border: 1px solid #687861; border-radius: 14px; background: #172117; box-shadow: 0 24px 80px #040704; }
+.game-settings h2 { margin: 0 0 14px; text-align: center; color: #ede6cd; }
+.game-settings .lobby-settings { margin-bottom: 14px; }
+.controls-settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 14px 0; }
+.controls-settings label { display: grid; grid-template-columns: 1fr minmax(90px, 1.25fr); align-items: center; gap: 8px; color: #cbd2c6; font-size: 13px; }
+.controls-settings button { min-height: 38px; padding: 7px; }
+.controls-settings button.active { color: #f1dfa0; border-color: #c5a85c; }
+@media (max-width: 560px) { .controls-settings { grid-template-columns: 1fr; } }
 .trade-backdrop { position: fixed; inset: 0; z-index: 45; display: grid; place-items: center; padding: 20px; background: rgba(7, 11, 7, .78); backdrop-filter: blur(2px); }
 .trade-window { width: min(420px, 100%); padding: 22px; border: 1px solid #8e7544; border-radius: 13px; background: #1b2518; box-shadow: 0 24px 80px #050805; }
 .trade-window header { display: flex; align-items: start; justify-content: space-between; }

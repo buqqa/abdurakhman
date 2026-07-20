@@ -3,6 +3,7 @@ import { SPEAR_COST } from '../game/config';
 import { useI18n } from '../i18n/I18nContext';
 import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
+import { useControls } from '../game/controls';
 
 export const MERCHANT_POSITION = { x: 1125, y: 635 } as const;
 const TRADE_DISTANCE = 111;
@@ -10,6 +11,7 @@ const TRADE_DISTANCE = 111;
 interface Props { player: Position; wood: number; isOpen: boolean; onOpen: () => void; onClose: () => void; onBuy: () => void }
 
 export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props) {
+  const { bindings } = useControls();
   const { language } = useI18n();
   const text = language === 'en'
     ? { name: 'Merchant', title: 'Forest merchant', offer: 'Spear', buff: 'Increased attack range and damage', penalty: 'Takes more hits to chop down a tree', buy: 'Trade for 50 wood' }
@@ -19,14 +21,14 @@ export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props
   const isNear = Math.hypot(player.x - MERCHANT_POSITION.x, player.y - MERCHANT_POSITION.y) <= TRADE_DISTANCE;
   useEffect(() => {
     const handleTrade = (event: KeyboardEvent) => {
-      if (event.code !== 'KeyE' || event.repeat || !isNear) return;
+      if (event.code !== bindings.interact || event.repeat || !isNear) return;
       event.preventDefault();
       event.stopImmediatePropagation();
       onOpen();
     };
     window.addEventListener('keydown', handleTrade, true);
     return () => window.removeEventListener('keydown', handleTrade, true);
-  }, [isNear, onOpen]);
+  }, [bindings.interact, isNear, onOpen]);
   const tradeWindow = isOpen ? createPortal(<div className="trade-backdrop" onContextMenu={(event) => event.preventDefault()} onClick={onClose}>
     <section className="trade-window" onClick={(event) => event.stopPropagation()}>
       <header><div><small>{text.title}</small><h2>{text.offer}</h2></div><button onClick={onClose}>×</button></header>

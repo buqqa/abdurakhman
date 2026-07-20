@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { useControls } from '../controls';
 
 export interface MovementInput { x: number; y: number }
 
 export function useMovementSystem(enabled: boolean) {
+  const { bindings } = useControls();
   const direction = useRef<MovementInput>({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -10,12 +12,12 @@ export function useMovementSystem(enabled: boolean) {
     const updateDirection = () => {
       if (!enabled) return void (direction.current = { x: 0, y: 0 });
       direction.current = {
-        x: Number(pressed.has('KeyD')) - Number(pressed.has('KeyA')),
-        y: Number(pressed.has('KeyS')) - Number(pressed.has('KeyW')),
+        x: Number(pressed.has(bindings.right)) - Number(pressed.has(bindings.left)),
+        y: Number(pressed.has(bindings.down)) - Number(pressed.has(bindings.up)),
       };
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) event.preventDefault();
+      if ([bindings.up, bindings.down, bindings.left, bindings.right].includes(event.code)) event.preventDefault();
       pressed.add(event.code);
       updateDirection();
     };
@@ -30,7 +32,7 @@ export function useMovementSystem(enabled: boolean) {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [enabled]);
+  }, [bindings, enabled]);
 
   return direction;
 }

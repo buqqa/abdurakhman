@@ -3,7 +3,6 @@ import { ForestMap } from './ForestMap';
 import type { InteractableObject, InteractionHandlers } from '../game/interactions';
 import type { Weapon } from '../game/types';
 import type { CrateKind } from '../game/interactions';
-import { useI18n } from '../i18n/I18nContext';
 import type { RemotePlayer, SharedWorld, WorldHit, ZombieDeath } from '../game/multiplayer';
 import type { Position } from './PlayerController';
 import type { Zombie } from '../game/zombies';
@@ -48,7 +47,6 @@ interface Props {
 }
 
 export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, sharedWorld, worldTake, onWorldState, onWorldTake, zombieDeath, onZombieDeath, onRemotePlayerDamage, multiplayerMode, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
-  const { t, language } = useI18n();
   return (
     <section>
       <ForestMap paused={paused} mobileMode={mobileMode} multiplayerMode={multiplayerMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
@@ -60,8 +58,6 @@ export function GameWorld({ paused, mobileMode, playerNickname, phase, day, diff
         sharedDrops={sharedDrops} onTakeDrop={onTakeDrop}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
-      {!mobileMode && <p className="controls">{t('controls')} · {t('inventoryHint')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}
-        {multiplayerMode && ` · ${language === 'en' ? 'V — revive teammate' : language === 'kk' ? 'V — одақтасты емдеу' : 'V — лечить союзника'}`}</p>}
     </section>
   );
 }

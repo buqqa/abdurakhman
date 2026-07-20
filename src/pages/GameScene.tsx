@@ -17,9 +17,11 @@ import { PartyScreen, type PartyGameSettings } from '../components/PartyScreen';
 import { useMultiplayerRoom } from '../game/multiplayer';
 import { PartyGameBadge } from '../components/PartyGameBadge';
 import { MAX_BASE_HEALTH, REPAIR_WOOD_COST } from '../game/config';
+import { useControls } from '../game/controls';
 
 export function GameScene({ playerNickname, isRegistered }: { playerNickname: string; isRegistered: boolean }) {
   const { t } = useI18n();
+  const { bindings } = useControls();
   const [isPaused, setIsPaused] = useState(false);
   const [pendingGame, setPendingGame] = useState<{ nights: number; difficulty: string }>();
   const [playMode, setPlayMode] = useState<'solo' | 'friend' | undefined>(() => isRegistered ? undefined : 'solo');
@@ -75,32 +77,32 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     multiplayer.sendWorld();
   }, [multiplayer.isLeader, multiplayer.stateRequest]);
   useEffect(() => {
-    const togglePause = (event: KeyboardEvent) => {
+    const handlePause = (event: KeyboardEvent) => {
       if (event.code !== 'Escape' || (party && !multiplayer.isLeader) || (game.phase !== 'day' && game.phase !== 'night')) return;
       setIsPaused((paused) => {
         if (paused) resumeClock(); else pauseClock();
         return !paused;
       });
     };
-    window.addEventListener('keydown', togglePause);
-    return () => window.removeEventListener('keydown', togglePause);
+    window.addEventListener('keydown', handlePause);
+    return () => window.removeEventListener('keydown', handlePause);
   }, [game.phase, multiplayer.isLeader, party, pauseClock, resumeClock]);
   useEffect(() => {
     const handleWeaponSwitch = (event: KeyboardEvent) => {
-      if (event.code === 'KeyQ' && !event.repeat && !isPaused) switchWeapon();
+      if (event.code === bindings.switchWeapon && !event.repeat && !isPaused) switchWeapon();
     };
     window.addEventListener('keydown', handleWeaponSwitch);
     return () => window.removeEventListener('keydown', handleWeaponSwitch);
-  }, [isPaused, switchWeapon]);
+  }, [bindings.switchWeapon, isPaused, switchWeapon]);
   useEffect(() => {
     const handleStartNight = (event: KeyboardEvent) => {
-      if (event.code !== 'Space' || event.repeat || device !== 'desktop' || isPaused || game.phase !== 'day') return;
+      if (event.code !== bindings.startNight || event.repeat || device !== 'desktop' || isPaused || game.phase !== 'day') return;
       event.preventDefault();
       if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight();
     };
     window.addEventListener('keydown', handleStartNight);
     return () => window.removeEventListener('keydown', handleStartNight);
-  }, [device, game.phase, isPaused, multiplayer.isLeader, multiplayer.sendStartNight, party, startNight]);
+  }, [bindings.startNight, device, game.phase, isPaused, multiplayer.isLeader, multiplayer.sendStartNight, party, startNight]);
   useEffect(() => {
     if (device !== 'mobile') return;
     const updateHeight = () => setMobileHeight(window.visualViewport?.height ?? window.innerHeight);
@@ -132,6 +134,11 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     if (party && !multiplayer.isLeader && game.baseHealth < MAX_BASE_HEALTH && game.wood >= REPAIR_WOOD_COST) multiplayer.sendBaseRepair();
     repairBase();
   };
+  const pauseFromMobile = () => {
+    if (party && !multiplayer.isLeader) return;
+    pauseClock();
+    setIsPaused(true);
+  };
   const interactionHandlers = { building: repairSharedBase, food: gatherFood, water: gatherWater };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
@@ -150,7 +157,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => { if (game[kind] < 1) return; dropResource(kind); multiplayer.dropResource(kind); } : undefined} />
-      {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} canStartNight={game.phase === 'day'} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
+      {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} canStartNight={game.phase === 'day'} canPause={!party || multiplayer.isLeader} onPause={pauseFromMobile} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
       <section className={`status ${isFinished ? 'status--result' : ''}`}>
         <p>{game.message}</p>
         <GameActions phase={game.phase} onRestart={returnToMenu} />
@@ -158,7 +165,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={returnToMenu} />}
       {isPaused && (party && !multiplayer.isLeader
-        ? <div className="pause-backdrop"><section className="pause-menu"><h2>ПАУЗА</h2><p>Владелец комнаты приостановил игру</p></section></div>
+        ? <PauseMenu locked />
         : <PauseMenu onContinue={() => { resumeClock(); setIsPaused(false); }} onEnd={() => { resumeClock(); setIsPaused(false); returnToMenu(); }} />)}
     </main>
   );

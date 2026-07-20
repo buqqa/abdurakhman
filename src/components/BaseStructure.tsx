@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { playGameSound } from '../lib/gameAudio';
+import { useControls } from '../game/controls';
 
 interface Props { health: number; x: number; y: number; mobileRepair?: boolean }
 
 export function BaseStructure({ health, x, y, mobileRepair }: Props) {
+  const { bindings } = useControls();
   const damage = health === 100 ? 'safe' : health > 50 ? 'damaged' : 'critical';
   const previousHealth = useRef(health);
   const [isRepairing, setIsRepairing] = useState(false);
@@ -37,7 +39,8 @@ export function BaseStructure({ health, x, y, mobileRepair }: Props) {
         if (!mobileRepair || event.button !== 0) return;
         event.preventDefault();
         event.stopPropagation();
-        event.currentTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 2 }));
+        if (bindings.repair.startsWith('Mouse')) event.currentTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: Number(bindings.repair.slice(5)) }));
+        else window.dispatchEvent(new KeyboardEvent('keydown', { code: bindings.repair, bubbles: true }));
       }}
       style={{ left: x, top: y }} aria-label={`База, прочность ${health}%`}>
       <span className="base__tower base__tower--left" /><span className="base__tower base__tower--right" />
