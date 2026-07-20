@@ -21,7 +21,7 @@ export function useWorldState({ authoritative, day, phase, sharedWorld, worldTak
   const structureDays = useRef({
     tent: 5 + Math.floor(Math.random() * 6),
     warehouse: 10 + Math.floor(Math.random() * 11),
-    car: 1,
+    car: 25 + Math.floor(Math.random() * 11),
   });
 
   useEffect(() => {
