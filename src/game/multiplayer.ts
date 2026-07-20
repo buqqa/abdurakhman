@@ -42,6 +42,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const [worldTake, setWorldTake] = useState<WorldTake>();
   const [resourceGrant, setResourceGrant] = useState<ResourceGrant>();
   const [baseRepairSignal, setBaseRepairSignal] = useState(0);
+  const [startNightSignal, setStartNightSignal] = useState(0);
   const [playerDamage, setPlayerDamage] = useState<{ damage: number; nonce: string }>();
   const lastPosition = useRef<Position>({ x: 100, y: 100 });
 
@@ -105,6 +106,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       void channel.send({ type: 'broadcast', event: 'world-take', payload: grant });
     });
     channel.on('broadcast', { event: 'base-repair' }, () => { if (isLeaderRef.current) setBaseRepairSignal((value) => value + 1); });
+    channel.on('broadcast', { event: 'start-night' }, () => { if (isLeaderRef.current) setStartNightSignal((value) => value + 1); });
     channel.on('broadcast', { event: 'player-damage' }, ({ payload }) => {
       const hit = payload as { targetId: string; damage: number; nonce: string };
       if (hit.targetId === id.current) setPlayerDamage({ damage: hit.damage, nonce: hit.nonce });
@@ -204,9 +206,10 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     void channel.send({ type: 'broadcast', event: 'world-take', payload: grant });
   }, []);
   const sendBaseRepair = useCallback(() => { void channelRef.current?.send({ type: 'broadcast', event: 'base-repair', payload: {} }); }, []);
+  const sendStartNight = useCallback(() => { void channelRef.current?.send({ type: 'broadcast', event: 'start-night', payload: {} }); }, []);
   const damageRemotePlayer = useCallback((targetId: string, damage: number) => {
     void channelRef.current?.send({ type: 'broadcast', event: 'player-damage', payload: { targetId, damage, nonce: crypto.randomUUID() } });
   }, []);
 
-  return { localPlayerId: id.current, isLeader, players, sharedGame, sharedWorld, worldTake, resourceGrant, baseRepairSignal, playerDamage, zombies, zombieHit, zombieDeath, drops, stateRequest, memberCount, roomFull, reviveSignal, worldHit, sendPosition, sendGame, sendWorld, sendZombies, sendZombieHit, sendZombieDeath, dropResource, takeResource, takeWorldObject, sendBaseRepair, damageRemotePlayer, sendDrops, revivePlayer, sendPlayerAttack, sendWorldHit };
+  return { localPlayerId: id.current, isLeader, players, sharedGame, sharedWorld, worldTake, resourceGrant, baseRepairSignal, startNightSignal, playerDamage, zombies, zombieHit, zombieDeath, drops, stateRequest, memberCount, roomFull, reviveSignal, worldHit, sendPosition, sendGame, sendWorld, sendZombies, sendZombieHit, sendZombieDeath, dropResource, takeResource, takeWorldObject, sendBaseRepair, sendStartNight, damageRemotePlayer, sendDrops, revivePlayer, sendPlayerAttack, sendWorldHit };
 }

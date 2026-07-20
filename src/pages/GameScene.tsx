@@ -57,6 +57,9 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     for (let repair = 0; repair < pending; repair += 1) applyTeammateRepair();
   }, [multiplayer.baseRepairSignal]);
   useEffect(() => {
+    if (multiplayer.isLeader && multiplayer.startNightSignal && game.phase === 'day') startNight();
+  }, [multiplayer.startNightSignal]);
+  useEffect(() => {
     if (!party || game.phase === 'menu') return;
     if (multiplayer.isLeader) multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay, completionTime: game.completionTime, paused: isPaused });
     else if (multiplayer.sharedGame) {
@@ -91,13 +94,13 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   }, [isPaused, switchWeapon]);
   useEffect(() => {
     const handleStartNight = (event: KeyboardEvent) => {
-      if (event.code !== 'Space' || event.repeat || device !== 'desktop' || isPaused || game.phase !== 'day' || (party && !multiplayer.isLeader)) return;
+      if (event.code !== 'Space' || event.repeat || device !== 'desktop' || isPaused || game.phase !== 'day') return;
       event.preventDefault();
-      startNight();
+      if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight();
     };
     window.addEventListener('keydown', handleStartNight);
     return () => window.removeEventListener('keydown', handleStartNight);
-  }, [device, game.phase, isPaused, multiplayer.isLeader, party, startNight]);
+  }, [device, game.phase, isPaused, multiplayer.isLeader, multiplayer.sendStartNight, party, startNight]);
   useEffect(() => {
     if (device !== 'mobile') return;
     const updateHeight = () => setMobileHeight(window.visualViewport?.height ?? window.innerHeight);
@@ -147,7 +150,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => { if (game[kind] < 1) return; dropResource(kind); multiplayer.dropResource(kind); } : undefined} />
-      {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} canStartNight={game.phase === 'day' && (!party || multiplayer.isLeader)} onStartNight={startNight} />}
+      {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} canStartNight={game.phase === 'day'} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
       <section className={`status ${isFinished ? 'status--result' : ''}`}>
         <p>{game.message}</p>
         <GameActions phase={game.phase} onRestart={returnToMenu} />
