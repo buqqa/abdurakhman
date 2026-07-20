@@ -7,13 +7,14 @@ import type { SharedWorld, WorldTake } from '../multiplayer';
 interface Options {
   authoritative: boolean;
   day: number;
+  maxNights: number;
   phase: Phase;
   sharedWorld?: SharedWorld;
   worldTake?: Pick<WorldTake, 'id' | 'nonce'>;
   onWorldState: (world: SharedWorld) => void;
 }
 
-export function useWorldState({ authoritative, day, phase, sharedWorld, worldTake, onWorldState }: Options) {
+export function useWorldState({ authoritative, day, maxNights, phase, sharedWorld, worldTake, onWorldState }: Options) {
   const [objects, setObjects] = useState<InteractableObject[]>(WORLD_OBJECTS);
   const [structures, setStructures] = useState<WorldStructure[]>([]);
   const spawnedDays = useRef(new Set<number>());
@@ -21,7 +22,7 @@ export function useWorldState({ authoritative, day, phase, sharedWorld, worldTak
   const structureDays = useRef({
     tent: 5 + Math.floor(Math.random() * 6),
     warehouse: 10 + Math.floor(Math.random() * 11),
-    car: 25 + Math.floor(Math.random() * 11),
+    car: maxNights >= 25 ? 25 + Math.floor(Math.random() * (Math.min(35, maxNights) - 24)) : Number.POSITIVE_INFINITY,
   });
 
   useEffect(() => {

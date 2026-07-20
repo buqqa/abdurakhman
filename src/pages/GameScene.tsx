@@ -51,6 +51,9 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     if (multiplayer.resourceGrant?.targetId === multiplayer.localPlayerId) receiveResource(multiplayer.resourceGrant.kind);
   }, [multiplayer.resourceGrant?.nonce]);
   useEffect(() => {
+    if (multiplayer.wrenchGrant?.targetId === multiplayer.localPlayerId) collectCrateLoot('crate-wrench');
+  }, [multiplayer.wrenchGrant?.nonce]);
+  useEffect(() => {
     if (!multiplayer.isLeader) return;
     const pending = multiplayer.baseRepairSignal - handledRepairs.current;
     handledRepairs.current = multiplayer.baseRepairSignal;
@@ -136,6 +139,10 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     gatherCrateLoot(kind);
     if (kind === 'crate-wrench') setWrenchInfoOpen(true);
   };
+  const claimWrench = (playerId: string) => {
+    if (party) multiplayer.grantWrench(playerId);
+    else collectCrateLoot('crate-wrench');
+  };
   const pauseFromMobile = () => {
     if (party && !multiplayer.isLeader) return;
     pauseClock();
@@ -147,7 +154,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
       {party && <PartyGameBadge code={party.code} players={multiplayer.memberCount} maxPlayers={party.maxPlayers} />}
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
-        multiplayerMode={Boolean(party)}
+        multiplayerMode={Boolean(party)} localPlayerId={multiplayer.localPlayerId} onWrenchClaim={claimWrench}
         remotePlayers={multiplayer.players} onPlayerMove={sendPlayerPosition} onRevivePlayer={reviveTeammate} onPlayerAttack={multiplayer.sendPlayerAttack} onWorldHit={multiplayer.sendWorldHit} worldHit={multiplayer.worldHit}
         sharedWorld={multiplayer.sharedWorld} worldTake={multiplayer.worldTake} onWorldState={multiplayer.sendWorld} onWorldTake={multiplayer.takeWorldObject}
         zombieDeath={multiplayer.zombieDeath} onZombieDeath={multiplayer.sendZombieDeath}

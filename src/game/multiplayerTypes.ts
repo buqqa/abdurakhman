@@ -10,7 +10,7 @@ export interface PresencePayload { id: string; nickname: string; joinedAt: numbe
 export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNights' | 'difficulty' | 'merchantDay' | 'completionTime'> & { paused: boolean };
 export type ResourceKind = 'wood' | 'food' | 'water';
 export interface SharedDrop extends Position { id: string; kind: ResourceKind }
-export interface WorldHit { object: InteractableObject; hitsToBreak: number; nonce: string }
+export interface WorldHit { object: InteractableObject; hitsToBreak: number; playerId: string; nonce: string }
 export interface ZombieDeath { zombie: Zombie; nonce: string }
 export interface SharedWorld { objects: InteractableObject[]; structures: WorldStructure[]; spawnedStructures: StructureKind[] }
 export interface WorldTake { id: string; nonce: string; targetId: string; kind: 'food' | 'water' }
