@@ -145,7 +145,9 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
         {objects.filter((object) => object.kind === 'food').map((food) => <ChickenLeg className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id} />)}
         {objects.filter((object) => object.kind === 'water').map((water) => <WaterBottle className="map-water-bottle" key={water.id}
           style={{ left: water.x - 8, top: water.y - 14 }} />)}
-        {sharedDrops.map((drop) => <span className={`shared-drop shared-drop--${drop.kind}`} style={{ left: drop.x, top: drop.y }} key={drop.id}>{drop.kind === 'wood' ? '🪵' : drop.kind === 'food' ? '🍗' : '💧'}</span>)}
+        {sharedDrops.map((drop) => <span className={`shared-drop shared-drop--${drop.kind}`} style={{ left: drop.x, top: drop.y }} key={drop.id}>
+          {drop.kind === 'wood' ? '🪵' : drop.kind === 'food' ? <ChickenLeg /> : <WaterBottle className="shared-drop__water" />}
+        </span>)}
         <BaseStructure health={baseHealth} x={BASE_POSITION.x} y={BASE_POSITION.y} mobileRepair={mobileMode} />
         {footprints.map((footprint) => <span className="footprint" style={{ left: footprint.x + 8, top: footprint.y + 24 }} key={footprint.id} />)}
         {merchantVisible && <Merchant player={player} wood={wood} isOpen={isTradeOpen} onOpen={() => setIsTradeOpen(true)} onClose={() => setIsTradeOpen(false)} onBuy={onBuySpear} />}

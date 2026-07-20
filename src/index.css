@@ -31,6 +31,7 @@ button { font: inherit; }
 .inventory-slot strong { position: absolute; right: 12px; bottom: 10px; font-size: 22px; }
 .inventory-slot .use-item { position: absolute; right: 9px; top: 9px; padding: 5px 8px; font-size: 12px; }
 .shared-drop { position: absolute; z-index: 4; font-size: 20px; filter: drop-shadow(0 3px 2px #172017); animation: shared-drop-land .28s ease-out; }
+.shared-drop__water { position: relative; display: block; width: 16px; height: 28px; }
 @keyframes shared-drop-land { from { translate: 0 -18px; scale: .7; } to { translate: 0; scale: 1; } }
 .inventory-help { margin: 0; color: #7f8d7b; font-size: 12px; }
 .map-viewport { width: 100%; max-width: 900px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; background: #263b2b; }
