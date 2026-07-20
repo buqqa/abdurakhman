@@ -188,13 +188,15 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .survival-hud { position: absolute; inset: 0; z-index: 14; pointer-events: none; font-family: Inter, system-ui, sans-serif; }
 .survival-hud__vitals { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); padding: 6px 8px; border-radius: 7px; background: rgba(10, 15, 10, .62); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .55)); }
 .hud-hearts, .hud-armor { display: flex; gap: 3px; height: 16px; }
-.hud-hearts span { width: 14px; overflow: visible; color: #d94a43; font: 17px/14px Arial, sans-serif; text-align: center; -webkit-text-stroke: 1px #5d211f; }
-.hud-hearts span.half { color: transparent; background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); background-clip: text; -webkit-background-clip: text; }
-.hud-hearts span.empty { color: #302b29; }
+.hud-hearts { align-items: center; }
+.hud-hearts span { width: 14px; height: 13px; background: #d94a43; clip-path: polygon(0 15%, 14% 15%, 14% 0, 43% 0, 50% 15%, 57% 0, 86% 0, 86% 15%, 100% 15%, 100% 54%, 86% 54%, 86% 69%, 71% 69%, 71% 85%, 57% 85%, 57% 100%, 43% 100%, 43% 85%, 29% 85%, 29% 69%, 14% 69%, 14% 54%, 0 54%); filter: drop-shadow(1px 0 #5d211f) drop-shadow(-1px 0 #5d211f) drop-shadow(0 1px #5d211f) drop-shadow(0 -1px #5d211f); }
+.hud-hearts span.half { background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); }
+.hud-hearts span.empty { background: #302b29; }
 .hud-armor { align-items: center; height: 16px; margin-top: 1px; gap: 3px; }
-.hud-armor span { position: relative; width: 14px; height: 13px; background: #252c2c; clip-path: polygon(3% 4%, 29% 0, 39% 23%, 61% 23%, 71% 0, 97% 4%, 88% 47%, 77% 49%, 77% 100%, 23% 100%, 23% 49%, 12% 47%); filter: drop-shadow(0 1px 1px #050706); }
-.hud-armor span.full { background: linear-gradient(135deg, #edf5f2 0 24%, #9fb8bc 27% 58%, #526d76 61%); }.hud-armor span.half { background: linear-gradient(90deg, #a9c1c4 50%, #252c2c 50%); }
-.hud-armor i { position: absolute; inset: 2px 3px 3px; background: linear-gradient(135deg, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0)); clip-path: inherit; }
+.hud-armor span { position: relative; width: 14px; height: 13px; background: #252c2c; clip-path: polygon(0 0, 29% 0, 29% 15%, 43% 15%, 43% 31%, 57% 31%, 57% 15%, 71% 15%, 71% 0, 100% 0, 100% 46%, 86% 46%, 86% 100%, 14% 100%, 14% 46%, 0 46%); filter: drop-shadow(1px 0 #050706) drop-shadow(-1px 0 #050706) drop-shadow(0 1px #050706) drop-shadow(0 -1px #050706); }
+.hud-armor span.full { background: linear-gradient(90deg, #dce9e7 0 29%, #9fb8bc 29% 71%, #526d76 71%); }.hud-armor span.half { background: linear-gradient(90deg, #a9c1c4 50%, #252c2c 50%); }
+.hud-armor i { position: absolute; left: 3px; top: 3px; width: 3px; height: 2px; background: rgba(255, 255, 255, .55); box-shadow: 2px 2px rgba(255, 255, 255, .2); }
+.hud-armor span.empty i { opacity: .12; }
 .day-announcement { position: absolute; left: 50%; top: 45%; display: grid; place-items: center; gap: 10px; transform: translate(-50%, -50%); animation: day-announcement 1.8s ease-in-out forwards; }
 .day-announcement strong { padding: 7px 15px; border: 1px solid rgba(126, 125, 93, .35); border-radius: 8px; color: #c8c9a9; background: rgba(12, 17, 14, .86); font: 700 24px/1 Georgia, serif; letter-spacing: .08em; text-shadow: 0 2px 4px #020403; box-shadow: 0 5px 22px rgba(0, 0, 0, .65); }
 .day-announcement__sun { position: relative; isolation: isolate; width: 44px; height: 44px; border: 3px solid #5c302b; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #e8a15b 0 5px, #bd5938 17px, #79332f 100%); box-shadow: inset -5px -5px rgba(72, 27, 29, .38), 0 0 18px rgba(176, 72, 45, .48); image-rendering: pixelated; animation: day-sun-rise 1.8s steps(8, end) forwards; }

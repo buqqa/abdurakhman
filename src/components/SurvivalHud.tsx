@@ -9,7 +9,7 @@ export function SurvivalHud({ phase, day, baseHealth, playerHealth }: Props) {
     <section className="survival-hud__vitals">
       <div className="hud-hearts" aria-label={`${t('health')} ${playerHealth}%`}>{Array.from({ length: 10 }, (_, index) => {
         const remaining = playerHealth - index * 10;
-        return <span className={remaining >= 10 ? 'full' : remaining > 0 ? 'half' : 'empty'} key={index}>♥</span>;
+        return <span className={remaining >= 10 ? 'full' : remaining > 0 ? 'half' : 'empty'} key={index} />;
       })}</div>
       <div className="hud-armor" aria-label={`${t('base')} ${baseHealth}%`}>{Array.from({ length: 10 }, (_, index) => {
         const remaining = baseHealth - index * 10;
