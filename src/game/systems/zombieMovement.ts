@@ -48,5 +48,31 @@ export function moveZombies({ zombies, player, playerHealth, teammates, time, de
     const y = zombie.y + (target.y - zombie.y) / target.distance * step;
     return { ...zombie, facingLeft: target.x < zombie.x, x: Math.max(25, Math.min(MAP_WIDTH - 35, x)), y: Math.max(25, Math.min(MAP_HEIGHT - 40, y)) };
   });
-  return { next, attacks };
+  const separated = next.map((zombie) => ({ ...zombie }));
+  for (let pass = 0; pass < 2; pass += 1) {
+    for (let first = 0; first < separated.length; first += 1) {
+      for (let second = first + 1; second < separated.length; second += 1) {
+        const left = separated[first];
+        const right = separated[second];
+        let dx = right.x - left.x;
+        let dy = right.y - left.y;
+        let distance = Math.hypot(dx, dy);
+        if (distance >= 27) continue;
+        if (distance < .01) {
+          const angle = (first * 2.4 + second * 1.7) % (Math.PI * 2);
+          dx = Math.cos(angle);
+          dy = Math.sin(angle);
+          distance = 1;
+        }
+        const push = (27 - distance) / 2;
+        const pushX = dx / distance * push;
+        const pushY = dy / distance * push;
+        left.x = Math.max(25, Math.min(MAP_WIDTH - 35, left.x - pushX));
+        left.y = Math.max(25, Math.min(MAP_HEIGHT - 40, left.y - pushY));
+        right.x = Math.max(25, Math.min(MAP_WIDTH - 35, right.x + pushX));
+        right.y = Math.max(25, Math.min(MAP_HEIGHT - 40, right.y + pushY));
+      }
+    }
+  }
+  return { next: separated, attacks };
 }
