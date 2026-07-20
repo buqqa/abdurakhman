@@ -43,8 +43,9 @@ export function useWorldState({ authoritative, day, phase, sharedWorld, worldTak
     if (resources.length) setObjects((current) => [...current, ...resources]);
   }, [authoritative, day, phase]);
   useEffect(() => {
-    if (!authoritative || phase !== 'day') return;
-    const expiredIds = structures.filter((structure) => structure.spawnedDay < day).map((structure) => structure.id);
+    if (!authoritative) return;
+    const expiredIds = structures.filter((structure) => structure.spawnedDay < day
+      && (structure.kind === 'car' ? phase === 'night' : phase === 'day')).map((structure) => structure.id);
     if (!expiredIds.length) return;
     setStructures((current) => current.filter((structure) => !expiredIds.includes(structure.id)));
     setObjects((current) => current.filter((object) => !expiredIds.some((id) => object.id.startsWith(`${id}-`))));

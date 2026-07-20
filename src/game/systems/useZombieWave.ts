@@ -93,7 +93,7 @@ export function useZombieWave(options: Options) {
     if (options.authoritative === false || options.phase !== 'night' || !options.carGuardPoint || guardedNights.current.has(options.day)) return;
     guardedNights.current.add(options.day);
     if (zombiesRef.current.some((zombie) => zombie.id.startsWith(`car-guard-${options.day}-`))) return;
-    const guards = createCarGuards(options.day, options.carGuardPoint.x, options.carGuardPoint.y);
+    const guards = createCarGuards(options.day, options.carGuardPoint.x, options.carGuardPoint.y, [...zombiesRef.current, ...waitingZombies.current]);
     zombiesRef.current = [...zombiesRef.current, ...guards];
     setZombies(zombiesRef.current);
     optionsRef.current.onZombiesChange?.(zombiesRef.current);

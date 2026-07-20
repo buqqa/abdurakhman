@@ -22,12 +22,24 @@ export interface Zombie {
   guardY?: number;
 }
 
-export function createCarGuards(night: number, x: number, y: number): Zombie[] {
+interface SpawnPosition { x: number; y: number }
+
+const hasSpawnSpace = (position: SpawnPosition, occupied: SpawnPosition[]) => occupied.every((other) => Math.hypot(position.x - other.x, position.y - other.y) >= 48);
+
+export function createCarGuards(night: number, x: number, y: number, occupied: SpawnPosition[] = []): Zombie[] {
+  const positions = [...occupied];
   return Array.from({ length: 5 }, (_, index) => {
-    const angle = index / 5 * Math.PI * 2;
+    let position = { x, y };
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const angle = (index + attempt / 5) / 5 * Math.PI * 2;
+      const radius = 72 + attempt % 3 * 12;
+      const candidate = { x: x + Math.cos(angle) * radius, y: y + Math.sin(angle) * radius * .72 };
+      if (hasSpawnSpace(candidate, positions)) { position = candidate; break; }
+    }
+    positions.push(position);
     const health = 6;
     return {
-      id: `car-guard-${night}-${index}`, x: x + Math.cos(angle) * 82, y: y + Math.sin(angle) * 58,
+      id: `car-guard-${night}-${index}`, ...position,
       health, maxHealth: health, damage: 0, playerDamage: 10, speed: 34,
       isBoss: false, hasHammer: false, isExplosive: false, isSprinter: false, isArmored: false,
       lastAttack: 0, facingLeft: false, hitAt: 0, spawnedAt: Date.now(), guardX: x, guardY: y,
@@ -35,9 +47,16 @@ export function createCarGuards(night: number, x: number, y: number): Zombie[] {
   });
 }
 
-function spawnPoint(index: number) {
-  if (index % 2 === 0) return { x: MAP_WIDTH - 45, y: 45 + Math.random() * (MAP_HEIGHT - 90) };
-  return { x: 45 + Math.random() * (MAP_WIDTH - 90), y: MAP_HEIGHT - 45 };
+function spawnPoint(index: number, occupied: SpawnPosition[]) {
+  let fallback = { x: MAP_WIDTH - 45, y: 45 };
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    const candidate = index % 2 === 0
+      ? { x: MAP_WIDTH - 45, y: 45 + Math.random() * (MAP_HEIGHT - 90) }
+      : { x: 45 + Math.random() * (MAP_WIDTH - 90), y: MAP_HEIGHT - 45 };
+    fallback = candidate;
+    if (hasSpawnSpace(candidate, occupied)) return candidate;
+  }
+  return fallback;
 }
 
 export function createZombieWave(night: number, difficulty: string) {
@@ -47,6 +66,7 @@ export function createZombieWave(night: number, difficulty: string) {
   const bossBaseHealth = 4;
   const normalDamage = 3 + Math.floor((night - 1) / 5);
 
+  const positions: SpawnPosition[] = [];
   return Array.from({ length: count }, (_, index): Zombie => {
     const isBoss = night % 5 === 0 && index === 0;
     const specialRoll = isBoss ? 1 : Math.random();
@@ -56,8 +76,10 @@ export function createZombieWave(night: number, difficulty: string) {
     const isArmored = specialRoll >= .3 && specialRoll < .4;
     const bossMultiplier = difficulty === 'HARDCORE' ? 3 : 2;
     const health = isBoss ? bossBaseHealth * bossMultiplier : isArmored ? 8 : normalHealth;
+    const position = spawnPoint(index, positions);
+    positions.push(position);
     return {
-      id: `zombie-${night}-${index}`, ...spawnPoint(index), health, maxHealth: health,
+      id: `zombie-${night}-${index}`, ...position, health, maxHealth: health,
       damage: hasHammer ? 20 : isArmored ? 15 : normalDamage * (isBoss ? bossMultiplier : 1),
       playerDamage: hasHammer ? 20 : isBoss ? 10 * bossMultiplier : isSprinter ? 5 : isArmored ? 15 : 10,
       speed: (25 + Math.min(night, 12)) * (isSprinter ? 2 : isArmored ? .5 : 1),

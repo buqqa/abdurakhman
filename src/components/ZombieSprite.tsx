@@ -13,7 +13,7 @@ export function ZombieSprite({ zombie, dying = false }: { zombie: Zombie; dying?
         {zombie.isBoss && <span className="zombie-staff" aria-hidden="true"><i /></span>}
       </span><span className="zombie-arm zombie-arm--bottom" />
         {zombie.isSprinter && <span className="zombie-headband" aria-hidden="true" />}
-        <span className="zombie-head"><i /><b />{zombie.isArmored && <span className="zombie-helmet" />}</span>
+        <span className="zombie-head"><i /><b />{zombie.guardX !== undefined && <span className="zombie-driver-cap" />}{zombie.isArmored && <span className="zombie-helmet" />}</span>
         <span className="zombie-body">{zombie.isArmored && <i className="zombie-chestplate" />}</span>
         <span className="zombie-leg zombie-leg--one" /><span className="zombie-leg zombie-leg--two" />
       </span>
