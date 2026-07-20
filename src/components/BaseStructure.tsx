@@ -45,7 +45,6 @@ export function BaseStructure({ health, x, y, mobileRepair }: Props) {
       style={{ left: x, top: y }} aria-label={`База, прочность ${health}%`}>
       <span className="base__tower base__tower--left" /><span className="base__tower base__tower--right" />
       <span className="base__wall" /><span className="base__battlements" />
-      <span className="base__banner"><i /></span>
       <span className="base__door"><i className="base__door-print">▲</i></span><span className="base__step" />
       <span className="base__plank base__plank--one" /><span className="base__plank base__plank--two" />
       <span className="base__crack base__crack--one" /><span className="base__crack base__crack--two" />
