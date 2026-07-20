@@ -141,9 +141,11 @@ button { font: inherit; }
 .player__weapon--spear i { position: absolute; left: -4px; top: -10px; width: 10px; height: 14px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); filter: drop-shadow(0 1px #1e292c); }
 .player__weapon--spear::after { content: ''; position: absolute; left: -2px; top: 5px; width: 6px; height: 8px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }
 .player__weapon--wrench { width: 7px; height: 23px; border: 1px solid #30383a; border-radius: 2px 2px 4px 4px; background: linear-gradient(90deg, #667273, #e1e6e1 45% 62%, #758182); }
-.player__weapon--wrench::after { content: ''; position: absolute; left: -3px; bottom: -7px; width: 11px; height: 11px; border: 2px solid #30383a; border-radius: 50%; background: radial-gradient(circle, #1b2220 0 2px, #dce2dd 3px 4px, #758182 5px); }
+.player__weapon--wrench::before { content: ''; position: absolute; left: -2px; top: -3px; width: 9px; height: 5px; z-index: 2; border: 1px solid #30383a; border-radius: 2px; background: repeating-linear-gradient(90deg, #4e595a 0 1px, #c5ceca 1px 2px); }
+.player__weapon--wrench::after { content: ''; position: absolute; left: 1px; bottom: 1px; width: 3px; height: 3px; border: 1px solid #3a4243; border-radius: 50%; background: #1b2220; }
 .player__weapon--wrench i { position: absolute; left: -6px; top: -10px; width: 17px; height: 15px; background: linear-gradient(90deg, #727e7f, #dce3df 48%, #8c9897); clip-path: polygon(0 0, 34% 27%, 66% 27%, 100% 0, 86% 68%, 65% 88%, 35% 88%, 14% 68%); filter: drop-shadow(0 1px #30383a); }
 .player__weapon--wrench i::after { content: ''; position: absolute; left: 6px; top: 0; width: 5px; height: 6px; background: #202820; clip-path: polygon(0 0, 100% 0, 70% 100%, 30% 100%); }
+.player__weapon--wrench i::before { content: ''; position: absolute; right: 1px; top: 3px; width: 5px; height: 7px; background: #7d8989; clip-path: polygon(35% 0, 100% 0, 100% 100%, 0 75%); }
 .player--attacking .player__weapon { animation: axe-swing .26s ease-out; }
 .player--spear .player__arm--right { visibility: hidden; }
 .player--spear.player--attacking .player__weapon { animation: spear-thrust .26s ease-out; }
@@ -206,9 +208,9 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .day-announcement { position: absolute; left: 50%; top: 45%; display: grid; place-items: center; gap: 10px; transform: translate(-50%, -50%); animation: day-announcement 1.8s ease-in-out forwards; }
 .day-announcement strong { padding: 7px 15px; border: 1px solid rgba(126, 125, 93, .35); border-radius: 8px; color: #c8c9a9; background: rgba(12, 17, 14, .86); font: 700 24px/1 Georgia, serif; letter-spacing: .08em; text-shadow: 0 2px 4px #020403; box-shadow: 0 5px 22px rgba(0, 0, 0, .65); }
 .day-announcement__sun { position: relative; isolation: isolate; width: 44px; height: 44px; border: 3px solid #5c302b; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #e8a15b 0 5px, #bd5938 17px, #79332f 100%); box-shadow: inset -5px -5px rgba(72, 27, 29, .38), 0 0 18px rgba(176, 72, 45, .48); image-rendering: pixelated; animation: day-sun-rise 1.8s steps(8, end) forwards; }
-.day-announcement__sun::before, .day-announcement__sun::after { content: ''; position: absolute; z-index: -1; border: 2px solid #5c302b; background: #a94b35; }
-.day-announcement__sun::before { left: 17px; top: -13px; width: 4px; height: 8px; box-shadow: 0 62px 0 -2px #a94b35, 0 62px #5c302b; }
-.day-announcement__sun::after { left: -13px; top: 17px; width: 8px; height: 4px; box-shadow: 62px 0 0 -2px #a94b35, 62px 0 #5c302b; }
+.day-announcement__sun i { position: absolute; left: 18px; top: -14px; z-index: -1; width: 8px; height: 11px; background: #a94b35; clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 4px 36px; filter: drop-shadow(0 1px #5c302b) drop-shadow(1px 0 #5c302b) drop-shadow(-1px 0 #5c302b); }
+.day-announcement__sun i:nth-child(2) { transform: rotate(45deg); }.day-announcement__sun i:nth-child(3) { transform: rotate(90deg); }.day-announcement__sun i:nth-child(4) { transform: rotate(135deg); }
+.day-announcement__sun i:nth-child(5) { transform: rotate(180deg); }.day-announcement__sun i:nth-child(6) { transform: rotate(225deg); }.day-announcement__sun i:nth-child(7) { transform: rotate(270deg); }.day-announcement__sun i:nth-child(8) { transform: rotate(315deg); }
 @keyframes day-announcement { 0% { opacity: 0; transform: translate(-50%, 25px) scale(.75); } 20%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -90px) scale(1.08); } }
 @keyframes day-sun-rise { 0% { transform: translateY(55px) scale(.5); } 25%, 70% { transform: translateY(0) scale(1); } 100% { transform: translateY(-18px) scale(1.12); } }
 .mobile-controls { position: fixed; left: 0; right: 0; bottom: 10px; z-index: 18; display: flex; align-items: end; justify-content: space-between; padding: 0 10px; pointer-events: none; touch-action: none; }

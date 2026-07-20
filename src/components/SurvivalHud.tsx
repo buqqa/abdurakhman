@@ -17,7 +17,7 @@ export function SurvivalHud({ phase, day, baseHealth, playerHealth }: Props) {
       })}</div>
     </section>
     {phase === 'day' && <div className="day-announcement" key={`day-${day}`}>
-      <span className="day-announcement__sun" />
+      <span className="day-announcement__sun">{Array.from({ length: 8 }, (_, index) => <i key={index} />)}</span>
       <strong>{t('day')} {day}</strong>
     </div>}
   </div>;
