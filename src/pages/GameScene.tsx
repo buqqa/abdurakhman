@@ -1,14 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { GameActions } from '../components/GameActions';
-import { GameHud } from '../components/GameHud';
 import { GameWorld } from '../components/GameWorld';
 import { useGameLoop } from '../game/useGameLoop';
 import { InventoryPanel } from '../components/InventoryPanel';
-import { PlayerStats } from '../components/PlayerStats';
 import { VictoryScreen } from '../components/VictoryScreen';
 import { DifficultyScreen } from '../components/DifficultyScreen';
 import { DefeatScreen } from '../components/DefeatScreen';
-import { useI18n } from '../i18n/I18nContext';
 import { PauseMenu } from '../components/PauseMenu';
 import { DeviceScreen, type DeviceMode } from '../components/DeviceScreen';
 import { MobileControls } from '../components/MobileControls';
@@ -20,7 +16,6 @@ import { MAX_BASE_HEALTH, REPAIR_WOOD_COST } from '../game/config';
 import { useControls } from '../game/controls';
 
 export function GameScene({ playerNickname, isRegistered }: { playerNickname: string; isRegistered: boolean }) {
-  const { t } = useI18n();
   const { bindings } = useControls();
   const [isPaused, setIsPaused] = useState(false);
   const [pendingGame, setPendingGame] = useState<{ nights: number; difficulty: string }>();
@@ -143,8 +138,6 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
     <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
-      {device !== 'mobile' && <><div className="title-row"><div><p>2D survival</p><h1>Forest Base</h1></div><span className="goal">{t('goal', { count: game.maxNights })}</span></div>
-      <GameHud game={game} /><PlayerStats health={game.playerHealth} /></>}
       {party && <PartyGameBadge code={party.code} players={multiplayer.memberCount} maxPlayers={party.maxPlayers} />}
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         multiplayerMode={Boolean(party)}
@@ -158,10 +151,6 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => { if (game[kind] < 1) return; dropResource(kind); multiplayer.dropResource(kind); } : undefined} />
       {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} canStartNight={game.phase === 'day'} canPause={!party || multiplayer.isLeader} onPause={pauseFromMobile} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
-      <section className={`status ${isFinished ? 'status--result' : ''}`}>
-        <p>{game.message}</p>
-        <GameActions phase={game.phase} onRestart={returnToMenu} />
-      </section>
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={returnToMenu} />}
       {isPaused && (party && !multiplayer.isLeader

@@ -19,7 +19,7 @@ import { WaterBottle } from './WaterBottle';
 import { Merchant } from './Merchant';
 import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
-import { MobileGameHud } from './MobileGameHud';
+import { SurvivalHud } from './SurvivalHud';
 import { RemotePlayer } from './RemotePlayer';
 import type { RemotePlayer as RemotePlayerState, SharedWorld, WorldHit, ZombieDeath } from '../game/multiplayer';
 import type { Zombie } from '../game/zombies';
@@ -136,7 +136,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
       onHit={attackTarget} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
-    <GameCamera player={player} lookAheadY={mobileMode ? 95 : 0} overlay={mobileMode ? <MobileGameHud phase={phase} day={day} maxNights={maxNights} baseHealth={baseHealth} playerHealth={playerHealth} /> : undefined}>
+    <GameCamera player={player} lookAheadY={mobileMode ? 95 : 0} overlay={<SurvivalHud day={day} maxNights={maxNights} baseHealth={baseHealth} playerHealth={playerHealth} />}>
       <section className={`forest-map ${isNight ? 'forest-map--night' : ''} ${paused ? 'forest-map--paused' : ''}`} style={{ width: MAP_WIDTH, height: MAP_HEIGHT }} aria-label="Карта леса">
         {trees.map((tree) => <div className={`map-tree ${treeAnimation?.id === tree.id ? treeAnimation.falling ? 'map-tree--fall' : 'map-tree--hit' : ''}`}
           style={{ left: tree.x - 25, top: tree.y - 50 }} key={tree.id}>

@@ -14,11 +14,14 @@ export function GameCamera({ player, children, overlay, lookAheadY = 0 }: { play
     return () => observer.disconnect();
   }, []);
 
+  const scale = Math.max(1, viewport.width / MAP_WIDTH, viewport.height / MAP_HEIGHT);
+  const visibleWidth = viewport.width / scale;
+  const visibleHeight = viewport.height / scale;
   const centerX = player.x + PLAYER_SIZE / 2;
   const centerY = player.y + PLAYER_SIZE / 2;
-  const cameraX = Math.round(Math.max(0, Math.min(MAP_WIDTH - viewport.width, centerX - viewport.width / 2)));
-  const maxCameraY = Math.max(0, MAP_HEIGHT - viewport.height) + lookAheadY;
-  const cameraY = Math.round(Math.max(0, Math.min(maxCameraY, centerY - viewport.height / 2 + lookAheadY)));
+  const cameraX = Math.round(Math.max(0, Math.min(MAP_WIDTH - visibleWidth, centerX - visibleWidth / 2)));
+  const maxCameraY = Math.max(0, MAP_HEIGHT - visibleHeight);
+  const cameraY = Math.round(Math.max(0, Math.min(maxCameraY, centerY - visibleHeight / 2 + lookAheadY)));
 
-  return <div className="map-viewport" ref={viewportRef}><div className="camera-world" style={{ transform: `translate(${-cameraX}px, ${-cameraY}px)` }}>{children}</div>{overlay}</div>;
+  return <div className="map-viewport" ref={viewportRef}><div className="camera-world" style={{ transform: `scale(${scale}) translate(${-cameraX}px, ${-cameraY}px)` }}>{children}</div>{overlay}</div>;
 }

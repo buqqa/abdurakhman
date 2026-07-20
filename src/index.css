@@ -2,23 +2,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; }
 button { font: inherit; }
-.game-shell { width: min(980px, 100%); margin: auto; padding: 28px 20px 48px; }
-.title-row { display: flex; justify-content: space-between; align-items: end; margin-bottom: 18px; }
-.title-row p { margin: 0 0 3px; color: #91a08b; text-transform: uppercase; letter-spacing: .16em; font-size: 12px; }
-.title-row h1 { margin: 0; color: #e7d7a1; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 5vw, 50px); font-style: italic; letter-spacing: .025em; text-shadow: 0 2px #3b2c20, 0 5px 14px rgba(0, 0, 0, .38); }
-.goal, .status p { color: #c7cbb9; }
-.game-hud { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
-.game-hud div { padding: 12px 14px; border: 1px solid #334132; background: #1a231a; border-radius: 8px; }
-.game-hud span { display: block; color: #8e9c89; font-size: 12px; }
-.game-hud strong { font-size: 18px; }
-.player-health { display: flex; align-items: center; gap: 14px; padding: 10px 14px; margin-bottom: 10px; border: 1px solid #334132; border-radius: 8px; background: #1a231a; }
-.player-health__label { color: #aeb7a8; font-size: 13px; }
-.hearts { display: flex; gap: 3px; filter: drop-shadow(0 2px 1px #090b08); }
-.heart { font-family: Arial, sans-serif; font-size: 22px; line-height: 1; -webkit-text-stroke: 1px #5d211f; }
-.heart--full { color: #d94a43; }
-.heart--half { color: transparent; background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); background-clip: text; -webkit-background-clip: text; }
-.heart--empty { color: #302b29; }
-.inventory-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(7, 10, 7, .72); z-index: 20; }
+.game-shell { position: fixed; inset: 0; width: 100vw; height: 100dvh; padding: 0; overflow: hidden; overscroll-behavior: none; }
+.inventory-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(7, 10, 7, .72); z-index: 35; }
 .inventory { width: min(420px, 100%); padding: 20px; border: 1px solid #52614e; border-radius: 10px; background: #182018; box-shadow: 0 18px 60px #050705; }
 .inventory header { display: flex; align-items: center; justify-content: space-between; }
 .inventory h2 { margin: 0; }
@@ -33,9 +18,8 @@ button { font: inherit; }
 .shared-drop__water { position: relative; display: block; width: 16px; height: 28px; }
 @keyframes shared-drop-land { from { translate: 0 -18px; scale: .7; } to { translate: 0; scale: 1; } }
 .inventory-help { margin: 0; color: #7f8d7b; font-size: 12px; }
-.map-viewport { width: 100%; max-width: 900px; height: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; background: #263b2b; }
-.game-shell:not(.game-shell--mobile) .map-viewport { outline: 3px solid #3b2a1b; outline-offset: 0; border-radius: 11px; box-shadow: 0 0 0 1px #85613d, 0 0 0 5px #241a12, 0 14px 30px rgba(4, 8, 4, .48), inset 0 0 0 2px rgba(221, 184, 112, .22); }
-.camera-world { width: max-content; height: max-content; transition: transform 60ms linear; }
+.map-viewport { position: relative; width: 100vw; max-width: none; height: 100%; margin: 0; overflow: hidden; border-radius: 0; background: #263b2b; }
+.camera-world { width: max-content; height: max-content; transform-origin: 0 0; transition: transform 60ms linear; will-change: transform; }
 .forest-map { position: relative; overflow: hidden; background-color: #49643e; background-image: radial-gradient(ellipse at 20% 25%, rgba(119, 146, 76, .28) 0 2px, transparent 3px), radial-gradient(ellipse at 72% 68%, rgba(34, 70, 37, .25) 0 3px, transparent 4px), linear-gradient(115deg, transparent 48%, rgba(216, 224, 146, .1) 49% 51%, transparent 52%); background-size: 37px 31px, 53px 47px, 19px 23px; transition: background-color .4s; }
 .forest-map::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .45; background-image: repeating-linear-gradient(78deg, transparent 0 24px, rgba(31, 75, 35, .35) 25px 26px, transparent 27px 42px); mix-blend-mode: multiply; }
 .forest-map::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .25; box-shadow: inset 0 0 70px rgba(20, 37, 22, .38); }
@@ -178,7 +162,7 @@ button { font: inherit; }
 .player--downed .player__nickname { bottom: 25px; color: #e4aaa3; border-color: rgba(202, 99, 88, .7); }
 .player--downed .player__weapon, .player--downed .player__collider { display: none; }
 .player--remote { transition: transform 90ms linear; will-change: transform; }
-.party-game-badge { position: fixed; left: 18px; top: 18px; z-index: 30; display: grid; min-width: 136px; padding: 9px 12px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .92); box-shadow: 0 5px 16px rgba(0, 0, 0, .35); }
+.party-game-badge { position: fixed; left: 12px; top: 72px; z-index: 30; display: grid; min-width: 136px; padding: 7px 10px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .88); box-shadow: 0 5px 16px rgba(0, 0, 0, .35); }
 .party-game-badge span, .party-game-badge small { font-size: 10px; letter-spacing: .06em; }.party-game-badge strong { color: #f1d77f; font-size: 18px; letter-spacing: .14em; }
 .controls { margin: 8px 2px 0; color: #8e9c89; font-size: 13px; }
 .merchant { position: absolute; width: 30px; height: 34px; z-index: 4; image-rendering: pixelated; filter: drop-shadow(0 2px 1px #0a0d09); }
@@ -194,21 +178,23 @@ button { font: inherit; }
 .merchant__arm--right { right: 3px; transform: rotate(-12deg); }
 .merchant__legs { position: absolute; left: 8px; bottom: -1px; width: 15px; height: 8px; border-left: 5px solid #4a4130; border-right: 5px solid #4a4130; }
 .merchant__pack { position: absolute; left: -3px; top: 13px; width: 10px; height: 15px; border: 2px solid #3e2c1e; border-radius: 3px; background: #9a6b3e; z-index: 2; }
-.status { display: flex; justify-content: space-between; align-items: center; gap: 20px; min-height: 92px; padding: 16px 0; }
-.actions { display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; }
 button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; cursor: pointer; color: #edf0e5; background: #2c3a2a; }
 button:hover { background: #3c5039; } button.danger { border-color: #82544b; background: #653e37; }
-.status--result { justify-content: center; flex-direction: column; font-size: 20px; }
 .game-shell--mobile { position: fixed; inset: 0; width: 100vw; padding: 0; overflow: hidden; overscroll-behavior: none; }
-.game-shell--mobile .party-game-badge { left: 12px; top: 62px; display: flex; align-items: center; gap: 7px; min-width: 0; padding: 4px 7px; border-radius: 6px; }.game-shell--mobile .party-game-badge span { display: none; }.game-shell--mobile .party-game-badge strong { font-size: 12px; letter-spacing: .1em; }.game-shell--mobile .party-game-badge small { font-size: 9px; }
+.game-shell--mobile .party-game-badge { left: 12px; top: 72px; display: flex; align-items: center; gap: 7px; min-width: 0; padding: 4px 7px; border-radius: 6px; }.game-shell--mobile .party-game-badge span { display: none; }.game-shell--mobile .party-game-badge strong { font-size: 12px; letter-spacing: .1em; }.game-shell--mobile .party-game-badge small { font-size: 9px; }
 .game-shell--mobile .map-viewport { position: relative; width: 100vw; max-width: none; height: 100%; margin: 0; border-radius: 0; box-shadow: inset 0 0 0 3px #241a12, inset 0 0 0 5px #85613d, inset 0 0 14px rgba(4, 8, 4, .5); }
 .game-shell--mobile .camera-world { transition: transform 40ms linear; will-change: transform; }
-.game-shell--mobile .status { position: fixed; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 19; width: max-content; min-height: 0; padding: 0; transform: translateX(-50%); background: transparent; }
-.game-shell--mobile .status p { display: none; }.game-shell--mobile .status button { padding: 9px 13px; font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); }
-.game-shell--mobile .status .actions { width: 100%; justify-content: center; }
-.mobile-game-hud { position: absolute; left: 12px; right: 12px; top: 10px; z-index: 14; padding: 9px 11px; border: 1px solid rgba(117, 138, 109, .72); border-radius: 9px; background: rgba(15, 24, 15, .84); box-shadow: 0 4px 14px rgba(0, 0, 0, .3); pointer-events: none; }
-.mobile-game-hud__row { display: flex; justify-content: space-between; align-items: center; color: #eceddc; font-size: 12px; }.mobile-game-hud__row span { color: #d8c77d; }
-.mobile-game-hud__health { height: 7px; margin-top: 7px; overflow: hidden; border-radius: 5px; background: #332927; }.mobile-game-hud__health i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a93d38, #dc5d50); transition: width .2s; }
+.survival-hud { position: absolute; inset: 0; z-index: 14; pointer-events: none; font-family: Inter, system-ui, sans-serif; }
+.survival-hud__vitals { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); padding: 6px 8px; border-radius: 7px; background: rgba(10, 15, 10, .62); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .55)); }
+.hud-hearts, .hud-armor { display: flex; gap: 2px; height: 20px; }
+.hud-hearts span { width: 18px; overflow: hidden; color: #d94a43; font: 21px/18px Arial, sans-serif; -webkit-text-stroke: 1px #5d211f; }
+.hud-hearts span.half { color: transparent; background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); background-clip: text; -webkit-background-clip: text; }
+.hud-hearts span.empty { color: #302b29; }
+.hud-armor { align-items: center; margin-top: 2px; }
+.hud-armor span { position: relative; width: 18px; height: 17px; background: #29302d; clip-path: polygon(0 0, 30% 0, 38% 25%, 62% 25%, 70% 0, 100% 0, 87% 48%, 76% 48%, 76% 100%, 24% 100%, 24% 48%, 13% 48%); filter: drop-shadow(0 1px #0b0e0c); }
+.hud-armor span.full { background: linear-gradient(135deg, #d9e3df, #768c91); }.hud-armor span.half { background: linear-gradient(90deg, #aebfc0 50%, #29302d 50%); }
+.hud-armor i { position: absolute; inset: 2px; background: rgba(255, 255, 255, .18); clip-path: inherit; }
+.survival-hud__day { position: absolute; right: max(14px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); padding: 7px 10px; border-radius: 6px; color: #f2e5b2; background: rgba(10, 15, 10, .66); font-size: 15px; text-shadow: 0 2px 2px #000; }
 .mobile-controls { position: fixed; left: 0; right: 0; bottom: 10px; z-index: 18; display: flex; align-items: end; justify-content: space-between; padding: 0 10px; pointer-events: none; touch-action: none; }
 .mobile-controls button { pointer-events: auto; user-select: none; -webkit-user-select: none; touch-action: none; }
 .mobile-pause { position: fixed; right: 12px; top: 62px; width: 38px; height: 38px; padding: 8px; border-radius: 50%; }
@@ -223,10 +209,5 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .mobile-actions { width: 146px; display: grid; grid-template-columns: repeat(3, 44px); align-items: end; justify-content: end; gap: 7px; }
 .mobile-actions button { width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 17px; font-weight: 800; box-shadow: 0 5px 14px rgba(0, 0, 0, .4); }
 @media (max-width: 640px) {
-  .goal { display: none; } .game-hud { grid-template-columns: repeat(2, 1fr); }
-  .status { align-items: stretch; flex-direction: column; } .actions { justify-content: stretch; }
-  .actions button { flex: 1 1 45%; }
-  .player-health { align-items: flex-start; flex-direction: column; gap: 6px; }
-  .heart { font-size: 20px; }
   .device-grid { grid-template-columns: 1fr; }.device-card { min-height: 145px; }
 }
