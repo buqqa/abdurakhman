@@ -3,6 +3,7 @@ import { HARVEST_DISTANCE, type InteractableObject, type InteractionHandler } fr
 import { PLAYER_SIZE } from '../mapConfig';
 import type { Position } from '../../components/PlayerController';
 import { useControls } from '../controls';
+import { DEFAULT_ATTACK_COOLDOWN } from '../config';
 
 interface Props {
   enabled: boolean;
@@ -14,7 +15,7 @@ interface Props {
   cooldown?: number;
 }
 
-export function AttackSystem({ enabled, player, targets, onHit, onMiss, attackDistance = HARVEST_DISTANCE, cooldown = 450 }: Props) {
+export function AttackSystem({ enabled, player, targets, onHit, onMiss, attackDistance = HARVEST_DISTANCE, cooldown = DEFAULT_ATTACK_COOLDOWN }: Props) {
   const { bindings } = useControls();
   const state = useRef({ player, targets, onHit, onMiss, attackDistance, cooldown });
   const lastAttack = useRef(0);

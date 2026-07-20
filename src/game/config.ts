@@ -10,6 +10,7 @@ export const SPEAR_COST = 50;
 export const SPEAR_DAMAGE = 1.5;
 export const SPEAR_RANGE_BONUS = 1.3;
 export const WRENCH_DAMAGE = 2;
-export const WRENCH_ATTACK_COOLDOWN = 1400;
+export const DEFAULT_ATTACK_COOLDOWN = 500;
+export const WRENCH_ATTACK_COOLDOWN = 1000;
 
 export const repairWoodCost = (weapon: Weapon) => weapon === 'wrench' ? WRENCH_REPAIR_WOOD_COST : REPAIR_WOOD_COST;

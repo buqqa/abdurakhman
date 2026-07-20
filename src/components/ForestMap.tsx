@@ -16,7 +16,7 @@ import { LootCrate } from './LootCrate';
 import { WorldStructures } from './WorldStructures';
 import { WaterBottle } from './WaterBottle';
 import { Merchant } from './Merchant';
-import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS, WRENCH_ATTACK_COOLDOWN, WRENCH_DAMAGE } from '../game/config';
+import { DEFAULT_ATTACK_COOLDOWN, SPEAR_DAMAGE, SPEAR_RANGE_BONUS, WRENCH_ATTACK_COOLDOWN, WRENCH_DAMAGE } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { SurvivalHud } from './SurvivalHud';
 import { RemotePlayer } from './RemotePlayer';
@@ -95,7 +95,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
     <ReviveSystem enabled={canMove} player={player} teammates={remotePlayers} onRevive={onRevivePlayer} />
     <AttackSystem enabled={canMove} player={player} targets={[...(isNight ? zombieTargets : []), ...trees, ...crates]}
       attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_RANGE_BONUS : HARVEST_DISTANCE}
-      cooldown={weapon === 'wrench' ? WRENCH_ATTACK_COOLDOWN : 450}
+      cooldown={weapon === 'wrench' ? WRENCH_ATTACK_COOLDOWN : DEFAULT_ATTACK_COOLDOWN}
       onHit={attackTarget} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
