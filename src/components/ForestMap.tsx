@@ -49,7 +49,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
     setPlayer(position);
   }, [onPlayerMove]);
   const car = structures.find((structure) => structure.kind === 'car');
-  const carGuardPoint = car ? { x: car.x + 77, y: car.y + 39 } : undefined;
+  const carGuardPoint = car?.spawnedDay === day ? { x: car.x + 77, y: car.y + 39 } : undefined;
   const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, playerHealth, teammates: remotePlayers, paused, onPlayerDamage, onRemotePlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath, carGuardPoint });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
