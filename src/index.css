@@ -163,7 +163,7 @@ button { font: inherit; }
 .player--downed .player__nickname { bottom: 25px; color: #e4aaa3; border-color: rgba(202, 99, 88, .7); }
 .player--downed .player__weapon, .player--downed .player__collider { display: none; }
 .player--remote { transition: transform 90ms linear; will-change: transform; }
-.party-game-badge { position: fixed !important; left: 12px !important; top: auto !important; bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 34; display: grid !important; visibility: visible !important; min-width: 136px; padding: 7px 10px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .94); box-shadow: 0 5px 16px rgba(0, 0, 0, .45); }
+.party-game-badge { position: fixed !important; left: auto !important; right: 12px !important; top: 12px !important; bottom: auto !important; z-index: 34; display: grid !important; visibility: visible !important; min-width: 136px; padding: 7px 10px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .94); box-shadow: 0 5px 16px rgba(0, 0, 0, .45); }
 .party-game-badge span, .party-game-badge small { font-size: 10px; letter-spacing: .06em; }.party-game-badge strong { color: #f1d77f; font-size: 18px; letter-spacing: .14em; }
 .controls { margin: 8px 2px 0; color: #8e9c89; font-size: 13px; }
 .merchant { position: absolute; width: 30px; height: 34px; z-index: 4; image-rendering: pixelated; filter: drop-shadow(0 2px 1px #0a0d09); }
@@ -182,7 +182,7 @@ button { font: inherit; }
 button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; cursor: pointer; color: #edf0e5; background: #2c3a2a; }
 button:hover { background: #3c5039; } button.danger { border-color: #82544b; background: #653e37; }
 .game-shell--mobile { position: fixed; inset: 0; width: 100vw; padding: 0; overflow: hidden; overscroll-behavior: none; }
-.game-shell--mobile .party-game-badge { left: 12px; top: auto; bottom: 116px; bottom: max(116px, calc(env(safe-area-inset-bottom) + 106px)); display: flex; align-items: center; gap: 7px; min-width: 0; padding: 4px 7px; border-radius: 6px; }.game-shell--mobile .party-game-badge span { display: none; }.game-shell--mobile .party-game-badge strong { font-size: 12px; letter-spacing: .1em; }.game-shell--mobile .party-game-badge small { font-size: 9px; }
+.game-shell--mobile .party-game-badge { left: auto !important; right: 12px !important; top: max(10px, env(safe-area-inset-top)) !important; bottom: auto !important; display: flex !important; align-items: center; gap: 7px; min-width: 0; padding: 5px 8px; border-radius: 6px; }.game-shell--mobile .party-game-badge span { display: none; }.game-shell--mobile .party-game-badge strong { font-size: 12px; letter-spacing: .1em; }.game-shell--mobile .party-game-badge small { font-size: 9px; }
 .game-shell--mobile .map-viewport { position: relative; width: 100vw; max-width: none; height: 100%; margin: 0; border-radius: 0; box-shadow: inset 0 0 0 3px #241a12, inset 0 0 0 5px #85613d, inset 0 0 14px rgba(4, 8, 4, .5); }
 .game-shell--mobile .camera-world { transition: transform 40ms linear; will-change: transform; }
 .survival-hud { position: absolute; inset: 0; z-index: 14; pointer-events: none; font-family: Inter, system-ui, sans-serif; }
@@ -195,7 +195,14 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .hud-armor span { position: relative; width: 14px; height: 13px; background: #252c2c; clip-path: polygon(3% 4%, 29% 0, 39% 23%, 61% 23%, 71% 0, 97% 4%, 88% 47%, 77% 49%, 77% 100%, 23% 100%, 23% 49%, 12% 47%); filter: drop-shadow(0 1px 1px #050706); }
 .hud-armor span.full { background: linear-gradient(135deg, #edf5f2 0 24%, #9fb8bc 27% 58%, #526d76 61%); }.hud-armor span.half { background: linear-gradient(90deg, #a9c1c4 50%, #252c2c 50%); }
 .hud-armor i { position: absolute; inset: 2px 3px 3px; background: linear-gradient(135deg, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0)); clip-path: inherit; }
-.survival-hud__day { position: absolute; right: max(14px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); padding: 7px 10px; border-radius: 6px; color: #f2e5b2; background: rgba(10, 15, 10, .66); font-size: 15px; text-shadow: 0 2px 2px #000; }
+.day-announcement { position: absolute; left: 50%; top: 45%; display: grid; place-items: center; gap: 12px; transform: translate(-50%, -50%); animation: day-announcement 3.2s ease-in-out forwards; }
+.day-announcement strong { padding: 7px 15px; border-radius: 8px; color: #fff1b8; background: rgba(35, 31, 15, .72); font: 700 25px/1 Georgia, serif; letter-spacing: .08em; text-shadow: 0 2px 4px #5b3b08; box-shadow: 0 4px 18px rgba(0, 0, 0, .35); }
+.day-announcement__sun { position: relative; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 35% 32%, #fffbd0 0 7px, #ffd75e 22px, #e99824 100%); box-shadow: 0 0 18px #ffd55d, 0 0 45px rgba(255, 185, 45, .75); animation: day-sun-rise 3.2s ease-in-out forwards; }
+.day-announcement__sun::before { content: ''; position: absolute; inset: -18px; z-index: -1; background: repeating-conic-gradient(from 4deg, rgba(255, 210, 80, .95) 0 4deg, transparent 4deg 22deg); clip-path: polygon(45% 0,55% 0,58% 39%,82% 8%,90% 15%,63% 43%,100% 45%,100% 55%,63% 58%,92% 82%,84% 90%,58% 63%,55% 100%,45% 100%,42% 63%,16% 91%,8% 83%,37% 58%,0 55%,0 45%,37% 42%,9% 16%,17% 8%,42% 39%); animation: day-rays 3.2s linear forwards; }
+.day-announcement__sun i { position: absolute; left: 13px; top: 11px; width: 10px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .72); transform: rotate(-24deg); }
+@keyframes day-announcement { 0% { opacity: 0; transform: translate(-50%, 25px) scale(.75); } 20%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -90px) scale(1.08); } }
+@keyframes day-sun-rise { 0% { transform: translateY(55px) scale(.5); } 25%, 70% { transform: translateY(0) scale(1); } 100% { transform: translateY(-18px) scale(1.12); } }
+@keyframes day-rays { from { transform: rotate(0deg) scale(.7); } to { transform: rotate(100deg) scale(1.15); } }
 .mobile-controls { position: fixed; left: 0; right: 0; bottom: 10px; z-index: 18; display: flex; align-items: end; justify-content: space-between; padding: 0 10px; pointer-events: none; touch-action: none; }
 .mobile-controls button { pointer-events: auto; user-select: none; -webkit-user-select: none; touch-action: none; }
 .mobile-pause { position: fixed; right: 12px; top: 62px; width: 38px; height: 38px; padding: 8px; border-radius: 50%; }

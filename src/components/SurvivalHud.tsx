@@ -1,8 +1,9 @@
 import { useI18n } from '../i18n/I18nContext';
+import type { Phase } from '../game/types';
 
-interface Props { day: number; maxNights: number; baseHealth: number; playerHealth: number }
+interface Props { phase: Phase; day: number; baseHealth: number; playerHealth: number }
 
-export function SurvivalHud({ day, maxNights, baseHealth, playerHealth }: Props) {
+export function SurvivalHud({ phase, day, baseHealth, playerHealth }: Props) {
   const { t } = useI18n();
   return <div className="survival-hud">
     <section className="survival-hud__vitals">
@@ -15,6 +16,9 @@ export function SurvivalHud({ day, maxNights, baseHealth, playerHealth }: Props)
         return <span className={remaining >= 10 ? 'full' : remaining > 0 ? 'half' : 'empty'} key={index}><i /></span>;
       })}</div>
     </section>
-    <strong className="survival-hud__day">{t('day')} {day}/{maxNights}</strong>
+    {phase === 'day' && <div className="day-announcement" key={`day-${day}`}>
+      <span className="day-announcement__sun"><i /></span>
+      <strong>{t('day')} {day}</strong>
+    </div>}
   </div>;
 }
