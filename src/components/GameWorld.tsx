@@ -51,7 +51,7 @@ export function GameWorld({ paused, mobileMode, playerNickname, phase, day, diff
   const { t, language } = useI18n();
   return (
     <section>
-      <ForestMap paused={paused} mobileMode={mobileMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
+      <ForestMap paused={paused} mobileMode={mobileMode} multiplayerMode={multiplayerMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
         remotePlayers={remotePlayers} onPlayerMove={onPlayerMove} onRevivePlayer={onRevivePlayer} onPlayerAttack={onPlayerAttack} onWorldHit={onWorldHit} worldHit={worldHit}
         sharedWorld={sharedWorld} worldTake={worldTake} onWorldState={onWorldState} onWorldTake={onWorldTake}
         zombieDeath={zombieDeath} onZombieDeath={onZombieDeath}

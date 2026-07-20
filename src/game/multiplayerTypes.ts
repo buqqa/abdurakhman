@@ -13,3 +13,5 @@ export interface SharedDrop extends Position { id: string; kind: ResourceKind }
 export interface WorldHit { object: InteractableObject; hitsToBreak: number; nonce: string }
 export interface ZombieDeath { zombie: Zombie; nonce: string }
 export interface SharedWorld { objects: InteractableObject[]; structures: WorldStructure[] }
+export interface WorldTake { id: string; nonce: string; targetId: string; kind: 'food' | 'water' }
+export interface ResourceGrant { id: string; nonce: string; targetId: string; kind: ResourceKind }

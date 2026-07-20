@@ -44,8 +44,16 @@ export function useZombieWave(options: Options) {
   const spawnTimer = useRef<number>();
   optionsRef.current = options;
   useEffect(() => {
-    if (options.authoritative === false) setZombies(options.externalZombies ?? []);
-  }, [options.authoritative, options.externalZombies]);
+    if (options.authoritative !== false) return;
+    const shared = options.externalZombies ?? [];
+    zombiesRef.current = shared;
+    setZombies(shared);
+    if (options.phase === 'night') {
+      spawnedNight.current = options.day;
+      activeWave.current = true;
+      waitingZombies.current = [];
+    }
+  }, [options.authoritative, options.day, options.externalZombies, options.phase]);
 
   useEffect(() => {
     window.clearTimeout(spawnTimer.current);
@@ -76,7 +84,7 @@ export function useZombieWave(options: Options) {
     };
     spawnNext();
     return () => window.clearTimeout(spawnTimer.current);
-  }, [options.day, options.difficulty, options.paused, options.phase]);
+  }, [options.authoritative, options.day, options.difficulty, options.paused, options.phase]);
 
   useEffect(() => {
     if (options.authoritative === false || options.phase !== 'night' || options.paused) return;
@@ -104,7 +112,7 @@ export function useZombieWave(options: Options) {
     };
     frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [options.paused, options.phase]);
+  }, [options.authoritative, options.paused, options.phase]);
 
   const hitZombie = (id: string, damage = 1) => {
     if (optionsRef.current.paused || optionsRef.current.phase !== 'night') return;

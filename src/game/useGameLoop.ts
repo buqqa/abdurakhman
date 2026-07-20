@@ -79,6 +79,10 @@ export function useGameLoop() {
     const steps = Math.ceil((MAX_BASE_HEALTH - baseHealth) / REPAIR_PER_STEP);
     return { ...state, wood: state.wood - REPAIR_WOOD_COST, baseHealth, message: steps ? message.repairSteps(steps) : message.repaired };
   });
+  const applyTeammateRepair = () => setGame((state) => ({
+    ...state,
+    baseHealth: Math.min(MAX_BASE_HEALTH, state.baseHealth + REPAIR_PER_STEP),
+  }));
   const startNight = () => {
     playGameSound('zombieSpawn');
     setGame((state) => ({ ...state, phase: 'night', message: message.night(state.day) }));
@@ -114,5 +118,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
 }
