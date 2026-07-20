@@ -163,7 +163,7 @@ button { font: inherit; }
 .player--downed .player__nickname { bottom: 25px; color: #e4aaa3; border-color: rgba(202, 99, 88, .7); }
 .player--downed .player__weapon, .player--downed .player__collider { display: none; }
 .player--remote { transition: transform 90ms linear; will-change: transform; }
-.party-game-badge { position: fixed; left: 12px; top: auto; bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 30; display: grid; min-width: 136px; padding: 7px 10px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .88); box-shadow: 0 5px 16px rgba(0, 0, 0, .35); }
+.party-game-badge { position: fixed !important; left: 12px !important; top: auto !important; bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 34; display: grid !important; visibility: visible !important; min-width: 136px; padding: 7px 10px; border: 1px solid #76633c; border-radius: 8px; color: #cbd1bd; background: rgba(13, 21, 13, .94); box-shadow: 0 5px 16px rgba(0, 0, 0, .45); }
 .party-game-badge span, .party-game-badge small { font-size: 10px; letter-spacing: .06em; }.party-game-badge strong { color: #f1d77f; font-size: 18px; letter-spacing: .14em; }
 .controls { margin: 8px 2px 0; color: #8e9c89; font-size: 13px; }
 .merchant { position: absolute; width: 30px; height: 34px; z-index: 4; image-rendering: pixelated; filter: drop-shadow(0 2px 1px #0a0d09); }
