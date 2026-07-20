@@ -24,17 +24,21 @@ export function moveZombies({ zombies, player, playerHealth, teammates, time, de
   const attacks: ZombieAttack[] = [];
   const next = zombies.map((zombie) => {
     const baseDistance = Math.hypot(BASE_POSITION.x - zombie.x, BASE_POSITION.y - zombie.y);
-    const nearest = players.reduce<{ kind: 'local' | 'remote'; id: string; x: number; y: number; distance: number } | undefined>((best, candidate) => {
+    const guarding = zombie.guardX !== undefined && zombie.guardY !== undefined;
+    const targets = guarding ? players.filter((candidate) => Math.hypot(candidate.x - zombie.guardX!, candidate.y - zombie.guardY!) <= 240) : players;
+    const nearest = targets.reduce<{ kind: 'local' | 'remote'; id: string; x: number; y: number; distance: number } | undefined>((best, candidate) => {
       const distance = Math.hypot(candidate.x - zombie.x, candidate.y - zombie.y);
       return !best || distance < best.distance ? { ...candidate, distance } : best;
     }, undefined);
-    const target = nearest && nearest.distance < baseDistance
-      ? nearest
-      : { kind: 'base' as const, x: BASE_POSITION.x, y: BASE_POSITION.y, distance: baseDistance };
-    const targetsPlayer = target.kind !== 'base';
+    const guardDistance = guarding ? Math.hypot(zombie.guardX! - zombie.x, zombie.guardY! - zombie.y) : 0;
+    const target = guarding
+      ? nearest ?? { kind: 'guard' as const, x: zombie.guardX!, y: zombie.guardY!, distance: guardDistance }
+      : nearest && nearest.distance < baseDistance ? nearest : { kind: 'base' as const, x: BASE_POSITION.x, y: BASE_POSITION.y, distance: baseDistance };
+    const targetsPlayer = target.kind === 'local' || target.kind === 'remote';
+    if (target.kind === 'guard' && target.distance <= 68) return zombie;
     if (target.distance <= (targetsPlayer ? 20 : 68)) {
       if (time - zombie.lastAttack >= 1050) {
-        attacks.push({ kind: target.kind, id: 'id' in target ? target.id : undefined, damage: targetsPlayer ? zombie.playerDamage : zombie.damage });
+        if (target.kind !== 'guard') attacks.push({ kind: target.kind, id: 'id' in target ? target.id : undefined, damage: targetsPlayer ? zombie.playerDamage : zombie.damage });
         return { ...zombie, lastAttack: time };
       }
       return zombie;

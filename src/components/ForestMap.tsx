@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { BASE_POSITION, MAP_HEIGHT, MAP_WIDTH, PLAYER_START } from '../game/mapConfig';
-import { createDailyResources, HARVEST_DISTANCE, WORLD_OBJECTS, type CrateKind, type InteractableObject, type InteractionHandlers } from '../game/interactions';
+import { HARVEST_DISTANCE, type CrateKind, type InteractableObject, type InteractionHandlers } from '../game/interactions';
 import { InteractionSystem } from '../game/systems/InteractionSystem';
 import { RepairSystem } from '../game/systems/RepairSystem';
 import { AttackSystem } from '../game/systems/AttackSystem';
@@ -14,10 +14,9 @@ import { ZombieSprite } from './ZombieSprite';
 import { ZombieExplosion } from './ZombieExplosion';
 import { LootCrate } from './LootCrate';
 import { WorldStructures } from './WorldStructures';
-import { createStructure, type StructureKind, type WorldStructure } from '../game/structures';
 import { WaterBottle } from './WaterBottle';
 import { Merchant } from './Merchant';
-import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS } from '../game/config';
+import { SPEAR_DAMAGE, SPEAR_RANGE_BONUS, WRENCH_ATTACK_COOLDOWN, WRENCH_DAMAGE } from '../game/config';
 import { ChickenLeg } from './ChickenLeg';
 import { SurvivalHud } from './SurvivalHud';
 import { RemotePlayer } from './RemotePlayer';
@@ -28,6 +27,7 @@ import { ReviveSystem } from '../game/systems/ReviveSystem';
 import { useFootprints } from '../game/systems/useFootprints';
 import { useTreeHarvest } from '../game/systems/useTreeHarvest';
 import { useCrateHarvest } from '../game/systems/useCrateHarvest';
+import { useWorldState } from '../game/systems/useWorldState';
 
 interface Props { paused: boolean; mobileMode: boolean; multiplayerMode: boolean; playerNickname: string; phase: Phase; day: number; difficulty: string; baseHealth: number; maxNights: number; playerHealth: number; weapon: Weapon; hasSpear: boolean; merchantDay: number; wood: number; onBuySpear: () => void; handlers: InteractionHandlers; onUnavailable: () => void; onAttack: () => void; onHarvest: () => void; onCrateLoot: (kind: CrateKind) => void; onPlayerDamage: (damage: number) => void; onBaseDamage: (damage: number) => void; onNightCleared: () => void; remotePlayers: RemotePlayerState[]; onPlayerMove: (position: Position) => void; onRevivePlayer: (id: string) => void; onPlayerAttack: () => void; onWorldHit: (object: import('../game/interactions').InteractableObject, hitsToBreak: number) => void; worldHit?: WorldHit; sharedWorld?: SharedWorld; worldTake?: { id: string; nonce: string }; onWorldState: (world: SharedWorld) => void; onWorldTake: (id: string) => void; zombieDeath?: ZombieDeath; onZombieDeath: (zombie: Zombie) => void; onRemotePlayerDamage: (id: string, damage: number) => void; authoritative: boolean; sharedZombies: Zombie[]; zombieHit?: { id: string; damage: number; nonce: string }; onZombiesChange: (zombies: Zombie[]) => void; onZombieHit: (id: string, damage: number) => void; sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void }
 
@@ -39,47 +39,8 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
   const canMove = worldReady && playerHealth > 0 && !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
   const lastMapFrame = useRef(0);
-  const [objects, setObjects] = useState(WORLD_OBJECTS);
   const [isSwinging, setIsSwinging] = useState(false);
-  const spawnedDays = useRef(new Set<number>());
-  const structureDays = useRef({ tent: 5 + Math.floor(Math.random() * 6), warehouse: 10 + Math.floor(Math.random() * 11) });
-  const spawnedStructures = useRef(new Set<StructureKind>());
-  const [structures, setStructures] = useState<WorldStructure[]>([]);
-  useEffect(() => {
-    if (authoritative) onWorldState({ objects, structures });
-  }, [authoritative, objects, onWorldState, structures]);
-  useEffect(() => {
-    if (authoritative || !sharedWorld) return;
-    setObjects(sharedWorld.objects);
-    setStructures(sharedWorld.structures);
-  }, [authoritative, sharedWorld]);
-  useEffect(() => {
-    if (worldTake) setObjects((current) => current.filter((item) => item.id !== worldTake.id));
-  }, [worldTake?.nonce]);
-  useEffect(() => {
-    if (!authoritative || day < 2 || phase !== 'day' || spawnedDays.current.has(day)) return;
-    spawnedDays.current.add(day);
-    const resources = createDailyResources(day, objects);
-    if (resources.length) setObjects((current) => [...current, ...resources]);
-  }, [authoritative, day, phase]);
-  useEffect(() => {
-    if (!authoritative || phase !== 'day') return;
-    const expiredIds = structures.filter((structure) => structure.spawnedDay < day).map((structure) => structure.id);
-    if (!expiredIds.length) return;
-    setStructures((current) => current.filter((structure) => !expiredIds.includes(structure.id)));
-    setObjects((current) => current.filter((object) => !expiredIds.some((id) => object.id.startsWith(`${id}-`))));
-  }, [authoritative, day, phase, structures]);
-  useEffect(() => {
-    if (!authoritative || phase !== 'day') return;
-    const ready = (['tent', 'warehouse'] as const).filter((kind) => day >= structureDays.current[kind] && !spawnedStructures.current.has(kind));
-    if (!ready.length) return;
-    ready.forEach((kind) => {
-      spawnedStructures.current.add(kind);
-      const spawn = createStructure(kind, objects, day);
-      setStructures((current) => [...current, spawn.structure]);
-      setObjects((current) => [...current, spawn.marker, ...spawn.crates]);
-    });
-  }, [authoritative, day, phase]);
+  const { objects, setObjects, structures } = useWorldState({ authoritative, day, phase, sharedWorld, worldTake, onWorldState });
   const updatePlayer = useCallback((position: Position) => {
     onPlayerMove(position);
     const now = performance.now();
@@ -87,7 +48,9 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
     lastMapFrame.current = now;
     setPlayer(position);
   }, [onPlayerMove]);
-  const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, playerHealth, teammates: remotePlayers, paused, onPlayerDamage, onRemotePlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath });
+  const car = structures.find((structure) => structure.kind === 'car');
+  const carGuardPoint = car ? { x: car.x + 77, y: car.y + 39 } : undefined;
+  const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, playerHealth, teammates: remotePlayers, paused, onPlayerDamage, onRemotePlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath, carGuardPoint });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
     onPlayerAttack();
@@ -115,7 +78,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
   const attackZombie = useCallback((target: { id: string }) => {
     swingWeapon();
     playGameSound('chop');
-    hitZombie(target.id, weapon === 'spear' ? SPEAR_DAMAGE : 1);
+    hitZombie(target.id, weapon === 'wrench' ? WRENCH_DAMAGE : weapon === 'spear' ? SPEAR_DAMAGE : 1);
   }, [hitZombie, swingWeapon, weapon]);
   const attackResource = useCallback((target: InteractableObject) => {
     if (target.kind === 'tree') harvestTree(target);
@@ -132,7 +95,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
     <ReviveSystem enabled={canMove} player={player} teammates={remotePlayers} onRevive={onRevivePlayer} />
     <AttackSystem enabled={canMove} player={player} targets={[...(isNight ? zombieTargets : []), ...trees, ...crates]}
       attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_RANGE_BONUS : HARVEST_DISTANCE}
-      cooldown={450}
+      cooldown={weapon === 'wrench' ? WRENCH_ATTACK_COOLDOWN : 450}
       onHit={attackTarget} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}

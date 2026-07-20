@@ -12,8 +12,10 @@ import { PlayModeScreen } from '../components/PlayModeScreen';
 import { PartyScreen, type PartyGameSettings } from '../components/PartyScreen';
 import { useMultiplayerRoom } from '../game/multiplayer';
 import { PartyGameBadge } from '../components/PartyGameBadge';
-import { MAX_BASE_HEALTH, REPAIR_WOOD_COST } from '../game/config';
+import { MAX_BASE_HEALTH, repairWoodCost } from '../game/config';
 import { useControls } from '../game/controls';
+import { WrenchFoundScreen } from '../components/WrenchFoundScreen';
+import type { CrateKind } from '../game/interactions';
 
 export function GameScene({ playerNickname, isRegistered }: { playerNickname: string; isRegistered: boolean }) {
   const { bindings } = useControls();
@@ -23,6 +25,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   const [party, setParty] = useState<PartyGameSettings>();
   const [device, setDevice] = useState<DeviceMode>();
   const [mobileHeight, setMobileHeight] = useState(() => window.innerHeight);
+  const [wrenchInfoOpen, setWrenchInfoOpen] = useState(false);
   const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock } = useGameLoop();
   const multiplayer = useMultiplayerRoom(party?.code, playerNickname, party?.maxPlayers);
   const handledRepairs = useRef(0);
@@ -126,8 +129,12 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     <p className="party-note">В этой комнате уже {party.maxPlayers} игрока. Попроси новый код или создай свою комнату.</p>
     <button onClick={returnToMenu}>Вернуться в меню</button></main>;
   const repairSharedBase = () => {
-    if (party && !multiplayer.isLeader && game.baseHealth < MAX_BASE_HEALTH && game.wood >= REPAIR_WOOD_COST) multiplayer.sendBaseRepair();
+    if (party && !multiplayer.isLeader && game.baseHealth < MAX_BASE_HEALTH && game.wood >= repairWoodCost(game.weapon)) multiplayer.sendBaseRepair();
     repairBase();
+  };
+  const collectCrateLoot = (kind: CrateKind) => {
+    gatherCrateLoot(kind);
+    if (kind === 'crate-wrench') setWrenchInfoOpen(true);
   };
   const pauseFromMobile = () => {
     if (party && !multiplayer.isLeader) return;
@@ -147,10 +154,11 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
         onRemotePlayerDamage={multiplayer.damageRemotePlayer}
         authoritative={!party || multiplayer.isLeader} sharedZombies={multiplayer.zombies} zombieHit={multiplayer.zombieHit} onZombiesChange={multiplayer.sendZombies} onZombieHit={multiplayer.sendZombieHit}
         sharedDrops={multiplayer.drops} onTakeDrop={(drop) => multiplayer.takeResource(drop.id)}
-        onAttack={attack} onHarvest={gatherWood} onCrateLoot={gatherCrateLoot}
+        onAttack={attack} onHarvest={gatherWood} onCrateLoot={collectCrateLoot}
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => { if (game[kind] < 1) return; dropResource(kind); multiplayer.dropResource(kind); } : undefined} />
-      {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished} canStartNight={game.phase === 'day'} canPause={!party || multiplayer.isLeader} onPause={pauseFromMobile} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
+      {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished && !wrenchInfoOpen} canStartNight={game.phase === 'day'} canPause={!party || multiplayer.isLeader} onPause={pauseFromMobile} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
+      {wrenchInfoOpen && <WrenchFoundScreen onClose={() => setWrenchInfoOpen(false)} />}
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}
       {game.phase === 'lost' && <DefeatScreen message={game.message} onRestart={returnToMenu} />}
       {isPaused && (party && !multiplayer.isLeader

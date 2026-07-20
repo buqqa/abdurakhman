@@ -18,6 +18,21 @@ export interface Zombie {
   facingLeft: boolean;
   hitAt: number;
   spawnedAt: number;
+  guardX?: number;
+  guardY?: number;
+}
+
+export function createCarGuards(night: number, x: number, y: number): Zombie[] {
+  return Array.from({ length: 5 }, (_, index) => {
+    const angle = index / 5 * Math.PI * 2;
+    const health = 6;
+    return {
+      id: `car-guard-${night}-${index}`, x: x + Math.cos(angle) * 82, y: y + Math.sin(angle) * 58,
+      health, maxHealth: health, damage: 0, playerDamage: 10, speed: 34,
+      isBoss: false, hasHammer: false, isExplosive: false, isSprinter: false, isArmored: false,
+      lastAttack: 0, facingLeft: false, hitAt: 0, spawnedAt: Date.now(), guardX: x, guardY: y,
+    };
+  });
 }
 
 function spawnPoint(index: number) {

@@ -1,7 +1,7 @@
 import type { CrateKind, InteractableObject } from './interactions';
 import { BASE_POSITION, MAP_HEIGHT, MAP_WIDTH } from './mapConfig';
 
-export type StructureKind = 'tent' | 'warehouse';
+export type StructureKind = 'tent' | 'warehouse' | 'car';
 
 export interface WorldStructure {
   id: string;
@@ -14,9 +14,9 @@ export interface WorldStructure {
 const randomCrate = (choices: CrateKind[]) => choices[Math.floor(Math.random() * choices.length)];
 
 export function createStructure(kind: StructureKind, occupied: InteractableObject[], spawnedDay: number) {
-  const width = kind === 'tent' ? 170 : 190;
-  const height = kind === 'tent' ? 100 : 120;
-  let position = { x: kind === 'tent' ? 470 : 850, y: kind === 'tent' ? 500 : 180 };
+  const width = kind === 'tent' ? 170 : kind === 'warehouse' ? 190 : 154;
+  const height = kind === 'tent' ? 100 : kind === 'warehouse' ? 120 : 78;
+  let position = kind === 'tent' ? { x: 470, y: 500 } : kind === 'warehouse' ? { x: 850, y: 180 } : { x: 820, y: 500 };
 
   for (let attempt = 0; attempt < 250; attempt += 1) {
     const candidate = {
@@ -30,14 +30,14 @@ export function createStructure(kind: StructureKind, occupied: InteractableObjec
   }
 
   const structure: WorldStructure = { id: `structure-${kind}`, kind, spawnedDay, ...position };
-  const kinds: CrateKind[] = kind === 'tent'
+  const kinds: CrateKind[] = kind === 'car' ? ['crate-wrench'] : kind === 'tent'
     ? ['crate-food', 'crate-food', 'crate-food']
     : ['crate-wood', 'crate-wood', randomCrate(['crate-wood', 'crate-food'])];
   const crates = kinds.map<InteractableObject>((crateKind, index) => ({
     id: `${structure.id}-crate-${index}`,
     kind: crateKind,
-    x: position.x + 48 + index * 46,
-    y: position.y + height - 13,
+    x: position.x + (kind === 'car' ? 111 : 48 + index * 46),
+    y: position.y + height - (kind === 'car' ? 27 : 13),
   }));
   const marker: InteractableObject = { id: `${structure.id}-marker`, kind: `structure-${kind}`, x: position.x + width / 2, y: position.y + height / 2 };
   return { structure, crates, marker };

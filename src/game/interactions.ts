@@ -7,7 +7,7 @@ export interface InteractableObject {
   y: number;
 }
 
-export type CrateKind = 'crate-food' | 'crate-wood' | 'crate-empty';
+export type CrateKind = 'crate-food' | 'crate-wood' | 'crate-empty' | 'crate-wrench';
 
 export type InteractionHandler = (object: InteractableObject) => void;
 export type InteractionHandlers = Record<string, InteractionHandler | undefined>;

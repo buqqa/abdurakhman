@@ -1,5 +1,5 @@
 export type Phase = 'menu' | 'day' | 'night' | 'won' | 'lost';
-export type Weapon = 'hammer' | 'spear';
+export type Weapon = 'hammer' | 'spear' | 'wrench';
 
 export interface GameState {
   day: number;
@@ -15,5 +15,6 @@ export interface GameState {
   difficulty: string;
   weapon: Weapon;
   hasSpear: boolean;
+  hasWrench: boolean;
   merchantDay: number;
 }

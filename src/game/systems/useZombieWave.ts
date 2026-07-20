@@ -7,6 +7,7 @@ import { playGameSound } from '../../lib/gameAudio';
 import type { RemotePlayer, ZombieDeath } from '../multiplayer';
 import { useZombieDeathEffects } from './useZombieDeathEffects';
 import { moveZombies } from './zombieMovement';
+import { createCarGuards } from '../zombies';
 
 const EXPLOSION_RADIUS = 75;
 const EXPLOSION_PLAYER_DAMAGE = 20;
@@ -31,6 +32,7 @@ interface Options {
   remoteHit?: { id: string; damage: number; nonce: string };
   remoteDeath?: ZombieDeath;
   onZombieDeath?: (zombie: Zombie) => void;
+  carGuardPoint?: Position;
 }
 
 export function useZombieWave(options: Options) {
@@ -42,6 +44,7 @@ export function useZombieWave(options: Options) {
   const spawnedNight = useRef(0);
   const waitingZombies = useRef<Zombie[]>([]);
   const spawnTimer = useRef<number>();
+  const guardedNights = useRef(new Set<number>());
   optionsRef.current = options;
   useEffect(() => {
     if (options.authoritative !== false) return;
@@ -85,6 +88,16 @@ export function useZombieWave(options: Options) {
     spawnNext();
     return () => window.clearTimeout(spawnTimer.current);
   }, [options.authoritative, options.day, options.difficulty, options.paused, options.phase]);
+
+  useEffect(() => {
+    if (options.authoritative === false || options.phase !== 'night' || !options.carGuardPoint || guardedNights.current.has(options.day)) return;
+    guardedNights.current.add(options.day);
+    if (zombiesRef.current.some((zombie) => zombie.id.startsWith(`car-guard-${options.day}-`))) return;
+    const guards = createCarGuards(options.day, options.carGuardPoint.x, options.carGuardPoint.y);
+    zombiesRef.current = [...zombiesRef.current, ...guards];
+    setZombies(zombiesRef.current);
+    optionsRef.current.onZombiesChange?.(zombiesRef.current);
+  }, [options.authoritative, options.carGuardPoint?.x, options.carGuardPoint?.y, options.day, options.phase]);
 
   useEffect(() => {
     if (options.authoritative === false || options.phase !== 'night' || options.paused) return;
