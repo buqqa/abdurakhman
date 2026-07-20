@@ -187,8 +187,8 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .game-shell--mobile .camera-world { transition: transform 40ms linear; will-change: transform; }
 .survival-hud { position: absolute; inset: 0; z-index: 14; pointer-events: none; font-family: Inter, system-ui, sans-serif; }
 .survival-hud__vitals { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); padding: 6px 8px; border-radius: 7px; background: rgba(10, 15, 10, .62); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .55)); }
-.hud-hearts, .hud-armor { display: flex; gap: 2px; height: 20px; }
-.hud-hearts span { width: 18px; overflow: hidden; color: #d94a43; font: 21px/18px Arial, sans-serif; -webkit-text-stroke: 1px #5d211f; }
+.hud-hearts, .hud-armor { display: flex; gap: 3px; height: 16px; }
+.hud-hearts span { width: 14px; overflow: visible; color: #d94a43; font: 17px/14px Arial, sans-serif; text-align: center; -webkit-text-stroke: 1px #5d211f; }
 .hud-hearts span.half { color: transparent; background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); background-clip: text; -webkit-background-clip: text; }
 .hud-hearts span.empty { color: #302b29; }
 .hud-armor { align-items: center; height: 16px; margin-top: 1px; gap: 3px; }
