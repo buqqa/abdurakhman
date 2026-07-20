@@ -7,11 +7,12 @@ import type { InteractableObject } from './interactions';
 import type { PlayerPayload, PresencePayload, RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDeath } from './multiplayerTypes';
 export type { RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDeath } from './multiplayerTypes';
 
-const POSITION_INTERVAL = 66;
+const POSITION_INTERVAL = 80;
+const PLAYER_UPDATE_INTERVAL = 50;
 const POSITION_HEARTBEAT = 1000;
 const ZOMBIE_INTERVAL = 100;
 
-export function useMultiplayerRoom(code: string | undefined, nickname: string, maxPlayers = 3) {
+export function useMultiplayerRoom(code: string | undefined, nickname: string, maxPlayers = 4) {
   const id = useRef(crypto.randomUUID());
   const channelRef = useRef<ReturnType<typeof supabase.channel>>();
   const lastSent = useRef(0);
@@ -20,10 +21,13 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const lastWalking = useRef(false);
   const lastFacingRight = useRef(false);
   const lastZombieSent = useRef(0);
+  const pendingPlayers = useRef(new Map<string, PlayerPayload>());
+  const playerFlushTimer = useRef<number>();
   const latestZombies = useRef<Zombie[]>([]);
   const latestWorld = useRef<SharedWorld>();
   const latestDrops = useRef<SharedDrop[]>([]);
   const isLeaderRef = useRef(false);
+  const admittedPlayerIds = useRef(new Set<string>());
   const claimedWorld = useRef(new Set<string>());
   const claimedDrops = useRef(new Set<string>());
   const [players, setPlayers] = useState<RemotePlayer[]>([]);
@@ -48,6 +52,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
 
   useEffect(() => {
     isLeaderRef.current = false;
+    admittedPlayerIds.current.clear();
     setIsLeader(false);
     claimedWorld.current.clear();
     claimedDrops.current.clear();
@@ -56,11 +61,23 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     const channel = supabase.channel(`forest-party-${code}`, { config: { presence: { key: id.current } } });
     channel.on('broadcast', { event: 'player-move' }, ({ payload }) => {
       const player = payload as PlayerPayload;
-      if (player.id === id.current) return;
-      setPlayers((current) => {
-        const existing = current.find((item) => item.id === player.id);
-        return [...current.filter((item) => item.id !== player.id), { ...existing, ...player, updatedAt: Date.now() }];
-      });
+      if (player.id === id.current || !admittedPlayerIds.current.has(player.id)) return;
+      pendingPlayers.current.set(player.id, player);
+      if (playerFlushTimer.current !== undefined) return;
+      playerFlushTimer.current = window.setTimeout(() => {
+        const updates = new Map(pendingPlayers.current);
+        pendingPlayers.current.clear();
+        playerFlushTimer.current = undefined;
+        const updatedAt = Date.now();
+        setPlayers((current) => {
+          const next = current.map((existing) => updates.has(existing.id)
+            ? { ...existing, ...updates.get(existing.id)!, updatedAt }
+            : existing);
+          const known = new Set(current.map((existing) => existing.id));
+          updates.forEach((update) => { if (!known.has(update.id)) next.push({ ...update, updatedAt }); });
+          return next;
+        });
+      }, PLAYER_UPDATE_INTERVAL);
     });
     channel.on('broadcast', { event: 'game-state' }, ({ payload }) => setSharedGame(payload as SharedGame));
     channel.on('broadcast', { event: 'zombie-state' }, ({ payload }) => setZombies(payload as Zombie[]));
@@ -118,7 +135,14 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       isLeaderRef.current = leader;
       setIsLeader(leader);
       const admittedIds = new Set(admitted.map((member) => member.id));
-      setPlayers((current) => current.filter((player) => admittedIds.has(player.id)));
+      admittedPlayerIds.current = admittedIds;
+      pendingPlayers.current.forEach((_, playerId) => {
+        if (!admittedIds.has(playerId)) pendingPlayers.current.delete(playerId);
+      });
+      setPlayers((current) => {
+        const filtered = current.filter((player) => admittedIds.has(player.id));
+        return filtered.length === current.length ? current : filtered;
+      });
       setMemberCount(Math.min(members.length, maxPlayers));
       setRoomFull(members.length > maxPlayers && !admitted.some((member) => member.id === id.current));
     });
@@ -128,8 +152,19 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       void channel.send({ type: 'broadcast', event: 'state-request', payload: {} });
     });
     channelRef.current = channel;
-    const removeStale = window.setInterval(() => setPlayers((current) => current.filter((player) => Date.now() - player.updatedAt < 4000)), 1000);
-    return () => { window.clearInterval(removeStale); void supabase.removeChannel(channel); channelRef.current = undefined; };
+    const removeStale = window.setInterval(() => setPlayers((current) => {
+      const active = current.filter((player) => Date.now() - player.updatedAt < 4000 && admittedPlayerIds.current.has(player.id));
+      return active.length === current.length ? current : active;
+    }), 1000);
+    return () => {
+      window.clearInterval(removeStale);
+      if (playerFlushTimer.current !== undefined) window.clearTimeout(playerFlushTimer.current);
+      playerFlushTimer.current = undefined;
+      pendingPlayers.current.clear();
+      admittedPlayerIds.current.clear();
+      void supabase.removeChannel(channel);
+      channelRef.current = undefined;
+    };
   }, [code, maxPlayers, nickname]);
 
   const sendPosition = useCallback((position: Position, weapon: Weapon, health: number) => {

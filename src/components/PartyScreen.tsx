@@ -5,6 +5,7 @@ export interface PartyGameSettings { nights: number; difficulty: string; maxPlay
 interface Props { onBack: () => void; onReady: (settings: PartyGameSettings) => void }
 type View = 'choose' | 'create' | 'join';
 const difficulties = [{ name: 'PEACEFUL', nights: 15, code: 'P' }, { name: 'SURVIVOR', nights: 25, code: 'S' }, { name: 'HARDCORE', nights: 50, code: 'H' }];
+const partySizes = [2, 3, 4];
 const suffix = () => Math.random().toString(36).slice(2, 6).toUpperCase().padEnd(4, 'X');
 
 export function PartyScreen({ onBack, onReady }: Props) {
@@ -26,7 +27,7 @@ export function PartyScreen({ onBack, onReady }: Props) {
     const normalized = joinCode.trim().toUpperCase();
     const selected = difficulties.find((item) => item.code === normalized[0]);
     const players = Number(normalized[1]);
-    if (!selected || normalized.length !== 6 || players < 2 || players > 3) return setError(text.invalid);
+    if (!selected || normalized.length !== 6 || !partySizes.includes(players)) return setError(text.invalid);
     onReady({ nights: selected.nights, difficulty: selected.name, maxPlayers: players, code: normalized, role: 'guest' });
   };
   if (view === 'choose') return <main className="setup-screen"><p>Forest Base</p><h1>{text.title}</h1><div className="setup-grid">
@@ -36,7 +37,7 @@ export function PartyScreen({ onBack, onReady }: Props) {
   return <main className="party-screen"><p>Forest Base</p><h1>{view === 'create' ? text.create : text.join}</h1>
     {view === 'create' ? <>
       <label>{text.difficulty}<span className="party-options">{difficulties.map((item) => <button className={difficulty.name === item.name ? 'active' : ''} onClick={() => setDifficulty(item)} key={item.name}>{item.name}</button>)}</span></label>
-      <label>{text.players}<span className="party-options">{[2, 3].map((count) => <button className={maxPlayers === count ? 'active' : ''} onClick={() => setMaxPlayers(count)} key={count}>{count}</button>)}</span></label>
+      <label>{text.players}<span className="party-options">{partySizes.map((count) => <button className={maxPlayers === count ? 'active' : ''} onClick={() => setMaxPlayers(count)} key={count}>{count}</button>)}</span></label>
       <div className="party-code"><small>{text.code}</small><strong>{code}</strong></div>
       <button onClick={() => onReady({ nights: difficulty.nights, difficulty: difficulty.name, maxPlayers, code, role: 'host' })}>{text.continue}</button>
     </> : <><p className="party-note">{text.waiting}</p><input value={joinCode} maxLength={6} placeholder={text.input} onChange={(event) => { setJoinCode(event.target.value.toUpperCase()); setError(''); }} />{error && <small className="party-error">{error}</small>}<button onClick={join}>{text.join}</button></>}

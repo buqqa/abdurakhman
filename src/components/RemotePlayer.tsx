@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import type { RemotePlayer as RemotePlayerState } from '../game/multiplayer';
 
-export function RemotePlayer({ player }: { player: RemotePlayerState }) {
+export const RemotePlayer = memo(function RemotePlayer({ player }: { player: RemotePlayerState }) {
   const [attacking, setAttacking] = useState(false);
   useEffect(() => {
     if (!player.attackNonce) return;
@@ -17,4 +17,4 @@ export function RemotePlayer({ player }: { player: RemotePlayerState }) {
       <span className={`player__weapon player__weapon--${player.weapon}`}><i /></span>
     </span>
   </div>;
-}
+});
