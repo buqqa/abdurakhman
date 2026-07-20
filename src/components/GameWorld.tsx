@@ -60,7 +60,7 @@ export function GameWorld({ paused, mobileMode, playerNickname, phase, day, diff
         sharedDrops={sharedDrops} onTakeDrop={onTakeDrop}
         onAttack={onAttack} onHarvest={onHarvest} onCrateLoot={onCrateLoot} onPlayerDamage={onPlayerDamage}
         onBaseDamage={onBaseDamage} onNightCleared={onNightCleared} />
-      {!mobileMode && <p className="controls">{t('controls')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}
+      {!mobileMode && <p className="controls">{t('controls')} · {t('inventoryHint')}{hasSpear && ` · Q — ${language === 'en' ? 'switch weapon' : language === 'kk' ? 'қаруды ауыстыру' : 'сменить оружие'}`}
         {multiplayerMode && ` · ${language === 'en' ? 'V — revive teammate' : language === 'kk' ? 'V — одақтасты емдеу' : 'V — лечить союзника'}`}</p>}
     </section>
   );

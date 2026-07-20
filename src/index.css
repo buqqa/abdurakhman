@@ -18,7 +18,6 @@ button { font: inherit; }
 .heart--full { color: #d94a43; }
 .heart--half { color: transparent; background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); background-clip: text; -webkit-background-clip: text; }
 .heart--empty { color: #302b29; }
-.inventory-hint { width: fit-content; margin: 8px 0 0 auto; padding: 6px 9px; border: 1px solid #3c493a; border-radius: 6px; color: #9eaa99; font-size: 12px; }
 .inventory-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(7, 10, 7, .72); z-index: 20; }
 .inventory { width: min(420px, 100%); padding: 20px; border: 1px solid #52614e; border-radius: 10px; background: #182018; box-shadow: 0 18px 60px #050705; }
 .inventory header { display: flex; align-items: center; justify-content: space-between; }
@@ -207,7 +206,6 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .game-shell--mobile .status { position: fixed; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 19; width: max-content; min-height: 0; padding: 0; transform: translateX(-50%); background: transparent; }
 .game-shell--mobile .status p { display: none; }.game-shell--mobile .status button { padding: 9px 13px; font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); }
 .game-shell--mobile .status .actions { width: 100%; justify-content: center; }
-.game-shell--mobile .inventory-hint { position: fixed; right: 16px; top: 72px; z-index: 17; }
 .mobile-game-hud { position: absolute; left: 12px; right: 12px; top: 10px; z-index: 14; padding: 9px 11px; border: 1px solid rgba(117, 138, 109, .72); border-radius: 9px; background: rgba(15, 24, 15, .84); box-shadow: 0 4px 14px rgba(0, 0, 0, .3); pointer-events: none; }
 .mobile-game-hud__row { display: flex; justify-content: space-between; align-items: center; color: #eceddc; font-size: 12px; }.mobile-game-hud__row span { color: #d8c77d; }
 .mobile-game-hud__health { height: 7px; margin-top: 7px; overflow: hidden; border-radius: 5px; background: #332927; }.mobile-game-hud__health i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a93d38, #dc5d50); transition: width .2s; }
