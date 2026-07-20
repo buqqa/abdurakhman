@@ -34,7 +34,7 @@ interface Props { paused: boolean; mobileMode: boolean; multiplayerMode: boolean
 export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, handlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, sharedWorld, worldTake, onWorldState, onWorldTake, zombieDeath, onZombieDeath, onRemotePlayerDamage, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
-  const merchantVisible = phase === 'day' && day === merchantDay && !hasSpear;
+  const merchantVisible = (phase === 'day' || phase === 'night') && day === merchantDay && !hasSpear;
   const worldReady = authoritative || Boolean(sharedWorld);
   const canMove = worldReady && playerHealth > 0 && !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
@@ -121,15 +121,19 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, playerNickname,
     if (target.kind === 'tree') harvestTree(target);
     else breakCrate(target);
   }, [breakCrate, harvestTree]);
+  const attackTarget = useCallback((target: InteractableObject) => {
+    if (target.kind === 'zombie') attackZombie(target);
+    else attackResource(target);
+  }, [attackResource, attackZombie]);
 
   return (
     <><InteractionSystem enabled={canMove} player={player} objects={[...interactionObjects, ...sharedDropObjects]} handlers={sharedHandlers}
       onUnavailable={onUnavailable} onInteracted={collectObject} />
     <ReviveSystem enabled={canMove} player={player} teammates={remotePlayers} onRevive={onRevivePlayer} />
-    <AttackSystem enabled={canMove} player={player} targets={phase === 'night' ? zombieTargets : [...trees, ...crates]}
+    <AttackSystem enabled={canMove} player={player} targets={[...(isNight ? zombieTargets : []), ...trees, ...crates]}
       attackDistance={weapon === 'spear' ? HARVEST_DISTANCE * SPEAR_RANGE_BONUS : HARVEST_DISTANCE}
       cooldown={450}
-      onHit={phase === 'night' ? attackZombie : attackResource} onMiss={onAttack} />
+      onHit={attackTarget} onMiss={onAttack} />
     {handlers.building && <RepairSystem enabled={canMove} player={player} buildings={buildings}
       onRepair={handlers.building} onUnavailable={onUnavailable} />}
     <GameCamera player={player} lookAheadY={mobileMode ? 95 : 0} overlay={mobileMode ? <MobileGameHud phase={phase} day={day} maxNights={maxNights} baseHealth={baseHealth} playerHealth={playerHealth} /> : undefined}>
