@@ -99,6 +99,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     return () => window.removeEventListener('keydown', handleStartNight);
   }, [bindings.startNight, device, game.phase, isPaused, multiplayer.isLeader, multiplayer.sendStartNight, party, startNight]);
   useEffect(() => {
+    if (device !== 'mobile') return;
     const updateHeight = () => setMobileHeight(window.visualViewport?.height ?? window.innerHeight);
     updateHeight();
     const lockAfterRotation = () => window.setTimeout(updateHeight, 120);
@@ -110,7 +111,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       window.removeEventListener('resize', updateHeight);
       window.visualViewport?.removeEventListener('resize', updateHeight);
     };
-  }, []);
+  }, [device]);
   const returnToMenu = () => { setPendingGame(undefined); setParty(undefined); setPlayMode(isRegistered ? undefined : 'solo'); setDevice(undefined); restart(); };
   if (game.phase === 'menu') {
     if (pendingGame) return <DeviceScreen onBack={() => setPendingGame(undefined)} onSelect={(selectedDevice) => {
@@ -136,7 +137,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   const interactionHandlers = { building: repairSharedBase, food: gatherFood, water: gatherWater };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
-    <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={{ height: mobileHeight }}>
+    <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
       {party && <PartyGameBadge code={party.code} players={multiplayer.memberCount} maxPlayers={party.maxPlayers} />}
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         multiplayerMode={Boolean(party)}

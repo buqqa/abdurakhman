@@ -48,7 +48,7 @@ interface Props {
 
 export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, merchantDay, wood, onBuySpear, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHit, sharedWorld, worldTake, onWorldState, onWorldTake, zombieDeath, onZombieDeath, onRemotePlayerDamage, multiplayerMode, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   return (
-    <section>
+    <section className="game-world">
       <ForestMap paused={paused} mobileMode={mobileMode} multiplayerMode={multiplayerMode} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} merchantDay={merchantDay} wood={wood} onBuySpear={onBuySpear} handlers={interactionHandlers} onUnavailable={onUnavailable}
         remotePlayers={remotePlayers} onPlayerMove={onPlayerMove} onRevivePlayer={onRevivePlayer} onPlayerAttack={onPlayerAttack} onWorldHit={onWorldHit} worldHit={worldHit}
         sharedWorld={sharedWorld} worldTake={worldTake} onWorldState={onWorldState} onWorldTake={onWorldTake}
