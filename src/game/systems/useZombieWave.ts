@@ -29,7 +29,7 @@ interface Options {
   externalZombies?: Zombie[];
   onZombiesChange?: (zombies: Zombie[]) => void;
   onRemoteHit?: (id: string, damage: number) => void;
-  remoteHit?: { id: string; damage: number; nonce: string };
+  remoteHit?: { sequence: number; totals: Record<string, number> };
   remoteDeath?: ZombieDeath;
   onZombieDeath?: (zombie: Zombie) => void;
   carGuardPoint?: Position;
@@ -45,6 +45,8 @@ export function useZombieWave(options: Options) {
   const waitingZombies = useRef<Zombie[]>([]);
   const spawnTimer = useRef<number>();
   const guardedNights = useRef(new Set<number>());
+  const handledRemoteDamage = useRef<Record<string, number>>({});
+  const handledRemoteSequence = useRef(0);
   optionsRef.current = options;
   useEffect(() => {
     if (options.authoritative !== false) return;
@@ -153,7 +155,18 @@ export function useZombieWave(options: Options) {
     }
   };
   useEffect(() => {
-    if (options.authoritative !== false && options.remoteHit) hitZombie(options.remoteHit.id, options.remoteHit.damage);
-  }, [options.remoteHit?.nonce]);
+    if (!options.remoteHit) return;
+    if (options.remoteHit.sequence < handledRemoteSequence.current) handledRemoteDamage.current = {};
+    handledRemoteSequence.current = options.remoteHit.sequence;
+    if (options.authoritative === false) {
+      handledRemoteDamage.current = { ...options.remoteHit.totals };
+      return;
+    }
+    Object.entries(options.remoteHit.totals).forEach(([id, total]) => {
+      const damage = total - (handledRemoteDamage.current[id] ?? 0);
+      handledRemoteDamage.current[id] = total;
+      if (damage > 0) hitZombie(id, damage);
+    });
+  }, [options.remoteHit?.sequence]);
   return { zombies, deaths, explosions, hitZombie };
 }

@@ -11,6 +11,8 @@ export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNi
 export type ResourceKind = 'wood' | 'food' | 'water';
 export interface SharedDrop extends Position { id: string; kind: ResourceKind }
 export interface WorldHit { object: InteractableObject; hitsToBreak: number; playerId: string; nonce: string }
+export interface CrateLootGrant { targetId: string; kind: import('./interactions').CrateKind; nonce: string }
+export interface ZombieDamageState { sequence: number; totals: Record<string, number> }
 export interface ZombieDeath { zombie: Zombie; nonce: string }
 export interface SharedWorld { objects: InteractableObject[]; structures: WorldStructure[]; spawnedStructures: StructureKind[] }
 export interface WorldTake { id: string; nonce: string; targetId: string; kind: 'food' | 'water' }

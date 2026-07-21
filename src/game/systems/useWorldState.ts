@@ -10,11 +10,11 @@ interface Options {
   maxNights: number;
   phase: Phase;
   sharedWorld?: SharedWorld;
-  worldTake?: Pick<WorldTake, 'id' | 'nonce'>;
+  worldTakes: Pick<WorldTake, 'id' | 'nonce'>[];
   onWorldState: (world: SharedWorld) => void;
 }
 
-export function useWorldState({ authoritative, day, maxNights, phase, sharedWorld, worldTake, onWorldState }: Options) {
+export function useWorldState({ authoritative, day, maxNights, phase, sharedWorld, worldTakes, onWorldState }: Options) {
   const [objects, setObjects] = useState<InteractableObject[]>(WORLD_OBJECTS);
   const [structures, setStructures] = useState<WorldStructure[]>([]);
   const spawnedDays = useRef(new Set<number>());
@@ -35,8 +35,8 @@ export function useWorldState({ authoritative, day, maxNights, phase, sharedWorl
     spawnedStructures.current = new Set(sharedWorld.spawnedStructures);
   }, [authoritative, sharedWorld]);
   useEffect(() => {
-    if (worldTake) setObjects((current) => current.filter((item) => item.id !== worldTake.id));
-  }, [worldTake?.nonce]);
+    if (worldTakes.length) setObjects((current) => current.filter((item) => !worldTakes.some((take) => take.id === item.id)));
+  }, [worldTakes]);
   useEffect(() => {
     if (!authoritative || day < 2 || phase !== 'day' || spawnedDays.current.has(day)) return;
     spawnedDays.current.add(day);

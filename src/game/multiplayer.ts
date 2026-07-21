@@ -4,8 +4,8 @@ import type { Position } from '../components/PlayerController';
 import type { Weapon } from './types';
 import type { Zombie } from './zombies';
 import type { InteractableObject } from './interactions';
-import type { PlayerPayload, PresencePayload, RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDeath } from './multiplayerTypes';
-export type { RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDeath } from './multiplayerTypes';
+import type { CrateLootGrant, PlayerPayload, PresencePayload, RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDamageState, ZombieDeath } from './multiplayerTypes';
+export type { CrateLootGrant, RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDeath } from './multiplayerTypes';
 
 const POSITION_INTERVAL = 80;
 const PLAYER_UPDATE_INTERVAL = 50;
@@ -33,22 +33,22 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const [players, setPlayers] = useState<RemotePlayer[]>([]);
   const [sharedGame, setSharedGame] = useState<SharedGame>();
   const [zombies, setZombies] = useState<Zombie[]>([]);
-  const [zombieHit, setZombieHit] = useState<{ id: string; damage: number; nonce: string }>();
+  const [zombieHit, setZombieHit] = useState<ZombieDamageState>({ sequence: 0, totals: {} });
   const [drops, setDrops] = useState<SharedDrop[]>([]);
   const [stateRequest, setStateRequest] = useState(0);
   const [memberCount, setMemberCount] = useState(code ? 1 : 0);
   const [roomFull, setRoomFull] = useState(false);
   const [isLeader, setIsLeader] = useState(false);
   const [reviveSignal, setReviveSignal] = useState(0);
-  const [worldHit, setWorldHit] = useState<WorldHit>();
-  const [wrenchGrant, setWrenchGrant] = useState<{ targetId: string; nonce: string }>();
+  const [worldHits, setWorldHits] = useState<WorldHit[]>([]);
+  const [crateLootGrants, setCrateLootGrants] = useState<CrateLootGrant[]>([]);
   const [zombieDeath, setZombieDeath] = useState<ZombieDeath>();
   const [sharedWorld, setSharedWorld] = useState<SharedWorld>();
-  const [worldTake, setWorldTake] = useState<WorldTake>();
-  const [resourceGrant, setResourceGrant] = useState<ResourceGrant>();
+  const [worldTakes, setWorldTakes] = useState<WorldTake[]>([]);
+  const [resourceGrants, setResourceGrants] = useState<ResourceGrant[]>([]);
   const [baseRepairSignal, setBaseRepairSignal] = useState(0);
   const [startNightSignal, setStartNightSignal] = useState(0);
-  const [playerDamage, setPlayerDamage] = useState<{ damage: number; nonce: string }>();
+  const [playerDamageTotal, setPlayerDamageTotal] = useState(0);
   const lastPosition = useRef<Position>({ x: 100, y: 100 });
 
   useEffect(() => {
@@ -57,8 +57,29 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     setIsLeader(false);
     claimedWorld.current.clear();
     claimedDrops.current.clear();
+    pendingPlayers.current.clear();
+    latestZombies.current = [];
+    latestWorld.current = undefined;
+    latestDrops.current = [];
+    setPlayers([]);
+    setSharedGame(undefined);
+    setSharedWorld(undefined);
+    setZombies([]);
+    setDrops([]);
+    setZombieDeath(undefined);
+    setWorldHits([]);
+    setWorldTakes([]);
+    setResourceGrants([]);
+    setCrateLootGrants([]);
+    setStateRequest(0);
+    setReviveSignal(0);
+    setBaseRepairSignal(0);
+    setStartNightSignal(0);
+    setMemberCount(code ? 1 : 0);
     if (!code) return;
     setRoomFull(false);
+    setPlayerDamageTotal(0);
+    setZombieHit({ sequence: 0, totals: {} });
     const channel = supabase.channel(`forest-party-${code}`, { config: { presence: { key: id.current } } });
     channel.on('broadcast', { event: 'player-move' }, ({ payload }) => {
       const player = payload as PlayerPayload;
@@ -82,9 +103,12 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     });
     channel.on('broadcast', { event: 'game-state' }, ({ payload }) => setSharedGame(payload as SharedGame));
     channel.on('broadcast', { event: 'zombie-state' }, ({ payload }) => setZombies(payload as Zombie[]));
-    channel.on('broadcast', { event: 'zombie-hit' }, ({ payload }) => setZombieHit(payload as { id: string; damage: number; nonce: string }));
+    channel.on('broadcast', { event: 'zombie-hit' }, ({ payload }) => {
+      const hit = payload as { id: string; damage: number };
+      setZombieHit((current) => ({ sequence: current.sequence + 1, totals: { ...current.totals, [hit.id]: (current.totals[hit.id] ?? 0) + hit.damage } }));
+    });
     channel.on('broadcast', { event: 'resource-drop' }, ({ payload }) => { const drop = payload as SharedDrop; setDrops((current) => { const next = [...current.filter((item) => item.id !== drop.id), drop]; latestDrops.current = next; return next; }); });
-    channel.on('broadcast', { event: 'resource-take' }, ({ payload }) => { const grant = payload as ResourceGrant; setDrops((current) => { const next = current.filter((item) => item.id !== grant.id); latestDrops.current = next; return next; }); setResourceGrant(grant); });
+    channel.on('broadcast', { event: 'resource-take' }, ({ payload }) => { const grant = payload as ResourceGrant; setDrops((current) => { const next = current.filter((item) => item.id !== grant.id); latestDrops.current = next; return next; }); setResourceGrants((current) => [...current.slice(-63), grant]); });
     channel.on('broadcast', { event: 'resource-take-request' }, ({ payload }) => {
       if (!isLeaderRef.current) return;
       const request = payload as { id: string; targetId: string };
@@ -104,14 +128,14 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       const action = payload as { id: string; nonce: string };
       setPlayers((current) => current.map((player) => player.id === action.id ? { ...player, attackNonce: action.nonce } : player));
     });
-    channel.on('broadcast', { event: 'world-hit' }, ({ payload }) => setWorldHit(payload as WorldHit));
-    channel.on('broadcast', { event: 'wrench-grant' }, ({ payload }) => setWrenchGrant(payload as { targetId: string; nonce: string }));
+    channel.on('broadcast', { event: 'world-hit' }, ({ payload }) => setWorldHits((current) => [...current.slice(-63), payload as WorldHit]));
+    channel.on('broadcast', { event: 'crate-loot-grant' }, ({ payload }) => setCrateLootGrants((current) => [...current.slice(-63), payload as CrateLootGrant]));
     channel.on('broadcast', { event: 'zombie-death' }, ({ payload }) => setZombieDeath(payload as ZombieDeath));
     channel.on('broadcast', { event: 'world-state' }, ({ payload }) => { const next = payload as SharedWorld; latestWorld.current = next; setSharedWorld(next); });
     channel.on('broadcast', { event: 'world-take' }, ({ payload }) => {
       const grant = payload as WorldTake;
       if (latestWorld.current) latestWorld.current = { ...latestWorld.current, objects: latestWorld.current.objects.filter((item) => item.id !== grant.id) };
-      setWorldTake(grant);
+      setWorldTakes((current) => [...current.slice(-63), grant]);
     });
     channel.on('broadcast', { event: 'world-take-request' }, ({ payload }) => {
       if (!isLeaderRef.current) return;
@@ -121,14 +145,14 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       claimedWorld.current.add(object.id);
       const grant: WorldTake = { id: object.id, kind: object.kind, targetId: request.targetId, nonce: crypto.randomUUID() };
       latestWorld.current = { ...latestWorld.current!, objects: latestWorld.current!.objects.filter((item) => item.id !== object.id) };
-      setWorldTake(grant);
+      setWorldTakes((current) => [...current.slice(-63), grant]);
       void channel.send({ type: 'broadcast', event: 'world-take', payload: grant });
     });
     channel.on('broadcast', { event: 'base-repair' }, () => { if (isLeaderRef.current) setBaseRepairSignal((value) => value + 1); });
     channel.on('broadcast', { event: 'start-night' }, () => { if (isLeaderRef.current) setStartNightSignal((value) => value + 1); });
     channel.on('broadcast', { event: 'player-damage' }, ({ payload }) => {
       const hit = payload as { targetId: string; damage: number; nonce: string };
-      if (hit.targetId === id.current) setPlayerDamage({ damage: hit.damage, nonce: hit.nonce });
+      if (hit.targetId === id.current) setPlayerDamageTotal((total) => total + hit.damage);
     });
     channel.on('presence', { event: 'sync' }, () => {
       const members = Object.values(channel.presenceState()).flat() as unknown as PresencePayload[];
@@ -210,7 +234,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     claimedDrops.current.add(dropId);
     const grant: ResourceGrant = { ...drop, targetId: id.current, nonce: crypto.randomUUID() };
     setDrops((current) => { const next = current.filter((item) => item.id !== dropId); latestDrops.current = next; return next; });
-    setResourceGrant(grant);
+    setResourceGrants((current) => [...current.slice(-63), grant]);
     void channel.send({ type: 'broadcast', event: 'resource-take', payload: grant });
   }, []);
   const sendDrops = useCallback((next: SharedDrop[]) => { latestDrops.current = next; void channelRef.current?.send({ type: 'broadcast', event: 'resource-state', payload: next }); }, []);
@@ -223,10 +247,10 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   const sendWorldHit = useCallback((object: InteractableObject, hitsToBreak: number) => {
     void channelRef.current?.send({ type: 'broadcast', event: 'world-hit', payload: { object, hitsToBreak, playerId: id.current, nonce: crypto.randomUUID() } });
   }, []);
-  const grantWrench = useCallback((targetId: string) => {
-    const grant = { targetId, nonce: crypto.randomUUID() };
-    if (targetId === id.current) setWrenchGrant(grant);
-    void channelRef.current?.send({ type: 'broadcast', event: 'wrench-grant', payload: grant });
+  const grantCrateLoot = useCallback((targetId: string, kind: CrateLootGrant['kind']) => {
+    const grant = { targetId, kind, nonce: crypto.randomUUID() };
+    if (targetId === id.current) setCrateLootGrants((current) => [...current.slice(-63), grant]);
+    void channelRef.current?.send({ type: 'broadcast', event: 'crate-loot-grant', payload: grant });
   }, []);
   const sendZombieDeath = useCallback((zombie: Zombie) => {
     void channelRef.current?.send({ type: 'broadcast', event: 'zombie-death', payload: { zombie, nonce: crypto.randomUUID() } });
@@ -244,7 +268,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     claimedWorld.current.add(objectId);
     const grant: WorldTake = { id: objectId, kind: object.kind, targetId: id.current, nonce: crypto.randomUUID() };
     latestWorld.current = { ...latestWorld.current!, objects: latestWorld.current!.objects.filter((item) => item.id !== objectId) };
-    setWorldTake(grant);
+    setWorldTakes((current) => [...current.slice(-63), grant]);
     void channel.send({ type: 'broadcast', event: 'world-take', payload: grant });
   }, []);
   const sendBaseRepair = useCallback(() => { void channelRef.current?.send({ type: 'broadcast', event: 'base-repair', payload: {} }); }, []);
@@ -253,5 +277,5 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     void channelRef.current?.send({ type: 'broadcast', event: 'player-damage', payload: { targetId, damage, nonce: crypto.randomUUID() } });
   }, []);
 
-  return { localPlayerId: id.current, isLeader, players, sharedGame, sharedWorld, worldTake, resourceGrant, wrenchGrant, baseRepairSignal, startNightSignal, playerDamage, zombies, zombieHit, zombieDeath, drops, stateRequest, memberCount, roomFull, reviveSignal, worldHit, sendPosition, sendGame, sendWorld, sendZombies, sendZombieHit, sendZombieDeath, dropResource, takeResource, takeWorldObject, sendBaseRepair, sendStartNight, damageRemotePlayer, sendDrops, revivePlayer, sendPlayerAttack, sendWorldHit, grantWrench };
+  return { localPlayerId: id.current, isLeader, players, sharedGame, sharedWorld, worldTakes, resourceGrants, crateLootGrants, baseRepairSignal, startNightSignal, playerDamageTotal, zombies, zombieHit, zombieDeath, drops, stateRequest, memberCount, roomFull, reviveSignal, worldHits, sendPosition, sendGame, sendWorld, sendZombies, sendZombieHit, sendZombieDeath, dropResource, takeResource, takeWorldObject, sendBaseRepair, sendStartNight, damageRemotePlayer, sendDrops, revivePlayer, sendPlayerAttack, sendWorldHit, grantCrateLoot };
 }

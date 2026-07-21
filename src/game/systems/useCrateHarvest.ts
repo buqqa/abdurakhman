@@ -4,21 +4,22 @@ import type { WorldHit } from '../multiplayer';
 import { playGameSound } from '../../lib/gameAudio';
 
 interface Options {
-  worldHit?: WorldHit;
+  worldHits: WorldHit[];
   setObjects: Dispatch<SetStateAction<InteractableObject[]>>;
   onLoot: (kind: CrateKind) => void;
   onSwing: () => void;
   onWorldHit: (object: InteractableObject, hitsToBreak: number) => void;
   authoritative: boolean;
   localPlayerId: string;
-  onWrenchClaim: (playerId: string) => void;
+  multiplayerMode: boolean;
+  onCrateClaim: (kind: CrateKind, playerId: string) => void;
 }
 
 const dropsWater = (crate: InteractableObject) => crate.id.startsWith('structure-tent-crate-')
   ? crate.id.endsWith('-0')
   : [...crate.id].reduce((total, char) => total + char.charCodeAt(0), 0) % 100 < 15;
 
-export function useCrateHarvest({ worldHit, setObjects, onLoot, onSwing, onWorldHit, authoritative, localPlayerId, onWrenchClaim }: Options) {
+export function useCrateHarvest({ worldHits, setObjects, onLoot, onSwing, onWorldHit, authoritative, localPlayerId, multiplayerMode, onCrateClaim }: Options) {
   const hits = useRef<Record<string, number>>({});
   const processed = useRef(new Set<string>());
   const [animation, setAnimation] = useState<{ id: string; breaking: boolean }>();
@@ -29,9 +30,10 @@ export function useCrateHarvest({ worldHit, setObjects, onLoot, onSwing, onWorld
     setAnimation({ id: crate.id, breaking });
     window.setTimeout(() => setAnimation(undefined), breaking ? 520 : 240);
     if (!breaking) return;
-    if (crate.kind === 'crate-wrench') {
-      if (authoritative) onWrenchClaim(playerId);
-    } else if (reward) onLoot(crate.kind as CrateKind);
+    const kind = crate.kind as CrateKind;
+    if (multiplayerMode) {
+      if (authoritative) onCrateClaim(kind, playerId);
+    } else if (reward) onLoot(kind);
     window.setTimeout(() => setObjects((items) => {
       const remaining = items.filter((item) => item.id !== crate.id);
       if (crate.kind !== 'crate-food') return remaining;
@@ -39,7 +41,7 @@ export function useCrateHarvest({ worldHit, setObjects, onLoot, onSwing, onWorld
       if (dropsWater(crate)) drops.push({ id: `water-drop-${crate.id}`, kind: 'water', x: crate.x + 17, y: crate.y + 9 });
       return [...remaining, ...drops];
     }), 480);
-  }, [authoritative, onLoot, onWrenchClaim, setObjects]);
+  }, [authoritative, multiplayerMode, onCrateClaim, onLoot, setObjects]);
   const breakCrate = useCallback((crate: InteractableObject) => {
     if ((hits.current[crate.id] ?? 0) >= 3) return;
     onSwing();
@@ -48,9 +50,11 @@ export function useCrateHarvest({ worldHit, setObjects, onLoot, onSwing, onWorld
     onWorldHit(crate, 3);
   }, [applyHit, localPlayerId, onSwing, onWorldHit]);
   useEffect(() => {
-    if (!worldHit || !worldHit.object.kind.startsWith('crate-') || processed.current.has(worldHit.nonce)) return;
-    processed.current.add(worldHit.nonce);
-    applyHit(worldHit.object, false, worldHit.playerId);
-  }, [applyHit, worldHit?.nonce]);
+    worldHits.forEach((worldHit) => {
+      if (!worldHit.object.kind.startsWith('crate-') || processed.current.has(worldHit.nonce)) return;
+      processed.current.add(worldHit.nonce);
+      applyHit(worldHit.object, false, worldHit.playerId);
+    });
+  }, [applyHit, worldHits]);
   return { crateAnimation: animation, breakCrate };
 }

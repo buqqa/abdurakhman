@@ -6,14 +6,14 @@ import { playGameSound } from '../../lib/gameAudio';
 
 interface Options {
   weapon: Weapon;
-  worldHit?: WorldHit;
+  worldHits: WorldHit[];
   setObjects: Dispatch<SetStateAction<InteractableObject[]>>;
   onHarvest: () => void;
   onSwing: () => void;
   onWorldHit: (object: InteractableObject, hitsToBreak: number) => void;
 }
 
-export function useTreeHarvest({ weapon, worldHit, setObjects, onHarvest, onSwing, onWorldHit }: Options) {
+export function useTreeHarvest({ weapon, worldHits, setObjects, onHarvest, onSwing, onWorldHit }: Options) {
   const hits = useRef<Record<string, number>>({});
   const processed = useRef(new Set<string>());
   const [animation, setAnimation] = useState<{ id: string; falling: boolean }>();
@@ -35,10 +35,12 @@ export function useTreeHarvest({ weapon, worldHit, setObjects, onHarvest, onSwin
     onWorldHit(tree, hitsToFell);
   }, [applyHit, onSwing, onWorldHit, weapon]);
   useEffect(() => {
-    if (!worldHit || worldHit.object.kind !== 'tree' || processed.current.has(worldHit.nonce)) return;
-    processed.current.add(worldHit.nonce);
-    applyHit(worldHit.object.id, worldHit.hitsToBreak, false);
-  }, [applyHit, worldHit?.nonce]);
+    worldHits.forEach((worldHit) => {
+      if (worldHit.object.kind !== 'tree' || processed.current.has(worldHit.nonce)) return;
+      processed.current.add(worldHit.nonce);
+      applyHit(worldHit.object.id, worldHit.hitsToBreak, false);
+    });
+  }, [applyHit, worldHits]);
 
   return { treeAnimation: animation, harvestTree };
 }
