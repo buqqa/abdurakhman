@@ -14,10 +14,10 @@ export function Merchant({ player, wood, hasSpear, hasAxe, isOpen, onOpen, onClo
   const { bindings } = useControls();
   const { language } = useI18n();
   const text = language === 'en'
-    ? { name: 'Merchant', title: 'Forest merchant', offer: 'Weapons', spear: 'Spear', spearBuff: 'Increased attack range and damage', spearPenalty: 'Takes 4 hits to fell a tree', axe: 'Axe', axeBuff: 'Fells a tree in 2 hits and defeats a regular zombie in 5', axePenalty: 'Attack cooldown: 0.7 seconds', buy: 'Trade for 50 wood', owned: 'Owned' }
+    ? { name: 'Merchant', title: 'Forest merchant', offer: 'Weapons', spear: 'Spear', spearBuff: 'Increased attack range and damage', spearPenalty: 'Takes 4 hits to fell a tree', axe: 'Axe', axeBuff: 'Gathers wood and kills zombies faster', axePenalty: 'Attack cooldown: 0.7 seconds', buy: 'Trade for 50 wood', owned: 'Owned' }
     : language === 'kk'
-      ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Қару-жарақ', spear: 'Найза', spearBuff: 'Шабуыл қашықтығы мен зақымы артқан', spearPenalty: 'Ағашты шабуға 4 соққы қажет', axe: 'Балта', axeBuff: 'Ағашты 2 соққымен, кәдімгі зомбиді 5 соққымен жеңеді', axePenalty: 'Соққы кідірісі: 0,7 секунд', buy: '50 ағашқа айырбастау', owned: 'Сатып алынды' }
-      : { name: 'Торговец', title: 'Лесной торговец', offer: 'Оружие', spear: 'Копьё', spearBuff: 'Увеличенный радиус и урон', spearPenalty: 'Для добычи дерева нужно 4 удара', axe: 'Топор', axeBuff: 'Добывает дерево за 2 удара и убивает обычного зомби за 5', axePenalty: 'Задержка между ударами: 0,7 секунды', buy: 'Обменять на 50 дерева', owned: 'Куплено' };
+      ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Қару-жарақ', spear: 'Найза', spearBuff: 'Шабуыл қашықтығы мен зақымы артқан', spearPenalty: 'Ағашты шабуға 4 соққы қажет', axe: 'Балта', axeBuff: 'Ағашты тезірек жинап, зомбилерді тезірек өлтіреді', axePenalty: 'Соққы кідірісі: 0,7 секунд', buy: '50 ағашқа айырбастау', owned: 'Сатып алынды' }
+      : { name: 'Торговец', title: 'Лесной торговец', offer: 'Оружие', spear: 'Копьё', spearBuff: 'Увеличенный радиус и урон', spearPenalty: 'Для добычи дерева нужно 4 удара', axe: 'Топор', axeBuff: 'Быстрее добывает дерево и убивает зомби', axePenalty: 'Задержка между ударами: 0,7 секунды', buy: 'Обменять на 50 дерева', owned: 'Куплено' };
   const isNear = Math.hypot(player.x - MERCHANT_POSITION.x, player.y - MERCHANT_POSITION.y) <= TRADE_DISTANCE;
   useEffect(() => {
     const handleTrade = (event: KeyboardEvent) => {

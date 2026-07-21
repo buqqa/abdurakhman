@@ -74,7 +74,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, localPlayerId, 
     'shared-drop': (object: { id: string }) => { const drop = sharedDrops.find((item) => item.id === object.id); if (drop) onTakeDrop(drop); },
   };
   const { treeAnimation, harvestTree } = useTreeHarvest({ weapon, worldHits, setObjects, onHarvest, onSwing: swingWeapon, onWorldHit });
-  const { crateAnimation, breakCrate } = useCrateHarvest({ worldHits, setObjects, onLoot: onCrateLoot, onSwing: swingWeapon, onWorldHit, authoritative, localPlayerId, multiplayerMode, onCrateClaim });
+  const { crateAnimation, breakCrate } = useCrateHarvest({ worldHits, setObjects, onLoot: onCrateLoot, onSwing: swingWeapon, onWorldHit, authoritative, localPlayerId, multiplayerMode, onCrateClaim, weapon });
   const zombieTargets = zombies.map((zombie) => ({ id: zombie.id, kind: 'zombie', x: zombie.x, y: zombie.y }));
   const attackZombie = useCallback((target: { id: string }) => {
     swingWeapon();

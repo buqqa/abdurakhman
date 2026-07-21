@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateA
 import type { CrateKind, InteractableObject } from '../interactions';
 import type { WorldHit } from '../multiplayer';
 import { playGameSound } from '../../lib/gameAudio';
+import type { Weapon } from '../types';
 
 interface Options {
   worldHits: WorldHit[];
@@ -13,19 +14,20 @@ interface Options {
   localPlayerId: string;
   multiplayerMode: boolean;
   onCrateClaim: (kind: CrateKind, playerId: string) => void;
+  weapon: Weapon;
 }
 
 const dropsWater = (crate: InteractableObject) => crate.id.startsWith('structure-tent-crate-')
   ? crate.id.endsWith('-0')
   : [...crate.id].reduce((total, char) => total + char.charCodeAt(0), 0) % 100 < 15;
 
-export function useCrateHarvest({ worldHits, setObjects, onLoot, onSwing, onWorldHit, authoritative, localPlayerId, multiplayerMode, onCrateClaim }: Options) {
+export function useCrateHarvest({ worldHits, setObjects, onLoot, onSwing, onWorldHit, authoritative, localPlayerId, multiplayerMode, onCrateClaim, weapon }: Options) {
   const hits = useRef<Record<string, number>>({});
   const processed = useRef(new Set<string>());
   const [animation, setAnimation] = useState<{ id: string; breaking: boolean }>();
-  const applyHit = useCallback((crate: InteractableObject, reward: boolean, playerId: string) => {
+  const applyHit = useCallback((crate: InteractableObject, reward: boolean, playerId: string, hitsToBreak: number) => {
     if ((hits.current[crate.id] ?? 0) >= 3) return;
-    hits.current[crate.id] = (hits.current[crate.id] ?? 0) + 1;
+    hits.current[crate.id] = (hits.current[crate.id] ?? 0) + 3 / hitsToBreak;
     const breaking = hits.current[crate.id] >= 3;
     setAnimation({ id: crate.id, breaking });
     window.setTimeout(() => setAnimation(undefined), breaking ? 520 : 240);
@@ -46,17 +48,18 @@ export function useCrateHarvest({ worldHits, setObjects, onLoot, onSwing, onWorl
     }), 480);
   }, [authoritative, multiplayerMode, onCrateClaim, onLoot, setObjects]);
   const breakCrate = useCallback((crate: InteractableObject) => {
+    const hitsToBreak = weapon === 'axe' ? 2 : 3;
     if ((hits.current[crate.id] ?? 0) >= 3) return;
     onSwing();
     playGameSound('chop');
-    applyHit(crate, true, localPlayerId);
-    onWorldHit(crate, 3);
-  }, [applyHit, localPlayerId, onSwing, onWorldHit]);
+    applyHit(crate, true, localPlayerId, hitsToBreak);
+    onWorldHit(crate, hitsToBreak);
+  }, [applyHit, localPlayerId, onSwing, onWorldHit, weapon]);
   useEffect(() => {
     worldHits.forEach((worldHit) => {
       if (!worldHit.object.kind.startsWith('crate-') || processed.current.has(worldHit.nonce)) return;
       processed.current.add(worldHit.nonce);
-      applyHit(worldHit.object, false, worldHit.playerId);
+      applyHit(worldHit.object, false, worldHit.playerId, worldHit.hitsToBreak);
     });
   }, [applyHit, worldHits]);
   return { crateAnimation: animation, breakCrate };
