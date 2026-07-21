@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BASE_POSITION, MAP_HEIGHT, MAP_WIDTH, PLAYER_START } from '../game/mapConfig';
 import { HARVEST_DISTANCE, type CrateKind, type InteractableObject, type InteractionHandlers } from '../game/interactions';
 import { InteractionSystem } from '../game/systems/InteractionSystem';
@@ -36,6 +36,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, localPlayerId, 
   const isNight = phase === 'night';
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisible = (phase === 'day' || phase === 'night') && day === merchantDay && (!hasSpear || !hasAxe);
+  useEffect(() => { if (!merchantVisible) setIsTradeOpen(false); }, [merchantVisible]);
   const worldReady = authoritative || Boolean(sharedWorld);
   const canMove = worldReady && playerHealth > 0 && !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);

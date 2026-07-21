@@ -47,8 +47,11 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   useEffect(() => {
     const damage = multiplayer.playerDamageTotal - handledPlayerDamage.current;
     handledPlayerDamage.current = multiplayer.playerDamageTotal;
-    if (damage > 0) damagePlayer(damage, true);
-  }, [multiplayer.playerDamageTotal]);
+    if (damage > 0) damagePlayer(damage, multiplayer.memberCount > 1);
+  }, [multiplayer.memberCount, multiplayer.playerDamageTotal]);
+  useEffect(() => {
+    if (party && multiplayer.memberCount <= 1 && game.phase === 'night' && game.playerHealth <= 0) damagePlayer(1, false);
+  }, [game.phase, game.playerHealth, multiplayer.memberCount, party]);
   useEffect(() => {
     [...multiplayer.worldTakes, ...multiplayer.resourceGrants].forEach((grant) => {
       if (handledResourceGrants.current.has(grant.nonce)) return;
@@ -183,7 +186,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
           multiplayer.takeResource(drop.id);
         }}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={collectCrateLoot}
-        onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
+        onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party && multiplayer.memberCount > 1))} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} hasSpear={game.hasSpear} hasWrench={game.hasWrench} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => {
         const hasItem = kind === 'spear' ? game.hasSpear : kind === 'wrench' ? game.hasWrench : game[kind] > 0;
         if (!hasItem) return;
