@@ -114,12 +114,16 @@
 .trade-list { display: grid; gap: 12px; margin-top: 18px; }.trade-list .trade-offer { margin: 0; }.trade-offer--owned { opacity: .6; }
 .trade-offer > div { flex: 1; }.trade-offer h3 { margin: 0 0 7px; color: #dfcc8b; }
 .trade-offer p { margin: 0; color: #b8c1b2; font-size: 14px; line-height: 1.5; }
+.trade-offer .trade-buff { color: #73c982; }
 .trade-offer .trade-penalty { margin-top: 8px; color: #df6861; font-size: 13px; }
 .trade-spear { position: relative; flex: 0 0 5px; width: 5px; height: 55px; margin-left: 10px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(35deg); }
 .trade-spear i { position: absolute; left: -6px; top: -16px; width: 15px; height: 19px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); }
 .trade-spear::after { content: ''; position: absolute; left: -2px; top: 8px; width: 7px; height: 12px; background: repeating-linear-gradient(0deg, #39251a 0 3px, #d0a35d 3px 4px); }
 .trade-axe { position: relative; flex: 0 0 8px; width: 8px; height: 48px; margin-left: 12px; border: 1px solid #422818; border-radius: 2px; background: linear-gradient(90deg, #59341f, #c18a4d 52%, #704326); transform: rotate(-35deg); }
 .trade-axe i { position: absolute; left: -10px; top: -6px; width: 24px; height: 15px; border: 2px solid #293437; background: linear-gradient(135deg, #aab5b3, #596669 70%); clip-path: polygon(0 9%, 72% 0, 100% 25%, 91% 78%, 68% 100%, 0 82%, 17% 50%); }
+.trade-sword { position: relative; flex: 0 0 7px; width: 7px; height: 51px; margin-left: 12px; border: 1px solid #263238; background: linear-gradient(90deg, #68777b, #e4ecea 52%, #829095); transform: rotate(35deg); clip-path: polygon(50% 0, 100% 12%, 100% 76%, 0 76%, 0 12%); }
+.trade-sword i { position: absolute; left: -7px; bottom: 8px; width: 19px; height: 5px; border: 1px solid #3a271a; background: #bd8749; }
+.trade-sword::after { content: ''; position: absolute; left: 0; bottom: 0; width: 5px; height: 10px; border: 1px solid #3a271a; background: repeating-linear-gradient(0deg, #4a2d1c 0 3px, #d0a35d 3px 4px); }
 .trade-buy { width: 100%; margin-top: 12px; border-color: #8d733c; background: #6d582c; }
 .trade-buy:disabled { cursor: not-allowed; opacity: .45; }
 .lobby-settings { width: min(340px, 100%); display: grid; gap: 8px; margin-top: 18px; padding: 10px 12px; border: 1px solid #384735; border-radius: 9px; background: rgba(18, 27, 17, .72); }

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { AXE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, repairWoodCost, SPEAR_COST, WATER_HEAL } from './config';
+import { AXE_COST, FOOD_HEAL, MAX_BASE_HEALTH, REPAIR_PER_STEP, repairWoodCost, SPEAR_COST, SWORD_COST, WATER_HEAL } from './config';
 import type { GameState, Weapon } from './types';
 import { playGameSound } from '../lib/gameAudio';
 import type { CrateKind } from './interactions';
@@ -11,7 +11,7 @@ import { createMerchantVisits } from './merchantSchedule';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, hasAxe: false, hasWrench: false, hasSeenWrench: false, merchantVisits: [],
+  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, hasAxe: false, hasSword: false, hasWrench: false, hasSeenWrench: false, merchantVisits: [],
 };
 
 export function useGameLoop() {
@@ -76,13 +76,18 @@ export function useGameLoop() {
     if (state.wood < AXE_COST) return { ...state, message: language === 'en' ? 'You need 50 wood for the axe.' : language === 'kk' ? 'Балтаға 50 ағаш керек.' : 'Для топора нужно 50 дерева.' };
     return { ...state, wood: state.wood - AXE_COST, weapon: 'axe', hasAxe: true, message: language === 'en' ? 'Axe equipped. It fells trees in 2 hits.' : language === 'kk' ? 'Балта жабдықталды. Ол ағашты 2 соққымен шабады.' : 'Топор экипирован. Он добывает дерево за 2 удара.' };
   });
+  const buySword = () => setGame((state) => {
+    if (state.hasSword) return state;
+    if (state.wood < SWORD_COST) return { ...state, message: language === 'en' ? 'You need 75 wood for the sword.' : language === 'kk' ? 'Қылышқа 75 ағаш керек.' : 'Для меча нужно 75 дерева.' };
+    return { ...state, wood: state.wood - SWORD_COST, weapon: 'sword', hasSword: true, message: language === 'en' ? 'Sword equipped. It attacks quickly but cannot fell trees.' : language === 'kk' ? 'Қылыш жабдықталды. Ол тез шабуылдайды, бірақ ағаш шаппайды.' : 'Меч экипирован. Он быстро атакует, но не добывает дерево.' };
+  });
   const switchWeapon = () => setGame((state) => {
-    if ((!state.hasSpear && !state.hasAxe && !state.hasWrench) || (state.phase !== 'day' && state.phase !== 'night')) return state;
-    const weapons: Weapon[] = ['hammer', ...(state.hasSpear ? ['spear' as const] : []), ...(state.hasAxe ? ['axe' as const] : []), ...(state.hasWrench ? ['wrench' as const] : [])];
+    if ((!state.hasSpear && !state.hasAxe && !state.hasSword && !state.hasWrench) || (state.phase !== 'day' && state.phase !== 'night')) return state;
+    const weapons: Weapon[] = ['hammer', ...(state.hasSpear ? ['spear' as const] : []), ...(state.hasAxe ? ['axe' as const] : []), ...(state.hasSword ? ['sword' as const] : []), ...(state.hasWrench ? ['wrench' as const] : [])];
     const weapon = weapons[(weapons.indexOf(state.weapon) + 1) % weapons.length];
-    const weaponName = language === 'en' ? (weapon === 'spear' ? 'Spear' : weapon === 'axe' ? 'Axe' : weapon === 'wrench' ? 'Wrench' : 'Hammer')
-      : language === 'kk' ? (weapon === 'spear' ? 'Найза' : weapon === 'axe' ? 'Балта' : weapon === 'wrench' ? 'Сомын кілті' : 'Балға')
-        : weapon === 'spear' ? 'Копьё' : weapon === 'axe' ? 'Топор' : weapon === 'wrench' ? 'Гаечный ключ' : 'Молот';
+    const weaponName = language === 'en' ? (weapon === 'spear' ? 'Spear' : weapon === 'axe' ? 'Axe' : weapon === 'sword' ? 'Sword' : weapon === 'wrench' ? 'Wrench' : 'Hammer')
+      : language === 'kk' ? (weapon === 'spear' ? 'Найза' : weapon === 'axe' ? 'Балта' : weapon === 'sword' ? 'Қылыш' : weapon === 'wrench' ? 'Сомын кілті' : 'Балға')
+        : weapon === 'spear' ? 'Копьё' : weapon === 'axe' ? 'Топор' : weapon === 'sword' ? 'Меч' : weapon === 'wrench' ? 'Гаечный ключ' : 'Молот';
     return { ...state, weapon, message: language === 'en' ? `${weaponName} equipped.` : language === 'kk' ? `${weaponName} жабдықталды.` : `${weaponName} экипирован.` };
   });
   const repairBase = () => setGame((state) => {
@@ -140,5 +145,5 @@ export function useGameLoop() {
     pausedAt.current = undefined;
   }, []);
 
-  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, buyAxe, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
+  return { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, buyAxe, buySword, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock };
 }

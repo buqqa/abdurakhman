@@ -142,13 +142,16 @@ button { font: inherit; }
 .player__arm--right { right: 3px; transform: rotate(-28deg); }
 .player__legs { position: absolute; left: 8px; bottom: -1px; width: 15px; height: 8px; border-left: 5px solid #34475a; border-right: 5px solid #34475a; z-index: 1; }
 .player__weapon { position: absolute; right: -5px; top: 7px; width: 4px; height: 19px; background: #7a5232; transform: rotate(-40deg); transform-origin: bottom; z-index: 3; }
-.player__weapon--hammer, .player__weapon--axe, .player__weapon--wrench { right: auto; left: 4px; transform: rotate(-43deg); }
+.player__weapon--hammer, .player__weapon--axe, .player__weapon--sword, .player__weapon--wrench { right: auto; left: 4px; transform: rotate(-43deg); }
 .player__weapon--hammer { border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); }
 .player__weapon--hammer i { position: absolute; left: -5px; top: -3px; width: 13px; height: 7px; border: 2px solid #354044; background: #8e9a98; z-index: 2; }
 .player__weapon--hammer::after { content: ''; position: absolute; left: -2px; top: 8px; width: 6px; height: 7px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }
 .player__weapon--axe { width: 5px; height: 22px; border: 1px solid #422818; border-radius: 1px 1px 3px 3px; background: linear-gradient(90deg, #59341f, #bd8248 52%, #704326); }
 .player__weapon--axe i { position: absolute; left: -6px; top: -5px; width: 15px; height: 10px; border: 2px solid #293437; background: linear-gradient(135deg, #aab5b3, #596669 70%); clip-path: polygon(0 8%, 72% 0, 100% 24%, 90% 78%, 67% 100%, 0 82%, 18% 50%); filter: drop-shadow(0 1px #1e292c) drop-shadow(1px 0 #1e292c); }
 .player__weapon--axe::after { content: ''; position: absolute; left: -2px; top: 8px; width: 7px; height: 8px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }
+.player__weapon--sword { top: 2px; width: 5px; height: 27px; border: 1px solid #263238; background: linear-gradient(90deg, #68777b, #e8efed 52%, #829095); clip-path: polygon(50% 0, 100% 12%, 100% 72%, 0 72%, 0 12%); }
+.player__weapon--sword i { position: absolute; left: -5px; top: 18px; width: 13px; height: 4px; border: 1px solid #3a271a; background: #bd8749; }
+.player__weapon--sword::after { content: ''; position: absolute; left: 0; top: 22px; width: 3px; height: 8px; border: 1px solid #3a271a; background: repeating-linear-gradient(0deg, #4a2d1c 0 2px, #d0a35d 2px 3px); }
 .player__weapon--spear { right: -10px; top: 8px; width: 4px; height: 31px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(-20deg); }
 .player__weapon--spear i { position: absolute; left: -4px; top: -10px; width: 10px; height: 14px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); filter: drop-shadow(0 1px #1e292c); }
 .player__weapon--spear::after { content: ''; position: absolute; left: -2px; top: 5px; width: 6px; height: 8px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }

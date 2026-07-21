@@ -21,10 +21,12 @@ interface Props {
   weapon: Weapon;
   hasSpear: boolean;
   hasAxe: boolean;
+  hasSword: boolean;
   merchantVisits: MerchantVisit[];
   wood: number;
   onBuySpear: () => void;
   onBuyAxe: () => void;
+  onBuySword: () => void;
   interactionHandlers: InteractionHandlers;
   onUnavailable: () => void;
   onAttack: () => void;
@@ -50,10 +52,10 @@ interface Props {
   sharedDrops: SharedDrop[]; onTakeDrop: (drop: SharedDrop) => void;
 }
 
-export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, hasAxe, merchantVisits, wood, onBuySpear, onBuyAxe, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHits, sharedWorld, worldTakes, onWorldState, onWorldTake, zombieDeath, onZombieDeath, onRemotePlayerDamage, multiplayerMode, localPlayerId, onCrateClaim, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
+export function GameWorld({ paused, mobileMode, playerNickname, phase, day, difficulty, baseHealth, maxNights, playerHealth, weapon, hasSpear, hasAxe, hasSword, merchantVisits, wood, onBuySpear, onBuyAxe, onBuySword, interactionHandlers, onUnavailable, onAttack, onHarvest, onCrateLoot, onPlayerDamage, onBaseDamage, onNightCleared, remotePlayers, onPlayerMove, onRevivePlayer, onPlayerAttack, onWorldHit, worldHits, sharedWorld, worldTakes, onWorldState, onWorldTake, zombieDeath, onZombieDeath, onRemotePlayerDamage, multiplayerMode, localPlayerId, onCrateClaim, authoritative, sharedZombies, zombieHit, onZombiesChange, onZombieHit, sharedDrops, onTakeDrop }: Props) {
   return (
     <section className="game-world">
-      <ForestMap paused={paused} mobileMode={mobileMode} multiplayerMode={multiplayerMode} localPlayerId={localPlayerId} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} hasAxe={hasAxe} merchantVisits={merchantVisits} wood={wood} onBuySpear={onBuySpear} onBuyAxe={onBuyAxe} handlers={interactionHandlers} onUnavailable={onUnavailable}
+      <ForestMap paused={paused} mobileMode={mobileMode} multiplayerMode={multiplayerMode} localPlayerId={localPlayerId} playerNickname={playerNickname} phase={phase} day={day} difficulty={difficulty} baseHealth={baseHealth} maxNights={maxNights} playerHealth={playerHealth} weapon={weapon} hasSpear={hasSpear} hasAxe={hasAxe} hasSword={hasSword} merchantVisits={merchantVisits} wood={wood} onBuySpear={onBuySpear} onBuyAxe={onBuyAxe} onBuySword={onBuySword} handlers={interactionHandlers} onUnavailable={onUnavailable}
         remotePlayers={remotePlayers} onPlayerMove={onPlayerMove} onRevivePlayer={onRevivePlayer} onPlayerAttack={onPlayerAttack} onWorldHit={onWorldHit} worldHits={worldHits}
         sharedWorld={sharedWorld} worldTakes={worldTakes} onWorldState={onWorldState} onWorldTake={onWorldTake}
         zombieDeath={zombieDeath} onZombieDeath={onZombieDeath}
