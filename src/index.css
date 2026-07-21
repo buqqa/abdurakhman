@@ -197,11 +197,11 @@ button { font: inherit; }
 .merchant__head { position: absolute; left: 8px; top: 3px; width: 15px; height: 12px; border: 2px solid #513621; border-radius: 2px; background: #dba872; }
 .merchant__head i { position: absolute; right: 2px; top: 4px; width: 2px; height: 2px; background: #20251d; box-shadow: -7px 0 #20251d; }
 .merchant__hair { position: absolute; left: 7px; top: 0; width: 17px; height: 7px; border: 2px solid #38291d; border-radius: 3px 3px 0 0; background: #594026; z-index: 2; }
-.merchant__body { position: absolute; left: 8px; top: 14px; width: 15px; height: 10px; border: 2px solid #38301f; border-radius: 2px; background: #6f7444; z-index: 2; }
-.merchant__arm { position: absolute; top: 15px; width: 5px; height: 12px; border: 2px solid #513621; border-radius: 2px; background: #dba872; transform-origin: top; z-index: 1; }
-.merchant__arm--left { left: 4px; transform: rotate(8deg); }
-.merchant__arm--right { right: 3px; transform: rotate(-12deg); }
-.merchant__legs { position: absolute; left: 8px; bottom: -1px; width: 15px; height: 8px; border-left: 5px solid #4a4130; border-right: 5px solid #4a4130; }
+.merchant__body { position: absolute; left: 8px; top: 14px; width: 15px; height: 13px; border: 2px solid #38301f; border-radius: 2px 2px 0 0; background: #6f7444; z-index: 2; }
+.merchant__arm { position: absolute; top: 15px; width: 5px; height: 13px; border: 2px solid #513621; border-radius: 2px; background: linear-gradient(#6f7444 0 45%, #dba872 46%); transform-origin: top; z-index: 3; }
+.merchant__arm--left { left: 2px; transform: rotate(8deg); }
+.merchant__arm--right { right: 1px; transform: rotate(-8deg); }
+.merchant__legs { position: absolute; left: 8px; top: 27px; width: 19px; height: 8px; border-top: 2px solid #302b21; background: linear-gradient(90deg, #4a4130 0 7px, transparent 7px 11px, #4a4130 11px 18px); z-index: 1; }
 .merchant__pack { position: absolute; left: -3px; top: 13px; width: 10px; height: 15px; border: 2px solid #3e2c1e; border-radius: 3px; background: #9a6b3e; z-index: 2; }
 button { border: 1px solid #536550; border-radius: 7px; padding: 10px 13px; cursor: pointer; color: #edf0e5; background: #2c3a2a; }
 button:hover { background: #3c5039; } button.danger { border-color: #82544b; background: #653e37; }
