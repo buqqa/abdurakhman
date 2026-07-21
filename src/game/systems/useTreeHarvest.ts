@@ -18,17 +18,17 @@ export function useTreeHarvest({ weapon, worldHits, setObjects, onHarvest, onSwi
   const processed = useRef(new Set<string>());
   const [animation, setAnimation] = useState<{ id: string; falling: boolean }>();
   const applyHit = useCallback((treeId: string, hitsToFell: number, reward: boolean) => {
-    if ((hits.current[treeId] ?? 0) >= hitsToFell) return;
+    if ((hits.current[treeId] ?? 0) >= 3) return;
     if (reward) onHarvest();
-    hits.current[treeId] = (hits.current[treeId] ?? 0) + 1;
-    const falling = hits.current[treeId] >= hitsToFell;
+    hits.current[treeId] = (hits.current[treeId] ?? 0) + 3 / hitsToFell;
+    const falling = hits.current[treeId] >= 3;
     setAnimation({ id: treeId, falling });
     window.setTimeout(() => setAnimation(undefined), falling ? 620 : 260);
     if (falling) window.setTimeout(() => setObjects((items) => items.filter((item) => item.id !== treeId)), 600);
   }, [onHarvest, setObjects]);
   const harvestTree = useCallback((tree: InteractableObject) => {
     const hitsToFell = weapon === 'spear' ? 4 : weapon === 'axe' ? 2 : 3;
-    if ((hits.current[tree.id] ?? 0) >= hitsToFell) return;
+    if ((hits.current[tree.id] ?? 0) >= 3) return;
     playGameSound('chop');
     onSwing();
     applyHit(tree.id, hitsToFell, true);

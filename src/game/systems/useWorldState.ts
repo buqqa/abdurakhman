@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Phase } from '../types';
+import type { MerchantVisit, Phase } from '../types';
 import { createDailyResources, WORLD_OBJECTS, type InteractableObject } from '../interactions';
 import { createStructure, type StructureKind, type WorldStructure } from '../structures';
 import type { SharedWorld, WorldTake } from '../multiplayer';
@@ -9,12 +9,13 @@ interface Options {
   day: number;
   maxNights: number;
   phase: Phase;
+  merchantVisits: MerchantVisit[];
   sharedWorld?: SharedWorld;
   worldTakes: Pick<WorldTake, 'id' | 'nonce'>[];
   onWorldState: (world: SharedWorld) => void;
 }
 
-export function useWorldState({ authoritative, day, maxNights, phase, sharedWorld, worldTakes, onWorldState }: Options) {
+export function useWorldState({ authoritative, day, maxNights, phase, merchantVisits, sharedWorld, worldTakes, onWorldState }: Options) {
   const [objects, setObjects] = useState<InteractableObject[]>(WORLD_OBJECTS);
   const [structures, setStructures] = useState<WorldStructure[]>([]);
   const spawnedDays = useRef(new Set<number>());
@@ -24,6 +25,7 @@ export function useWorldState({ authoritative, day, maxNights, phase, sharedWorl
     warehouse: 10 + Math.floor(Math.random() * 11),
     car: maxNights === 50 ? 25 + Math.floor(Math.random() * 11) : Number.POSITIVE_INFINITY,
   });
+  const merchantReservations: InteractableObject[] = merchantVisits.map((visit, index) => ({ id: `merchant-reservation-${index}`, kind: 'merchant-reservation', x: visit.x, y: visit.y }));
 
   useEffect(() => {
     if (authoritative) onWorldState({ objects, structures, spawnedStructures: [...spawnedStructures.current] });
@@ -40,7 +42,7 @@ export function useWorldState({ authoritative, day, maxNights, phase, sharedWorl
   useEffect(() => {
     if (!authoritative || day < 2 || phase !== 'day' || spawnedDays.current.has(day)) return;
     spawnedDays.current.add(day);
-    const resources = createDailyResources(day, objects);
+    const resources = createDailyResources(day, [...objects, ...merchantReservations]);
     if (resources.length) setObjects((current) => [...current, ...resources]);
   }, [authoritative, day, phase]);
   useEffect(() => {
@@ -57,11 +59,11 @@ export function useWorldState({ authoritative, day, maxNights, phase, sharedWorl
     const ready = available.filter((kind) => day >= structureDays.current[kind] && !spawnedStructures.current.has(kind));
     ready.forEach((kind) => {
       spawnedStructures.current.add(kind);
-      const spawn = createStructure(kind, objects, day);
+      const spawn = createStructure(kind, [...objects, ...merchantReservations], day);
       setStructures((current) => [...current, spawn.structure]);
       setObjects((current) => [...current, spawn.marker, ...spawn.crates]);
     });
-  }, [authoritative, day, objects, phase]);
+  }, [authoritative, day, merchantVisits, objects, phase]);
 
   return { objects, setObjects, structures };
 }

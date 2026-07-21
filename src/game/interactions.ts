@@ -39,7 +39,7 @@ export function createDailyResources(day: number, occupied: InteractableObject[]
   const createPoint = () => {
     for (let attempts = 0; attempts < 200; attempts += 1) {
       const point = { x: 65 + Math.random() * (MAP_WIDTH - 130), y: 65 + Math.random() * (MAP_HEIGHT - 130) };
-      const nearbyObjects = [...occupied, ...resources].some((object) => Math.hypot(point.x - object.x, point.y - object.y) < (object.kind.startsWith('structure-') ? 140 : 70));
+      const nearbyObjects = [...occupied, ...resources].some((object) => Math.hypot(point.x - object.x, point.y - object.y) < (object.kind.startsWith('structure-') ? 140 : object.kind === 'merchant-reservation' ? 120 : 70));
       if (Math.hypot(point.x - BASE_POSITION.x, point.y - BASE_POSITION.y) >= 130 && !nearbyObjects) return point;
     }
     return undefined;

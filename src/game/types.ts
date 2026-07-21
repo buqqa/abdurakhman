@@ -1,5 +1,6 @@
 export type Phase = 'menu' | 'day' | 'night' | 'won' | 'lost';
 export type Weapon = 'hammer' | 'spear' | 'axe' | 'wrench';
+export interface MerchantVisit { day: number; x: number; y: number }
 
 export interface GameState {
   day: number;
@@ -18,5 +19,5 @@ export interface GameState {
   hasAxe: boolean;
   hasWrench: boolean;
   hasSeenWrench: boolean;
-  merchantDay: number;
+  merchantVisits: MerchantVisit[];
 }

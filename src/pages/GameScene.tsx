@@ -81,15 +81,15 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   }, [multiplayer.startNightSignal]);
   useEffect(() => {
     if (!party || game.phase === 'menu') return;
-    if (multiplayer.isLeader) multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay, completionTime: game.completionTime, paused: isPaused });
+    if (multiplayer.isLeader) multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantVisits: game.merchantVisits, completionTime: game.completionTime, paused: isPaused });
     else if (multiplayer.sharedGame) {
       syncSharedGame(multiplayer.sharedGame);
       setIsPaused(multiplayer.sharedGame.paused);
     }
-  }, [game.baseHealth, game.completionTime, game.day, game.difficulty, game.maxNights, game.merchantDay, game.phase, isPaused, multiplayer.isLeader, multiplayer.sendGame, multiplayer.sharedGame, party, syncSharedGame]);
+  }, [game.baseHealth, game.completionTime, game.day, game.difficulty, game.maxNights, game.merchantVisits, game.phase, isPaused, multiplayer.isLeader, multiplayer.sendGame, multiplayer.sharedGame, party, syncSharedGame]);
   useEffect(() => {
     if (!party || !multiplayer.isLeader || !multiplayer.stateRequest) return;
-    multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantDay: game.merchantDay, completionTime: game.completionTime, paused: isPaused });
+    multiplayer.sendGame({ day: game.day, phase: game.phase, baseHealth: game.baseHealth, maxNights: game.maxNights, difficulty: game.difficulty, merchantVisits: game.merchantVisits, completionTime: game.completionTime, paused: isPaused });
     multiplayer.sendZombies();
     multiplayer.sendDrops(multiplayer.drops);
     multiplayer.sendWorld();
@@ -171,7 +171,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   return (
     <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
       {party && <PartyGameBadge code={party.code} players={multiplayer.memberCount} maxPlayers={party.maxPlayers} />}
-      <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} hasAxe={game.hasAxe} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} onBuyAxe={buyAxe} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
+      <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} hasAxe={game.hasAxe} merchantVisits={game.merchantVisits} wood={game.wood} onBuySpear={buySpear} onBuyAxe={buyAxe} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         multiplayerMode={Boolean(party)} localPlayerId={multiplayer.localPlayerId} onCrateClaim={claimCrateLoot}
         remotePlayers={multiplayer.players} onPlayerMove={sendPlayerPosition} onRevivePlayer={reviveTeammate} onPlayerAttack={multiplayer.sendPlayerAttack} onWorldHit={multiplayer.sendWorldHit} worldHits={multiplayer.worldHits}
         sharedWorld={multiplayer.sharedWorld} worldTakes={multiplayer.worldTakes} onWorldState={multiplayer.sendWorld} onWorldTake={(id) => {

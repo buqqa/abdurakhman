@@ -5,12 +5,11 @@ import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
 import { useControls } from '../game/controls';
 
-export const MERCHANT_POSITION = { x: 1125, y: 635 } as const;
 const TRADE_DISTANCE = 111;
 
-interface Props { player: Position; wood: number; hasSpear: boolean; hasAxe: boolean; isOpen: boolean; onOpen: () => void; onClose: () => void; onBuySpear: () => void; onBuyAxe: () => void }
+interface Props { player: Position; position: Position; wood: number; hasSpear: boolean; hasAxe: boolean; isOpen: boolean; onOpen: () => void; onClose: () => void; onBuySpear: () => void; onBuyAxe: () => void }
 
-export function Merchant({ player, wood, hasSpear, hasAxe, isOpen, onOpen, onClose, onBuySpear, onBuyAxe }: Props) {
+export function Merchant({ player, position, wood, hasSpear, hasAxe, isOpen, onOpen, onClose, onBuySpear, onBuyAxe }: Props) {
   const { bindings } = useControls();
   const { language } = useI18n();
   const text = language === 'en'
@@ -18,7 +17,7 @@ export function Merchant({ player, wood, hasSpear, hasAxe, isOpen, onOpen, onClo
     : language === 'kk'
       ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Қару-жарақ', spear: 'Найза', spearBuff: 'Шабуыл қашықтығы мен зақымы артқан', spearPenalty: 'Ағашты шабуға 4 соққы қажет', axe: 'Балта', axeBuff: 'Ағашты тезірек жинап, зомбилерді тезірек өлтіреді', axePenalty: 'Соққы кідірісі: 0,7 секунд', buy: '50 ағашқа айырбастау', owned: 'Сатып алынды' }
       : { name: 'Торговец', title: 'Лесной торговец', offer: 'Оружие', spear: 'Копьё', spearBuff: 'Увеличенный радиус и урон', spearPenalty: 'Для добычи дерева нужно 4 удара', axe: 'Топор', axeBuff: 'Быстрее добывает дерево и убивает зомби', axePenalty: 'Задержка между ударами: 0,7 секунды', buy: 'Обменять на 50 дерева', owned: 'Куплено' };
-  const isNear = Math.hypot(player.x - MERCHANT_POSITION.x, player.y - MERCHANT_POSITION.y) <= TRADE_DISTANCE;
+  const isNear = Math.hypot(player.x - position.x, player.y - position.y) <= TRADE_DISTANCE;
   useEffect(() => {
     const handleTrade = (event: KeyboardEvent) => {
       if (event.code !== bindings.interact || event.repeat || !isNear) return;
@@ -41,7 +40,7 @@ export function Merchant({ player, wood, hasSpear, hasAxe, isOpen, onOpen, onClo
     </section>
   </div>, document.body) : null;
   return <>
-    <div className="merchant" style={{ left: MERCHANT_POSITION.x, top: MERCHANT_POSITION.y }}>
+    <div className="merchant" style={{ left: position.x, top: position.y }}>
       <span className="merchant__name">{text.name}</span><span className="merchant__sprite"><span className="merchant__hair" />
         <span className="merchant__head"><i /></span><span className="merchant__arm merchant__arm--left" />
         <span className="merchant__body" /><span className="merchant__arm merchant__arm--right" />

@@ -7,10 +7,11 @@ import { useI18n } from '../i18n/I18nContext';
 import { gameMessages } from '../i18n/gameMessages';
 import type { SharedGame } from './multiplayer';
 import type { ResourceKind } from './multiplayer';
+import { createMerchantVisits } from './merchantSchedule';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, hasAxe: false, hasWrench: false, hasSeenWrench: false, merchantDay: 5,
+  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, hasAxe: false, hasWrench: false, hasSeenWrench: false, merchantVisits: [],
 };
 
 export function useGameLoop() {
@@ -25,8 +26,8 @@ export function useGameLoop() {
     startedAt.current = Date.now();
     pausedAt.current = undefined;
     pausedTime.current = 0;
-    const merchantDay = 1;
-    setGame({ ...initialState, phase: 'day', maxNights, difficulty, merchantDay, message: message.prepare });
+    const merchantVisits = createMerchantVisits(difficulty);
+    setGame({ ...initialState, phase: 'day', maxNights, difficulty, merchantVisits, message: message.prepare });
   };
   const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: language === 'en'
     ? `The ${state.weapon} yielded 2 wood.`
