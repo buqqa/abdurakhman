@@ -86,8 +86,8 @@
 .auth-divider { display: flex; align-items: center; gap: 10px; margin: 17px 0 12px; color: #73806f; font-size: 12px; }
 .auth-divider::before, .auth-divider::after { content: ''; height: 1px; flex: 1; background: #344132; }
 .google-button, .guest-button { width: 100%; }
-.google-button { display: flex; align-items: center; justify-content: center; gap: 9px; margin-bottom: 9px; border-color: #8b6042; color: #f5eee4; background: #745037; }
-.google-button:hover { color: #fff8ed; background: #8b6042; }
+.google-button { display: flex; align-items: center; justify-content: center; gap: 9px; margin-bottom: 9px; border: 1px solid #52634e; color: #d9dfd4; background: transparent; }
+.google-button:hover { color: #d9dfd4; background: #263324; }
 .google-button span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; color: transparent; background: conic-gradient(from -38deg, #4285f4 0 25%, #34a853 25% 43%, #fbbc05 43% 67%, #ea4335 67% 82%, #4285f4 82%); background-clip: text; -webkit-background-clip: text; font-family: Arial, sans-serif; font-size: 17px; font-weight: 800; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .2)); }
 .guest-button { border: 1px solid #52634e; color: #d9dfd4; background: transparent; }
 .guest-button:hover { background: #263324; }
