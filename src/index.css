@@ -140,12 +140,12 @@ button { font: inherit; }
 .player__weapon--spear { right: -10px; top: 8px; width: 4px; height: 31px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(-20deg); }
 .player__weapon--spear i { position: absolute; left: -4px; top: -10px; width: 10px; height: 14px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); filter: drop-shadow(0 1px #1e292c); }
 .player__weapon--spear::after { content: ''; position: absolute; left: -2px; top: 5px; width: 6px; height: 8px; background: repeating-linear-gradient(0deg, #39251a 0 2px, #d0a35d 2px 3px); }
-.player__weapon--wrench { width: 6px; height: 21px; border: 1px solid #293234; border-radius: 2px 2px 4px 4px; background: linear-gradient(90deg, #657273, #e5eae5 50%, #718081); }
-.player__weapon--wrench::before { content: ''; position: absolute; left: -2px; top: -3px; width: 10px; height: 6px; z-index: 2; border: 1px solid #293234; border-radius: 2px; background: repeating-linear-gradient(90deg, #465253 0 2px, #c8d0cc 2px 3px); }
-.player__weapon--wrench::after { content: ''; position: absolute; left: 1px; bottom: 1px; width: 3px; height: 3px; border: 1px solid #293234; border-radius: 50%; background: #1b2220; }
-.player__weapon--wrench i { position: absolute; left: -6px; top: -11px; width: 18px; height: 16px; border: 1px solid #293234; border-radius: 3px; background: linear-gradient(90deg, #657273, #dfe5e1 48%, #778586); clip-path: polygon(0 0, 35% 28%, 65% 28%, 100% 0, 87% 68%, 65% 88%, 35% 88%, 13% 68%); filter: drop-shadow(0 1px #293234); }
-.player__weapon--wrench i::after { content: ''; position: absolute; left: 6px; top: 0; width: 5px; height: 6px; background: #202820; clip-path: polygon(0 0, 100% 0, 70% 100%, 30% 100%); }
-.player__weapon--wrench i::before { content: ''; position: absolute; right: 1px; top: 3px; width: 5px; height: 7px; background: #7d8989; clip-path: polygon(35% 0, 100% 0, 100% 100%, 0 75%); }
+.player__weapon--wrench { width: 6px; height: 22px; border: 1px solid #273033; border-radius: 1px 1px 4px 4px; background: linear-gradient(90deg, #596568 0 25%, #dce4e2 26% 55%, #879396 56%); box-shadow: inset -1px 0 #475255; }
+.player__weapon--wrench::before { content: ''; position: absolute; left: -2px; top: -4px; width: 10px; height: 7px; z-index: 3; border: 1px solid #273033; background: repeating-linear-gradient(0deg, #667275 0 2px, #aeb9b8 2px 3px); clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%); }
+.player__weapon--wrench::after { content: ''; position: absolute; left: 1px; bottom: 2px; width: 3px; height: 3px; border: 1px solid #273033; border-radius: 50%; background: #263033; }
+.player__weapon--wrench i { position: absolute; left: -5px; top: -13px; width: 16px; height: 14px; border: 1px solid #273033; background: linear-gradient(100deg, #566265 0 25%, #dce4e2 26% 55%, #7c898c 56%); clip-path: polygon(0 0, 34% 27%, 60% 27%, 90% 5%, 100% 24%, 72% 65%, 63% 100%, 28% 100%, 20% 67%); filter: drop-shadow(0 1px #273033); }
+.player__weapon--wrench i::after { content: ''; position: absolute; left: 4px; top: 0; width: 6px; height: 6px; background: #273033; clip-path: polygon(0 0, 100% 0, 68% 100%, 30% 100%); }
+.player__weapon--wrench i::before { content: ''; position: absolute; right: 0; top: 1px; width: 5px; height: 9px; background: #687477; clip-path: polygon(30% 0, 100% 0, 100% 82%, 0 100%); }
 .player--attacking .player__weapon { animation: axe-swing .26s ease-out; }
 .player--spear .player__arm--right { visibility: hidden; }
 .player--spear.player--attacking .player__weapon { animation: spear-thrust .26s ease-out; }
@@ -196,11 +196,11 @@ button:hover { background: #3c5039; } button.danger { border-color: #82544b; bac
 .survival-hud { position: absolute; inset: 0; z-index: 14; pointer-events: none; font-family: Inter, system-ui, sans-serif; }
 .survival-hud__vitals { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); padding: 6px 8px; border-radius: 7px; background: rgba(10, 15, 10, .62); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .55)); }
 .hud-hearts, .hud-armor { display: flex; gap: 3px; height: 16px; }
-.hud-hearts { align-items: center; }
+.hud-hearts { align-items: center; margin-top: 1px; }
 .hud-hearts span { width: 14px; height: 13px; background: #d94a43; clip-path: polygon(0 15%, 14% 15%, 14% 0, 43% 0, 50% 15%, 57% 0, 86% 0, 86% 15%, 100% 15%, 100% 54%, 86% 54%, 86% 69%, 71% 69%, 71% 85%, 57% 85%, 57% 100%, 43% 100%, 43% 85%, 29% 85%, 29% 69%, 14% 69%, 14% 54%, 0 54%); filter: drop-shadow(1px 0 #5d211f) drop-shadow(-1px 0 #5d211f) drop-shadow(0 1px #5d211f) drop-shadow(0 -1px #5d211f); }
 .hud-hearts span.half { background: linear-gradient(90deg, #d94a43 50%, #302b29 50%); }
 .hud-hearts span.empty { background: #302b29; }
-.hud-armor { align-items: center; height: 16px; margin-top: 1px; gap: 3px; }
+.hud-armor { align-items: center; height: 16px; gap: 3px; }
 .hud-armor span { position: relative; width: 14px; height: 13px; background: #252c2c; clip-path: polygon(0 0, 29% 0, 29% 15%, 43% 15%, 43% 31%, 57% 31%, 57% 15%, 71% 15%, 71% 0, 100% 0, 100% 46%, 86% 46%, 86% 100%, 14% 100%, 14% 46%, 0 46%); filter: drop-shadow(1px 0 #050706) drop-shadow(-1px 0 #050706) drop-shadow(0 1px #050706) drop-shadow(0 -1px #050706); }
 .hud-armor span.full { background: linear-gradient(90deg, #dce9e7 0 29%, #9fb8bc 29% 71%, #526d76 71%); }.hud-armor span.half { background: linear-gradient(90deg, #a9c1c4 50%, #252c2c 50%); }
 .hud-armor i { position: absolute; left: 3px; top: 3px; width: 3px; height: 2px; background: rgba(255, 255, 255, .55); box-shadow: 2px 2px rgba(255, 255, 255, .2); }
