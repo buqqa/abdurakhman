@@ -126,11 +126,15 @@ export function useGameLoop() {
   const restart = () => setGame(initialState);
   const dropResource = (kind: ResourceKind) => setGame((state) => {
     if (kind === 'spear') return state.hasSpear ? { ...state, hasSpear: false, weapon: state.weapon === 'spear' ? 'hammer' : state.weapon } : state;
+    if (kind === 'axe') return state.hasAxe ? { ...state, hasAxe: false, weapon: state.weapon === 'axe' ? 'hammer' : state.weapon } : state;
+    if (kind === 'sword') return state.hasSword ? { ...state, hasSword: false, weapon: state.weapon === 'sword' ? 'hammer' : state.weapon } : state;
     if (kind === 'wrench') return state.hasWrench ? { ...state, hasWrench: false, weapon: state.weapon === 'wrench' ? 'hammer' : state.weapon } : state;
     return { ...state, [kind]: Math.max(0, state[kind] - 1) };
   });
   const receiveResource = (kind: ResourceKind) => setGame((state) => {
     if (kind === 'spear') return { ...state, hasSpear: true };
+    if (kind === 'axe') return { ...state, hasAxe: true };
+    if (kind === 'sword') return { ...state, hasSword: true };
     if (kind === 'wrench') return { ...state, hasWrench: true, hasSeenWrench: true, weapon: 'wrench' };
     return { ...state, [kind]: state[kind] + 1 };
   });

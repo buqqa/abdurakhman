@@ -7,10 +7,16 @@ import type { InteractableObject } from './interactions';
 import type { CrateLootGrant, PlayerPayload, PresencePayload, RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDamageState, ZombieDeath } from './multiplayerTypes';
 export type { CrateLootGrant, RemotePlayer, ResourceGrant, ResourceKind, SharedDrop, SharedGame, SharedWorld, WorldHit, WorldTake, ZombieDeath } from './multiplayerTypes';
 
-const POSITION_INTERVAL = 80;
+const POSITION_INTERVAL = 50;
 const PLAYER_UPDATE_INTERVAL = 50;
 const POSITION_HEARTBEAT = 1000;
 const ZOMBIE_INTERVAL = 100;
+const DROP_SEPARATION = 24;
+const DROP_OFFSETS = [
+  { x: 0, y: 0 }, { x: 26, y: 0 }, { x: -26, y: 0 },
+  { x: 0, y: 26 }, { x: 0, y: -26 }, { x: 26, y: 26 },
+  { x: -26, y: 26 }, { x: 26, y: -26 }, { x: -26, y: -26 },
+] as const;
 
 export function useMultiplayerRoom(code: string | undefined, nickname: string, maxPlayers = 4) {
   const id = useRef(crypto.randomUUID());
@@ -221,7 +227,11 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
   }, []);
   const sendZombieHit = useCallback((id: string, damage: number) => { void channelRef.current?.send({ type: 'broadcast', event: 'zombie-hit', payload: { id, damage, nonce: crypto.randomUUID() } }); }, []);
   const dropResource = useCallback((kind: ResourceKind) => {
-    const drop = { id: crypto.randomUUID(), kind, x: lastPosition.current.x + 28, y: lastPosition.current.y + 22 };
+    const origin = { x: lastPosition.current.x + 28, y: lastPosition.current.y + 22 };
+    const position = DROP_OFFSETS.map((offset) => ({ x: origin.x + offset.x, y: origin.y + offset.y }))
+      .find((candidate) => !latestDrops.current.some((item) => item.kind !== kind
+        && Math.hypot(item.x - candidate.x, item.y - candidate.y) < DROP_SEPARATION)) ?? origin;
+    const drop = { id: crypto.randomUUID(), kind, ...position };
     setDrops((current) => { const next = [...current, drop]; latestDrops.current = next; return next; });
     void channelRef.current?.send({ type: 'broadcast', event: 'resource-drop', payload: drop });
   }, []);

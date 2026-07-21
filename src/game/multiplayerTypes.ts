@@ -8,7 +8,7 @@ export interface RemotePlayer extends Position { id: string; nickname: string; w
 export interface PlayerPayload { id: string; nickname: string; x: number; y: number; weapon: Weapon; health: number; downed: boolean; walking: boolean; facingRight: boolean }
 export interface PresencePayload { id: string; nickname: string; joinedAt: number }
 export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNights' | 'difficulty' | 'merchantVisits' | 'completionTime'> & { paused: boolean };
-export type ResourceKind = 'wood' | 'food' | 'water' | 'spear' | 'wrench';
+export type ResourceKind = 'wood' | 'food' | 'water' | 'spear' | 'axe' | 'sword' | 'wrench';
 export interface SharedDrop extends Position { id: string; kind: ResourceKind }
 export interface WorldHit { object: InteractableObject; hitsToBreak: number; playerId: string; nonce: string }
 export interface CrateLootGrant { targetId: string; kind: import('./interactions').CrateKind; nonce: string }

@@ -182,13 +182,15 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
         onRemotePlayerDamage={multiplayer.damageRemotePlayer}
         authoritative={!party || multiplayer.isLeader} sharedZombies={multiplayer.zombies} zombieHit={multiplayer.zombieHit} onZombiesChange={multiplayer.sendZombies} onZombieHit={multiplayer.sendZombieHit}
         sharedDrops={multiplayer.drops} onTakeDrop={(drop) => {
-          if ((drop.kind === 'spear' && game.hasSpear) || (drop.kind === 'wrench' && game.hasWrench)) return;
+          if ((drop.kind === 'spear' && game.hasSpear) || (drop.kind === 'axe' && game.hasAxe)
+            || (drop.kind === 'sword' && game.hasSword) || (drop.kind === 'wrench' && game.hasWrench)) return;
           multiplayer.takeResource(drop.id);
         }}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={collectCrateLoot}
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party && multiplayer.memberCount > 1))} onBaseDamage={damageBase} onNightCleared={finishNight} />
-      <InventoryPanel wood={game.wood} food={game.food} water={game.water} hasSpear={game.hasSpear} hasWrench={game.hasWrench} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => {
-        const hasItem = kind === 'spear' ? game.hasSpear : kind === 'wrench' ? game.hasWrench : game[kind] > 0;
+      <InventoryPanel wood={game.wood} food={game.food} water={game.water} hasSpear={game.hasSpear} hasAxe={game.hasAxe} hasSword={game.hasSword} hasWrench={game.hasWrench} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => {
+        const hasItem = kind === 'spear' ? game.hasSpear : kind === 'axe' ? game.hasAxe
+          : kind === 'sword' ? game.hasSword : kind === 'wrench' ? game.hasWrench : game[kind] > 0;
         if (!hasItem) return;
         dropResource(kind);
         multiplayer.dropResource(kind);
