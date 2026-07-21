@@ -26,7 +26,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   const [device, setDevice] = useState<DeviceMode>();
   const [mobileHeight, setMobileHeight] = useState(() => window.innerHeight);
   const [wrenchInfoOpen, setWrenchInfoOpen] = useState(false);
-  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock } = useGameLoop();
+  const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, buyAxe, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock } = useGameLoop();
   const multiplayer = useMultiplayerRoom(party?.code, playerNickname, party?.maxPlayers);
   const handledRepairs = useRef(0);
   const handledPlayerDamage = useRef(0);
@@ -168,7 +168,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   return (
     <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
       {party && <PartyGameBadge code={party.code} players={multiplayer.memberCount} maxPlayers={party.maxPlayers} />}
-      <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
+      <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} hasAxe={game.hasAxe} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} onBuyAxe={buyAxe} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         multiplayerMode={Boolean(party)} localPlayerId={multiplayer.localPlayerId} onCrateClaim={claimCrateLoot}
         remotePlayers={multiplayer.players} onPlayerMove={sendPlayerPosition} onRevivePlayer={reviveTeammate} onPlayerAttack={multiplayer.sendPlayerAttack} onWorldHit={multiplayer.sendWorldHit} worldHits={multiplayer.worldHits}
         sharedWorld={multiplayer.sharedWorld} worldTakes={multiplayer.worldTakes} onWorldState={multiplayer.sendWorld} onWorldTake={(id) => {

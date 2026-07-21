@@ -1,5 +1,5 @@
 import type { Position } from './PlayerController';
-import { SPEAR_COST } from '../game/config';
+import { AXE_COST, SPEAR_COST } from '../game/config';
 import { useI18n } from '../i18n/I18nContext';
 import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
@@ -8,16 +8,16 @@ import { useControls } from '../game/controls';
 export const MERCHANT_POSITION = { x: 1125, y: 635 } as const;
 const TRADE_DISTANCE = 111;
 
-interface Props { player: Position; wood: number; isOpen: boolean; onOpen: () => void; onClose: () => void; onBuy: () => void }
+interface Props { player: Position; wood: number; hasSpear: boolean; hasAxe: boolean; isOpen: boolean; onOpen: () => void; onClose: () => void; onBuySpear: () => void; onBuyAxe: () => void }
 
-export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props) {
+export function Merchant({ player, wood, hasSpear, hasAxe, isOpen, onOpen, onClose, onBuySpear, onBuyAxe }: Props) {
   const { bindings } = useControls();
   const { language } = useI18n();
   const text = language === 'en'
-    ? { name: 'Merchant', title: 'Forest merchant', offer: 'Spear', buff: 'Increased attack range and damage', penalty: 'Takes more hits to chop down a tree', buy: 'Trade for 50 wood' }
+    ? { name: 'Merchant', title: 'Forest merchant', offer: 'Weapons', spear: 'Spear', spearBuff: 'Increased attack range and damage', spearPenalty: 'Takes 4 hits to fell a tree', axe: 'Axe', axeBuff: 'Fells a tree in 2 hits and defeats a regular zombie in 5', axePenalty: 'Attack cooldown: 0.7 seconds', buy: 'Trade for 50 wood', owned: 'Owned' }
     : language === 'kk'
-      ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Найза', buff: 'Шабуыл қашықтығы мен зақымы артқан', penalty: 'Ағашты шабуға көбірек соққы қажет', buy: '50 ағашқа айырбастау' }
-      : { name: 'Торговец', title: 'Лесной торговец', offer: 'Копьё', buff: 'Увеличенный радиус и урон', penalty: 'Для добычи дерева нужно больше ударов', buy: 'Обменять на 50 дерева' };
+      ? { name: 'Саудагер', title: 'Орман саудагері', offer: 'Қару-жарақ', spear: 'Найза', spearBuff: 'Шабуыл қашықтығы мен зақымы артқан', spearPenalty: 'Ағашты шабуға 4 соққы қажет', axe: 'Балта', axeBuff: 'Ағашты 2 соққымен, кәдімгі зомбиді 5 соққымен жеңеді', axePenalty: 'Соққы кідірісі: 0,7 секунд', buy: '50 ағашқа айырбастау', owned: 'Сатып алынды' }
+      : { name: 'Торговец', title: 'Лесной торговец', offer: 'Оружие', spear: 'Копьё', spearBuff: 'Увеличенный радиус и урон', spearPenalty: 'Для добычи дерева нужно 4 удара', axe: 'Топор', axeBuff: 'Добывает дерево за 2 удара и убивает обычного зомби за 5', axePenalty: 'Задержка между ударами: 0,7 секунды', buy: 'Обменять на 50 дерева', owned: 'Куплено' };
   const isNear = Math.hypot(player.x - MERCHANT_POSITION.x, player.y - MERCHANT_POSITION.y) <= TRADE_DISTANCE;
   useEffect(() => {
     const handleTrade = (event: KeyboardEvent) => {
@@ -32,10 +32,12 @@ export function Merchant({ player, wood, isOpen, onOpen, onClose, onBuy }: Props
   const tradeWindow = isOpen ? createPortal(<div className="trade-backdrop" onContextMenu={(event) => event.preventDefault()} onClick={onClose}>
     <section className="trade-window" onClick={(event) => event.stopPropagation()}>
       <header><div><small>{text.title}</small><h2>{text.offer}</h2></div><button onClick={onClose}>×</button></header>
-      <div className="trade-offer"><span className="trade-spear"><i /></span><div><p>{text.buff}</p><p className="trade-penalty">{text.penalty}</p></div></div>
-      <button className="trade-buy" disabled={wood < SPEAR_COST} onClick={() => { onBuy(); if (wood >= SPEAR_COST) onClose(); }}>
-        {text.buy} <strong>({wood}/{SPEAR_COST})</strong>
-      </button>
+      <div className="trade-list">
+        <div className={`trade-offer ${hasSpear ? 'trade-offer--owned' : ''}`}><span className="trade-spear"><i /></span><div><h3>{text.spear}</h3><p>{text.spearBuff}</p><p className="trade-penalty">{text.spearPenalty}</p>
+          <button className="trade-buy" disabled={hasSpear || wood < SPEAR_COST} onClick={onBuySpear}>{hasSpear ? text.owned : text.buy} <strong>({wood}/{SPEAR_COST})</strong></button></div></div>
+        <div className={`trade-offer ${hasAxe ? 'trade-offer--owned' : ''}`}><span className="trade-axe"><i /></span><div><h3>{text.axe}</h3><p>{text.axeBuff}</p><p className="trade-penalty">{text.axePenalty}</p>
+          <button className="trade-buy" disabled={hasAxe || wood < AXE_COST} onClick={onBuyAxe}>{hasAxe ? text.owned : text.buy} <strong>({wood}/{AXE_COST})</strong></button></div></div>
+      </div>
     </section>
   </div>, document.body) : null;
   return <>
