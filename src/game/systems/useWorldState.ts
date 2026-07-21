@@ -22,7 +22,7 @@ export function useWorldState({ authoritative, day, maxNights, phase, sharedWorl
   const structureDays = useRef({
     tent: 5 + Math.floor(Math.random() * 6),
     warehouse: 10 + Math.floor(Math.random() * 11),
-    car: Math.min(1, maxNights),
+    car: maxNights >= 25 ? 25 + Math.floor(Math.random() * (Math.min(35, maxNights) - 24)) : Number.POSITIVE_INFINITY,
   });
 
   useEffect(() => {
