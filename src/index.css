@@ -15,7 +15,6 @@ button { font: inherit; }
 .inventory-slot p { margin: 8px 0 0; color: #aeb7a8; }
 .inventory-slot strong { position: absolute; right: 12px; bottom: 10px; font-size: 22px; }
 .inventory-slot .use-item { position: absolute; right: 9px; top: 9px; padding: 5px 8px; font-size: 12px; }
-.inventory-slot--empty { opacity: .42; }
 .weapon-item { position: relative; display: block; image-rendering: pixelated; filter: drop-shadow(2px 3px 1px rgba(0, 0, 0, .55)); }
 .weapon-item--spear { width: 5px; height: 38px; margin: 0 0 0 12px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(24deg); }
 .weapon-item--spear i { position: absolute; left: -4px; top: -11px; width: 11px; height: 14px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); }

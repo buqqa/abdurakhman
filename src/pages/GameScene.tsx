@@ -54,11 +54,12 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       if (handledResourceGrants.current.has(grant.nonce)) return;
       handledResourceGrants.current.add(grant.nonce);
       if (grant.targetId === multiplayer.localPlayerId) {
+        const showWrenchInfo = grant.kind === 'wrench' && !game.hasSeenWrench;
         receiveResource(grant.kind);
-        if (grant.kind === 'wrench') setWrenchInfoOpen(true);
+        if (showWrenchInfo) setWrenchInfoOpen(true);
       }
     });
-  }, [multiplayer.localPlayerId, multiplayer.resourceGrants, multiplayer.worldTakes]);
+  }, [game.hasSeenWrench, multiplayer.localPlayerId, multiplayer.resourceGrants, multiplayer.worldTakes]);
   useEffect(() => {
     multiplayer.crateLootGrants.forEach((grant) => {
       if (handledCrateGrants.current.has(grant.nonce)) return;
@@ -149,8 +150,9 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     repairBase();
   };
   const collectCrateLoot = (kind: CrateKind) => {
+    const showWrenchInfo = kind === 'crate-wrench' && !game.hasSeenWrench;
     gatherCrateLoot(kind);
-    if (kind === 'crate-wrench') setWrenchInfoOpen(true);
+    if (showWrenchInfo) setWrenchInfoOpen(true);
   };
   const claimCrateLoot = (kind: CrateKind, playerId: string) => {
     if (party) multiplayer.grantCrateLoot(playerId, kind);
@@ -169,11 +171,17 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
       <GameWorld paused={isPaused} mobileMode={device === 'mobile'} playerNickname={playerNickname} phase={game.phase} day={game.day} difficulty={game.difficulty} baseHealth={game.baseHealth} maxNights={game.maxNights} playerHealth={game.playerHealth} weapon={game.weapon} hasSpear={game.hasSpear} merchantDay={game.merchantDay} wood={game.wood} onBuySpear={buySpear} interactionHandlers={interactionHandlers} onUnavailable={interactionUnavailable}
         multiplayerMode={Boolean(party)} localPlayerId={multiplayer.localPlayerId} onCrateClaim={claimCrateLoot}
         remotePlayers={multiplayer.players} onPlayerMove={sendPlayerPosition} onRevivePlayer={reviveTeammate} onPlayerAttack={multiplayer.sendPlayerAttack} onWorldHit={multiplayer.sendWorldHit} worldHits={multiplayer.worldHits}
-        sharedWorld={multiplayer.sharedWorld} worldTakes={multiplayer.worldTakes} onWorldState={multiplayer.sendWorld} onWorldTake={multiplayer.takeWorldObject}
+        sharedWorld={multiplayer.sharedWorld} worldTakes={multiplayer.worldTakes} onWorldState={multiplayer.sendWorld} onWorldTake={(id) => {
+          if (game.hasWrench && id.startsWith('wrench-drop-')) return;
+          multiplayer.takeWorldObject(id);
+        }}
         zombieDeath={multiplayer.zombieDeath} onZombieDeath={multiplayer.sendZombieDeath}
         onRemotePlayerDamage={multiplayer.damageRemotePlayer}
         authoritative={!party || multiplayer.isLeader} sharedZombies={multiplayer.zombies} zombieHit={multiplayer.zombieHit} onZombiesChange={multiplayer.sendZombies} onZombieHit={multiplayer.sendZombieHit}
-        sharedDrops={multiplayer.drops} onTakeDrop={(drop) => multiplayer.takeResource(drop.id)}
+        sharedDrops={multiplayer.drops} onTakeDrop={(drop) => {
+          if ((drop.kind === 'spear' && game.hasSpear) || (drop.kind === 'wrench' && game.hasWrench)) return;
+          multiplayer.takeResource(drop.id);
+        }}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={collectCrateLoot}
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
       <InventoryPanel wood={game.wood} food={game.food} water={game.water} hasSpear={game.hasSpear} hasWrench={game.hasWrench} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => {

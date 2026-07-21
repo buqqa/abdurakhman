@@ -45,8 +45,8 @@ export function InventoryPanel({ wood, food, water, hasSpear, hasWrench, onEat, 
           <div className="inventory-slot" onPointerDown={() => startHold('wood', wood)} onPointerUp={stopHold} onPointerLeave={stopHold}><span>🪵</span><p>{t('wood')}</p><strong>{wood}</strong></div>
           <div className="inventory-slot" onPointerDown={() => startHold('food', food)} onPointerUp={stopHold} onPointerLeave={stopHold}><ChickenLeg className="inventory-chicken" /><p>{t('food')}</p><strong>{food}</strong><button className="use-item" disabled={food === 0} onClick={onEat}>{t('eat')}</button></div>
           <div className="inventory-slot" onPointerDown={() => startHold('water', water)} onPointerUp={stopHold} onPointerLeave={stopHold}><WaterBottle className="inventory-water-bottle" /><p>{t('water')}</p><strong>{water}</strong><button className="use-item" disabled={water === 0} onClick={onDrink}>{t('drink')}</button></div>
-          <div className={`inventory-slot ${hasSpear ? '' : 'inventory-slot--empty'}`} onPointerDown={() => startHold('spear', Number(hasSpear))} onPointerUp={stopHold} onPointerLeave={stopHold}><WeaponItem kind="spear" /><p>Копьё</p><strong>{hasSpear ? 1 : 0}</strong></div>
-          <div className={`inventory-slot ${hasWrench ? '' : 'inventory-slot--empty'}`} onPointerDown={() => startHold('wrench', Number(hasWrench))} onPointerUp={stopHold} onPointerLeave={stopHold}><WeaponItem kind="wrench" /><p>Гаечный ключ</p><strong>{hasWrench ? 1 : 0}</strong></div>
+          {hasSpear && <div className="inventory-slot" onPointerDown={() => startHold('spear', 1)} onPointerUp={stopHold} onPointerLeave={stopHold}><WeaponItem kind="spear" /><p>Копьё</p><strong>1</strong></div>}
+          {hasWrench && <div className="inventory-slot" onPointerDown={() => startHold('wrench', 1)} onPointerUp={stopHold} onPointerLeave={stopHold}><WeaponItem kind="wrench" /><p>Гаечный ключ</p><strong>1</strong></div>}
         </div>
         <p className="inventory-help">{onDrop ? language === 'en' ? 'Hold an item to share it.' : language === 'kk' ? 'Бөлісу үшін затты басып тұр.' : 'Зажми предмет, чтобы поделиться им.' : t('inventoryHelp')}</p>
       </section>

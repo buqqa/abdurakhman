@@ -10,7 +10,7 @@ import type { ResourceKind } from './multiplayer';
 
 const initialState: GameState = {
   day: 1, phase: 'menu', wood: 0, food: 2, water: 0, playerHealth: 100, baseHealth: MAX_BASE_HEALTH,
-  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, hasWrench: false, merchantDay: 5,
+  message: '', completionTime: null, maxNights: 5, difficulty: '', weapon: 'hammer', hasSpear: false, hasWrench: false, hasSeenWrench: false, merchantDay: 5,
 };
 
 export function useGameLoop() {
@@ -34,7 +34,7 @@ export function useGameLoop() {
       : `${state.weapon === 'spear' ? 'Копьём' : state.weapon === 'wrench' ? 'Гаечным ключом' : 'Молотом'} добыто 2 дерева.` }));
   const gatherCrateLoot = (kind: CrateKind) => {
     if (kind === 'crate-wrench') {
-      setGame((state) => ({ ...state, hasWrench: true, weapon: 'wrench', message: language === 'en' ? 'Wrench equipped.' : language === 'kk' ? 'Сомын кілті жабдықталды.' : 'Гаечный ключ экипирован.' }));
+      setGame((state) => ({ ...state, hasWrench: true, hasSeenWrench: true, weapon: 'wrench', message: language === 'en' ? 'Wrench equipped.' : language === 'kk' ? 'Сомын кілті жабдықталды.' : 'Гаечный ключ экипирован.' }));
     } else if (kind === 'crate-wood') {
       setGame((state) => ({ ...state, wood: state.wood + 10, message: language === 'en' ? 'The warehouse crate contained 10 wood.' : language === 'kk' ? 'Қойма жәшігінен 10 ағаш табылды.' : 'В ящике склада найдено 10 дерева.' }));
     } else {
@@ -120,7 +120,7 @@ export function useGameLoop() {
   });
   const receiveResource = (kind: ResourceKind) => setGame((state) => {
     if (kind === 'spear') return { ...state, hasSpear: true };
-    if (kind === 'wrench') return { ...state, hasWrench: true, weapon: 'wrench' };
+    if (kind === 'wrench') return { ...state, hasWrench: true, hasSeenWrench: true, weapon: 'wrench' };
     return { ...state, [kind]: state[kind] + 1 };
   });
   const syncSharedGame = useCallback((shared: SharedGame) => setGame((state) => {

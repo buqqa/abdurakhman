@@ -16,5 +16,6 @@ export interface GameState {
   weapon: Weapon;
   hasSpear: boolean;
   hasWrench: boolean;
+  hasSeenWrench: boolean;
   merchantDay: number;
 }
