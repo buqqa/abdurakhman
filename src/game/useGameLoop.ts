@@ -113,8 +113,16 @@ export function useGameLoop() {
     return { ...state, day: state.day + 1, phase: 'day', message: message.newDay };
   });
   const restart = () => setGame(initialState);
-  const dropResource = (kind: ResourceKind) => setGame((state) => ({ ...state, [kind]: Math.max(0, state[kind] - 1) }));
-  const receiveResource = (kind: ResourceKind) => setGame((state) => ({ ...state, [kind]: state[kind] + 1 }));
+  const dropResource = (kind: ResourceKind) => setGame((state) => {
+    if (kind === 'spear') return state.hasSpear ? { ...state, hasSpear: false, weapon: state.weapon === 'spear' ? 'hammer' : state.weapon } : state;
+    if (kind === 'wrench') return state.hasWrench ? { ...state, hasWrench: false, weapon: state.weapon === 'wrench' ? 'hammer' : state.weapon } : state;
+    return { ...state, [kind]: Math.max(0, state[kind] - 1) };
+  });
+  const receiveResource = (kind: ResourceKind) => setGame((state) => {
+    if (kind === 'spear') return { ...state, hasSpear: true };
+    if (kind === 'wrench') return { ...state, hasWrench: true, weapon: 'wrench' };
+    return { ...state, [kind]: state[kind] + 1 };
+  });
   const syncSharedGame = useCallback((shared: SharedGame) => setGame((state) => {
     const { paused: _paused, ...nextGame } = shared;
     return { ...state, ...nextGame };

@@ -31,11 +31,14 @@ export function useCrateHarvest({ worldHits, setObjects, onLoot, onSwing, onWorl
     window.setTimeout(() => setAnimation(undefined), breaking ? 520 : 240);
     if (!breaking) return;
     const kind = crate.kind as CrateKind;
-    if (multiplayerMode) {
+    if (kind === 'crate-wrench') {
+      // The unique wrench is collected from the ground after the crate breaks.
+    } else if (multiplayerMode) {
       if (authoritative) onCrateClaim(kind, playerId);
     } else if (reward) onLoot(kind);
     window.setTimeout(() => setObjects((items) => {
       const remaining = items.filter((item) => item.id !== crate.id);
+      if (crate.kind === 'crate-wrench') return [...remaining, { id: `wrench-drop-${crate.id}`, kind: 'wrench', x: crate.x, y: crate.y + 9 }];
       if (crate.kind !== 'crate-food') return remaining;
       const drops: InteractableObject[] = [{ id: `food-drop-${crate.id}`, kind: 'food', x: crate.x - 8, y: crate.y + 9 }];
       if (dropsWater(crate)) drops.push({ id: `water-drop-${crate.id}`, kind: 'water', x: crate.x + 17, y: crate.y + 9 });

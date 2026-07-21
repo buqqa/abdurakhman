@@ -141,9 +141,9 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       if (!isLeaderRef.current) return;
       const request = payload as { id: string; targetId: string };
       const object = latestWorld.current?.objects.find((item) => item.id === request.id);
-      if (!object || (object.kind !== 'food' && object.kind !== 'water') || claimedWorld.current.has(object.id)) return;
+      if (!object || !['food', 'water', 'wrench'].includes(object.kind) || claimedWorld.current.has(object.id)) return;
       claimedWorld.current.add(object.id);
-      const grant: WorldTake = { id: object.id, kind: object.kind, targetId: request.targetId, nonce: crypto.randomUUID() };
+      const grant: WorldTake = { id: object.id, kind: object.kind as WorldTake['kind'], targetId: request.targetId, nonce: crypto.randomUUID() };
       latestWorld.current = { ...latestWorld.current!, objects: latestWorld.current!.objects.filter((item) => item.id !== object.id) };
       setWorldTakes((current) => [...current.slice(-63), grant]);
       void channel.send({ type: 'broadcast', event: 'world-take', payload: grant });
@@ -264,9 +264,9 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     if (!channel) return;
     if (!isLeaderRef.current) return void channel.send({ type: 'broadcast', event: 'world-take-request', payload: { id: objectId, targetId: id.current } });
     const object = latestWorld.current?.objects.find((item) => item.id === objectId);
-    if (!object || (object.kind !== 'food' && object.kind !== 'water') || claimedWorld.current.has(objectId)) return;
+    if (!object || !['food', 'water', 'wrench'].includes(object.kind) || claimedWorld.current.has(objectId)) return;
     claimedWorld.current.add(objectId);
-    const grant: WorldTake = { id: objectId, kind: object.kind, targetId: id.current, nonce: crypto.randomUUID() };
+    const grant: WorldTake = { id: objectId, kind: object.kind as WorldTake['kind'], targetId: id.current, nonce: crypto.randomUUID() };
     latestWorld.current = { ...latestWorld.current!, objects: latestWorld.current!.objects.filter((item) => item.id !== objectId) };
     setWorldTakes((current) => [...current.slice(-63), grant]);
     void channel.send({ type: 'broadcast', event: 'world-take', payload: grant });

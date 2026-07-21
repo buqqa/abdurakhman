@@ -3,18 +3,21 @@ import { useI18n } from '../i18n/I18nContext';
 import { WaterBottle } from './WaterBottle';
 import { ChickenLeg } from './ChickenLeg';
 import type { ResourceKind } from '../game/multiplayer';
+import { WeaponItem } from './WeaponItem';
 
 interface Props {
   wood: number;
   food: number;
   water: number;
+  hasSpear: boolean;
+  hasWrench: boolean;
   onEat: () => void;
   onDrink: () => void;
   onDrop?: (kind: ResourceKind) => void;
 }
 
-export function InventoryPanel({ wood, food, water, onEat, onDrink, onDrop }: Props) {
-  const { t } = useI18n();
+export function InventoryPanel({ wood, food, water, hasSpear, hasWrench, onEat, onDrink, onDrop }: Props) {
+  const { t, language } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const holdTimer = useRef<number>();
   const startHold = (kind: ResourceKind, count: number) => {
@@ -29,7 +32,7 @@ export function InventoryPanel({ wood, food, water, onEat, onDrink, onDrop }: Pr
       if (event.code === 'Escape') setIsOpen(false);
     };
     window.addEventListener('keydown', toggleInventory);
-    return () => window.removeEventListener('keydown', toggleInventory);
+    return () => { window.removeEventListener('keydown', toggleInventory); window.clearTimeout(holdTimer.current); };
   }, []);
 
   if (!isOpen) return null;
@@ -42,8 +45,10 @@ export function InventoryPanel({ wood, food, water, onEat, onDrink, onDrop }: Pr
           <div className="inventory-slot" onPointerDown={() => startHold('wood', wood)} onPointerUp={stopHold} onPointerLeave={stopHold}><span>🪵</span><p>{t('wood')}</p><strong>{wood}</strong></div>
           <div className="inventory-slot" onPointerDown={() => startHold('food', food)} onPointerUp={stopHold} onPointerLeave={stopHold}><ChickenLeg className="inventory-chicken" /><p>{t('food')}</p><strong>{food}</strong><button className="use-item" disabled={food === 0} onClick={onEat}>{t('eat')}</button></div>
           <div className="inventory-slot" onPointerDown={() => startHold('water', water)} onPointerUp={stopHold} onPointerLeave={stopHold}><WaterBottle className="inventory-water-bottle" /><p>{t('water')}</p><strong>{water}</strong><button className="use-item" disabled={water === 0} onClick={onDrink}>{t('drink')}</button></div>
+          <div className={`inventory-slot ${hasSpear ? '' : 'inventory-slot--empty'}`} onPointerDown={() => startHold('spear', Number(hasSpear))} onPointerUp={stopHold} onPointerLeave={stopHold}><WeaponItem kind="spear" /><p>Копьё</p><strong>{hasSpear ? 1 : 0}</strong></div>
+          <div className={`inventory-slot ${hasWrench ? '' : 'inventory-slot--empty'}`} onPointerDown={() => startHold('wrench', Number(hasWrench))} onPointerUp={stopHold} onPointerLeave={stopHold}><WeaponItem kind="wrench" /><p>Гаечный ключ</p><strong>{hasWrench ? 1 : 0}</strong></div>
         </div>
-        <p className="inventory-help">{t('inventoryHelp')}</p>
+        <p className="inventory-help">{onDrop ? language === 'en' ? 'Hold an item to share it.' : language === 'kk' ? 'Бөлісу үшін затты басып тұр.' : 'Зажми предмет, чтобы поделиться им.' : t('inventoryHelp')}</p>
       </section>
     </div>
   );

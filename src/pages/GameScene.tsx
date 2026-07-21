@@ -53,7 +53,10 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     [...multiplayer.worldTakes, ...multiplayer.resourceGrants].forEach((grant) => {
       if (handledResourceGrants.current.has(grant.nonce)) return;
       handledResourceGrants.current.add(grant.nonce);
-      if (grant.targetId === multiplayer.localPlayerId) receiveResource(grant.kind);
+      if (grant.targetId === multiplayer.localPlayerId) {
+        receiveResource(grant.kind);
+        if (grant.kind === 'wrench') setWrenchInfoOpen(true);
+      }
     });
   }, [multiplayer.localPlayerId, multiplayer.resourceGrants, multiplayer.worldTakes]);
   useEffect(() => {
@@ -158,7 +161,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
     pauseClock();
     setIsPaused(true);
   };
-  const interactionHandlers = { building: repairSharedBase, food: gatherFood, water: gatherWater };
+  const interactionHandlers = { building: repairSharedBase, food: gatherFood, water: gatherWater, wrench: () => collectCrateLoot('crate-wrench') };
   const isFinished = game.phase === 'won' || game.phase === 'lost';
   return (
     <main className={`game-shell ${device === 'mobile' ? 'game-shell--mobile' : ''}`} style={device === 'mobile' ? { height: mobileHeight } : undefined}>
@@ -173,7 +176,12 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
         sharedDrops={multiplayer.drops} onTakeDrop={(drop) => multiplayer.takeResource(drop.id)}
         onAttack={attack} onHarvest={gatherWood} onCrateLoot={collectCrateLoot}
         onPlayerDamage={(damage) => damagePlayer(damage, Boolean(party))} onBaseDamage={damageBase} onNightCleared={finishNight} />
-      <InventoryPanel wood={game.wood} food={game.food} water={game.water} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => { if (game[kind] < 1) return; dropResource(kind); multiplayer.dropResource(kind); } : undefined} />
+      <InventoryPanel wood={game.wood} food={game.food} water={game.water} hasSpear={game.hasSpear} hasWrench={game.hasWrench} onEat={eatFood} onDrink={drinkWater} onDrop={party ? (kind) => {
+        const hasItem = kind === 'spear' ? game.hasSpear : kind === 'wrench' ? game.hasWrench : game[kind] > 0;
+        if (!hasItem) return;
+        dropResource(kind);
+        multiplayer.dropResource(kind);
+      } : undefined} />
       {device === 'mobile' && <MobileControls enabled={!isPaused && !isFinished && !wrenchInfoOpen} canStartNight={game.phase === 'day'} canPause={!party || multiplayer.isLeader} onPause={pauseFromMobile} onStartNight={() => { if (party && !multiplayer.isLeader) multiplayer.sendStartNight(); else startNight(); }} />}
       {wrenchInfoOpen && <WrenchFoundScreen onClose={() => setWrenchInfoOpen(false)} />}
       {game.phase === 'won' && <VictoryScreen seconds={game.completionTime ?? 0} nights={game.maxNights} onRestart={returnToMenu} />}

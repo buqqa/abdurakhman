@@ -15,6 +15,16 @@ button { font: inherit; }
 .inventory-slot p { margin: 8px 0 0; color: #aeb7a8; }
 .inventory-slot strong { position: absolute; right: 12px; bottom: 10px; font-size: 22px; }
 .inventory-slot .use-item { position: absolute; right: 9px; top: 9px; padding: 5px 8px; font-size: 12px; }
+.inventory-slot--empty { opacity: .42; }
+.weapon-item { position: relative; display: block; image-rendering: pixelated; filter: drop-shadow(2px 3px 1px rgba(0, 0, 0, .55)); }
+.weapon-item--spear { width: 5px; height: 38px; margin: 0 0 0 12px; border: 1px solid #422818; background: linear-gradient(90deg, #59341f, #b57a42 52%, #704326); transform: rotate(24deg); }
+.weapon-item--spear i { position: absolute; left: -4px; top: -11px; width: 11px; height: 14px; border: 1px solid #263238; background: linear-gradient(135deg, #dce7e5, #78898d 58%, #b7c4c3); clip-path: polygon(50% 0, 100% 64%, 50% 100%, 0 64%); }
+.weapon-item--wrench { width: 8px; height: 31px; margin: 0 0 0 12px; border: 2px solid #171d1f; border-radius: 2px 2px 5px 5px; background: linear-gradient(90deg, #303a3d 0 25%, #879293 26% 55%, #4b575a 56%); transform: rotate(32deg); }
+.weapon-item--wrench::after { content: ''; position: absolute; left: 1px; bottom: 2px; width: 4px; height: 4px; border: 1px solid #171d1f; border-radius: 50%; background: #222a2d; }
+.weapon-item--wrench i { position: absolute; left: -6px; top: -15px; width: 18px; height: 17px; border: 2px solid #171d1f; background: linear-gradient(100deg, #2d383b 0 25%, #8b9696 26% 55%, #455154 56%); clip-path: polygon(0 0, 34% 27%, 60% 27%, 90% 5%, 100% 24%, 72% 65%, 63% 100%, 28% 100%, 20% 67%); }
+.weapon-item--wrench i::after { content: ''; position: absolute; left: 5px; top: 0; width: 7px; height: 7px; background: #171d1f; clip-path: polygon(0 0, 100% 0, 68% 100%, 30% 100%); }
+.map-weapon-drop { position: absolute; z-index: 4; animation: shared-drop-land .28s ease-out; }
+.shared-drop .weapon-item { margin: 0; }
 .shared-drop { position: absolute; z-index: 4; font-size: 20px; filter: drop-shadow(0 3px 2px #172017); animation: shared-drop-land .28s ease-out; }
 .shared-drop__water { position: relative; display: block; width: 16px; height: 28px; }
 @keyframes shared-drop-land { from { translate: 0 -18px; scale: .7; } to { translate: 0; scale: 1; } }
