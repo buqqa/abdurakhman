@@ -46,7 +46,7 @@ export function Merchant({ player, position, wood, hasSpear, hasAxe, hasSword, i
       <span className="merchant__name">{text.name}</span><span className="merchant__sprite"><span className="merchant__hair" />
         <span className="merchant__head"><i /></span><span className="merchant__arm merchant__arm--left" />
         <span className="merchant__body" /><span className="merchant__arm merchant__arm--right" />
-        <span className="merchant__legs" /><span className="merchant__pack" /></span>
+        <span className="merchant__legs" /></span>
     </div>
     {tradeWindow}
   </>;
