@@ -27,7 +27,10 @@ export function useGameLoop() {
     pausedAt.current = undefined;
     pausedTime.current = 0;
     const merchantVisits = createMerchantVisits(difficulty);
-    setGame({ ...initialState, phase: 'day', maxNights, difficulty, merchantVisits, message: message.prepare });
+    setGame({
+      ...initialState, phase: 'day', maxNights, difficulty, merchantVisits, message: message.prepare,
+      hasSpear: true, hasAxe: true, hasSword: true, hasWrench: true, hasSeenWrench: true,
+    });
   };
   const gatherWood = () => setGame((state) => ({ ...state, wood: state.wood + 2, message: language === 'en'
     ? `The ${state.weapon} yielded 2 wood.`

@@ -21,9 +21,9 @@ export function useWorldState({ authoritative, day, maxNights, phase, merchantVi
   const spawnedDays = useRef(new Set<number>());
   const spawnedStructures = useRef(new Set<StructureKind>());
   const structureDays = useRef({
-    tent: 5 + Math.floor(Math.random() * 6),
+    tent: 1,
     warehouse: 10 + Math.floor(Math.random() * 11),
-    car: maxNights === 50 ? 25 + Math.floor(Math.random() * 11) : Number.POSITIVE_INFINITY,
+    car: Math.min(1, maxNights),
   });
   const merchantReservations: InteractableObject[] = merchantVisits.map((visit, index) => ({ id: `merchant-reservation-${index}`, kind: 'merchant-reservation', x: visit.x, y: visit.y }));
 
@@ -55,14 +55,20 @@ export function useWorldState({ authoritative, day, maxNights, phase, merchantVi
   }, [authoritative, day, phase, structures]);
   useEffect(() => {
     if (!authoritative) return;
-    const available: StructureKind[] = phase === 'day' ? ['tent', 'warehouse'] : phase === 'night' ? ['car'] : [];
+    const available: StructureKind[] = phase === 'day' ? ['tent', 'warehouse', 'car'] : phase === 'night' ? ['car'] : [];
     const ready = available.filter((kind) => day >= structureDays.current[kind] && !spawnedStructures.current.has(kind));
+    const additions: ReturnType<typeof createStructure>[] = [];
+    const occupied = [...objects, ...merchantReservations];
     ready.forEach((kind) => {
       spawnedStructures.current.add(kind);
-      const spawn = createStructure(kind, [...objects, ...merchantReservations], day);
-      setStructures((current) => [...current, spawn.structure]);
-      setObjects((current) => [...current, spawn.marker, ...spawn.crates]);
+      const spawn = createStructure(kind, occupied, day);
+      additions.push(spawn);
+      occupied.push(spawn.marker, ...spawn.crates);
     });
+    if (additions.length) {
+      setStructures((current) => [...current, ...additions.map((spawn) => spawn.structure)]);
+      setObjects((current) => [...current, ...additions.flatMap((spawn) => [spawn.marker, ...spawn.crates])]);
+    }
   }, [authoritative, day, merchantVisits, objects, phase]);
 
   return { objects, setObjects, structures };
