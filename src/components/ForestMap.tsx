@@ -37,13 +37,14 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, localPlayerId, 
   const [isTradeOpen, setIsTradeOpen] = useState(false);
   const merchantVisit = merchantVisits.find((visit) => visit.day === day);
   const merchantVisible = (phase === 'day' || phase === 'night') && Boolean(merchantVisit);
+  const playerCount = multiplayerMode ? Math.min(4, remotePlayers.length + 1) : 1;
   useEffect(() => { if (!merchantVisible) setIsTradeOpen(false); }, [merchantVisible]);
   const worldReady = authoritative || Boolean(sharedWorld);
   const canMove = worldReady && playerHealth > 0 && !paused && !isTradeOpen && (phase === 'day' || phase === 'night');
   const [player, setPlayer] = useState<Position>(PLAYER_START);
   const lastMapFrame = useRef(0);
   const [isSwinging, setIsSwinging] = useState(false);
-  const { objects, setObjects, structures } = useWorldState({ authoritative, day, maxNights, phase, merchantVisits, sharedWorld, worldTakes, onWorldState });
+  const { objects, setObjects, structures } = useWorldState({ authoritative, day, maxNights, playerCount, phase, merchantVisits, sharedWorld, worldTakes, onWorldState });
   const updatePlayer = useCallback((position: Position) => {
     onPlayerMove(position);
     const now = performance.now();
@@ -53,7 +54,7 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, localPlayerId, 
   }, [onPlayerMove]);
   const car = structures.find((structure) => structure.kind === 'car');
   const carGuardPoint = car?.spawnedDay === day ? { x: car.x + 77, y: car.y + 39 } : undefined;
-  const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, player, playerHealth, teammates: remotePlayers, paused, onPlayerDamage, onRemotePlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath, carGuardPoint });
+  const { zombies, deaths, explosions, hitZombie } = useZombieWave({ phase, day, difficulty, playerCount, player, playerHealth, teammates: remotePlayers, paused, onPlayerDamage, onRemotePlayerDamage, onBaseDamage, onCleared: onNightCleared, authoritative, externalZombies: sharedZombies, remoteHit: zombieHit, remoteDeath: zombieDeath, onZombiesChange, onRemoteHit: onZombieHit, onZombieDeath, carGuardPoint });
   const swingWeapon = useCallback(() => {
     setIsSwinging(true);
     onPlayerAttack();

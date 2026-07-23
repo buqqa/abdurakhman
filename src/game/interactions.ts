@@ -34,7 +34,7 @@ export const WORLD_OBJECTS: InteractableObject[] = [
   { id: 'base', kind: 'building', ...BASE_POSITION },
 ];
 
-export function createDailyResources(day: number, occupied: InteractableObject[]): InteractableObject[] {
+export function createDailyResources(day: number, occupied: InteractableObject[], playerCount = 1): InteractableObject[] {
   const resources: InteractableObject[] = [];
   const createPoint = () => {
     for (let attempts = 0; attempts < 200; attempts += 1) {
@@ -52,8 +52,11 @@ export function createDailyResources(day: number, occupied: InteractableObject[]
     }
   };
   addRandom('tree');
+  const extraPlayers = Math.max(0, Math.min(3, playerCount - 1));
   const crateRoll = Math.random();
-  const crateCount = crateRoll < .35 ? 0 : crateRoll < .8 ? 1 : 2;
+  const noCrateChance = Math.max(.05, .35 - extraPlayers * .1);
+  const twoCrateThreshold = .8 - extraPlayers * .08;
+  const crateCount = crateRoll < noCrateChance ? 0 : crateRoll < twoCrateThreshold ? 1 : 2;
   for (let index = 0; index < crateCount; index += 1) {
     const point = createPoint();
     const kind: CrateKind = Math.random() < .15 ? 'crate-empty' : 'crate-food';

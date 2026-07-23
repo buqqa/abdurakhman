@@ -8,6 +8,7 @@ interface Options {
   authoritative: boolean;
   day: number;
   maxNights: number;
+  playerCount: number;
   phase: Phase;
   merchantVisits: MerchantVisit[];
   sharedWorld?: SharedWorld;
@@ -15,7 +16,7 @@ interface Options {
   onWorldState: (world: SharedWorld) => void;
 }
 
-export function useWorldState({ authoritative, day, maxNights, phase, merchantVisits, sharedWorld, worldTakes, onWorldState }: Options) {
+export function useWorldState({ authoritative, day, maxNights, playerCount, phase, merchantVisits, sharedWorld, worldTakes, onWorldState }: Options) {
   const [objects, setObjects] = useState<InteractableObject[]>(WORLD_OBJECTS);
   const [structures, setStructures] = useState<WorldStructure[]>([]);
   const spawnedDays = useRef(new Set<number>());
@@ -42,9 +43,9 @@ export function useWorldState({ authoritative, day, maxNights, phase, merchantVi
   useEffect(() => {
     if (!authoritative || day < 2 || phase !== 'day' || spawnedDays.current.has(day)) return;
     spawnedDays.current.add(day);
-    const resources = createDailyResources(day, [...objects, ...merchantReservations]);
+    const resources = createDailyResources(day, [...objects, ...merchantReservations], playerCount);
     if (resources.length) setObjects((current) => [...current, ...resources]);
-  }, [authoritative, day, phase]);
+  }, [authoritative, day, phase, playerCount]);
   useEffect(() => {
     if (!authoritative) return;
     const expiredIds = structures.filter((structure) => structure.spawnedDay < day

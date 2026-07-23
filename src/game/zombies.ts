@@ -26,7 +26,7 @@ interface SpawnPosition { x: number; y: number }
 
 const hasSpawnSpace = (position: SpawnPosition, occupied: SpawnPosition[]) => occupied.every((other) => Math.hypot(position.x - other.x, position.y - other.y) >= 48);
 
-export function createCarGuards(night: number, x: number, y: number, occupied: SpawnPosition[] = []): Zombie[] {
+export function createCarGuards(night: number, x: number, y: number, occupied: SpawnPosition[] = [], playerCount = 1): Zombie[] {
   const positions = [...occupied];
   return Array.from({ length: 3 }, (_, index) => {
     let position = { x, y };
@@ -37,7 +37,7 @@ export function createCarGuards(night: number, x: number, y: number, occupied: S
       if (hasSpawnSpace(candidate, positions)) { position = candidate; break; }
     }
     positions.push(position);
-    const health = 6;
+    const health = 6 * (1 + (Math.max(1, Math.min(4, playerCount)) - 1) * .25);
     return {
       id: `car-guard-${night}-${index}`, ...position,
       health, maxHealth: health, damage: 0, playerDamage: 10, speed: 34,
@@ -59,9 +59,11 @@ function spawnPoint(index: number, occupied: SpawnPosition[]) {
   return fallback;
 }
 
-export function createZombieWave(night: number, difficulty: string) {
+export function createZombieWave(night: number, difficulty: string, playerCount = 1) {
   const maxCount = Math.min(10, 2 + Math.ceil(night * .8));
-  const count = 1 + Math.floor(Math.random() * maxCount);
+  const players = Math.max(1, Math.min(4, playerCount));
+  const count = Math.min(18, 1 + Math.floor(Math.random() * maxCount) + (players - 1) * 2);
+  const healthMultiplier = 1 + (players - 1) * .25;
   const normalHealth = 6;
   const bossBaseHealth = 4;
   const normalDamage = 3 + Math.floor((night - 1) / 5);
@@ -75,7 +77,7 @@ export function createZombieWave(night: number, difficulty: string) {
     const isSprinter = specialRoll >= .2 && specialRoll < .3;
     const isArmored = specialRoll >= .3 && specialRoll < .4;
     const bossMultiplier = difficulty === 'HARDCORE' ? 3 : 2;
-    const health = isBoss ? bossBaseHealth * bossMultiplier : isArmored ? 8 : normalHealth;
+    const health = (isBoss ? bossBaseHealth * bossMultiplier : isArmored ? 8 : normalHealth) * healthMultiplier;
     const position = spawnPoint(index, positions);
     positions.push(position);
     return {

@@ -17,6 +17,7 @@ interface Options {
   phase: Phase;
   day: number;
   difficulty: string;
+  playerCount: number;
   paused: boolean;
   player: Position;
   playerHealth: number;
@@ -64,7 +65,7 @@ export function useZombieWave(options: Options) {
     window.clearTimeout(spawnTimer.current);
     if (options.authoritative === false || options.phase !== 'night' || options.paused) return;
     if (spawnedNight.current !== options.day) {
-      const wave = createZombieWave(options.day, options.difficulty);
+      const wave = createZombieWave(options.day, options.difficulty, options.playerCount);
       spawnedNight.current = options.day;
       activeWave.current = true;
       zombiesRef.current = wave.slice(0, 1).map((zombie) => ({ ...zombie, spawnedAt: Date.now() }));
@@ -89,13 +90,13 @@ export function useZombieWave(options: Options) {
     };
     spawnNext();
     return () => window.clearTimeout(spawnTimer.current);
-  }, [options.authoritative, options.day, options.difficulty, options.paused, options.phase]);
+  }, [options.authoritative, options.day, options.difficulty, options.paused, options.phase, options.playerCount]);
 
   useEffect(() => {
     if (options.authoritative === false || options.phase !== 'night' || !options.carGuardPoint || guardedNights.current.has(options.day)) return;
     guardedNights.current.add(options.day);
     if (zombiesRef.current.some((zombie) => zombie.id.startsWith(`car-guard-${options.day}-`))) return;
-    const guards = createCarGuards(options.day, options.carGuardPoint.x, options.carGuardPoint.y, [...zombiesRef.current, ...waitingZombies.current]);
+    const guards = createCarGuards(options.day, options.carGuardPoint.x, options.carGuardPoint.y, [...zombiesRef.current, ...waitingZombies.current], options.playerCount);
     zombiesRef.current = [...zombiesRef.current, ...guards];
     setZombies(zombiesRef.current);
     optionsRef.current.onZombiesChange?.(zombiesRef.current);
