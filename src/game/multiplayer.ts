@@ -161,7 +161,15 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       if (hit.targetId === id.current) setPlayerDamageTotal((total) => total + hit.damage);
     });
     channel.on('presence', { event: 'sync' }, () => {
-      const members = Object.values(channel.presenceState()).flat() as unknown as PresencePayload[];
+      const presenceEntries = Object.values(channel.presenceState()).flat() as unknown as PresencePayload[];
+      const uniqueMembers = new Map<string, PresencePayload>();
+      presenceEntries.forEach((member) => {
+        const existing = uniqueMembers.get(member.id);
+        const shouldReplace = !existing || (member.role === 'host' && existing.role !== 'host')
+          || (member.role === existing.role && member.joinedAt < existing.joinedAt);
+        if (shouldReplace) uniqueMembers.set(member.id, member);
+      });
+      const members = [...uniqueMembers.values()];
       const admitted = [...members].sort((a, b) => Number(b.role === 'host') - Number(a.role === 'host')
         || a.joinedAt - b.joinedAt || a.id.localeCompare(b.id)).slice(0, maxPlayers);
       const declaredHost = admitted.find((member) => member.role === 'host');
