@@ -106,14 +106,18 @@ export function useZombieWave(options: Options) {
     if (options.authoritative === false || options.phase !== 'night' || options.paused) return;
     let frame = 0;
     let previous = performance.now();
+    let lastVisualUpdate = 0;
     const update = (time: number) => {
       const delta = Math.min((time - previous) / 1000, 0.04);
       previous = time;
       const { next, attacks } = moveZombies({ zombies: zombiesRef.current, player: optionsRef.current.player, playerHealth: optionsRef.current.playerHealth, teammates: optionsRef.current.teammates, time, delta });
       const survivors = next.filter((zombie) => zombie.health > .001);
       zombiesRef.current = survivors;
-      setZombies(survivors);
-      optionsRef.current.onZombiesChange?.(survivors);
+      if (time - lastVisualUpdate >= 33 || survivors.length === 0) {
+        lastVisualUpdate = time;
+        setZombies(survivors);
+        optionsRef.current.onZombiesChange?.(survivors);
+      }
       attacks.forEach((attack) => {
         if (attack.kind === 'local') optionsRef.current.onPlayerDamage(attack.damage);
         else if (attack.kind === 'remote' && attack.id) optionsRef.current.onRemotePlayerDamage(attack.id, attack.damage);

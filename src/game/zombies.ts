@@ -62,7 +62,7 @@ function spawnPoint(index: number, occupied: SpawnPosition[]) {
 export function createZombieWave(night: number, difficulty: string, playerCount = 1) {
   const maxCount = Math.min(10, 2 + Math.ceil(night * .8));
   const players = Math.max(1, Math.min(4, playerCount));
-  const count = Math.min(18, 1 + Math.floor(Math.random() * maxCount) + (players - 1) * 2);
+  const count = Math.min(14, 1 + Math.floor(Math.random() * maxCount) + players - 1);
   const healthMultiplier = 1 + (players - 1) * .25;
   const normalHealth = 6;
   const bossBaseHealth = 4;
