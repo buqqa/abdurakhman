@@ -18,7 +18,7 @@ const DROP_OFFSETS = [
   { x: -26, y: 26 }, { x: 26, y: -26 }, { x: -26, y: -26 },
 ] as const;
 
-export function useMultiplayerRoom(code: string | undefined, nickname: string, maxPlayers = 4) {
+export function useMultiplayerRoom(code: string | undefined, nickname: string, maxPlayers = 4, isRoomHost = false) {
   const id = useRef(crypto.randomUUID());
   const channelRef = useRef<ReturnType<typeof supabase.channel>>();
   const lastSent = useRef(0);
@@ -162,8 +162,10 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     });
     channel.on('presence', { event: 'sync' }, () => {
       const members = Object.values(channel.presenceState()).flat() as unknown as PresencePayload[];
-      const admitted = [...members].sort((a, b) => a.joinedAt - b.joinedAt || a.id.localeCompare(b.id)).slice(0, maxPlayers);
-      const leader = admitted[0]?.id === id.current;
+      const admitted = [...members].sort((a, b) => Number(b.role === 'host') - Number(a.role === 'host')
+        || a.joinedAt - b.joinedAt || a.id.localeCompare(b.id)).slice(0, maxPlayers);
+      const declaredHost = admitted.find((member) => member.role === 'host');
+      const leader = declaredHost ? declaredHost.id === id.current : isRoomHost && admitted.some((member) => member.id === id.current);
       isLeaderRef.current = leader;
       setIsLeader(leader);
       const admittedIds = new Set(admitted.map((member) => member.id));
@@ -180,7 +182,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
     });
     channel.subscribe((status) => {
       if (status !== 'SUBSCRIBED') return;
-      void channel.track({ id: id.current, nickname, joinedAt: Date.now() });
+      void channel.track({ id: id.current, nickname, joinedAt: Date.now(), role: isRoomHost ? 'host' : 'guest' });
       void channel.send({ type: 'broadcast', event: 'state-request', payload: {} });
     });
     channelRef.current = channel;
@@ -197,7 +199,7 @@ export function useMultiplayerRoom(code: string | undefined, nickname: string, m
       void supabase.removeChannel(channel);
       channelRef.current = undefined;
     };
-  }, [code, maxPlayers, nickname]);
+  }, [code, isRoomHost, maxPlayers, nickname]);
 
   const sendPosition = useCallback((position: Position, weapon: Weapon, health: number) => {
     const now = performance.now();

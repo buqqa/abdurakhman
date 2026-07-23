@@ -6,7 +6,7 @@ import type { StructureKind, WorldStructure } from './structures';
 
 export interface RemotePlayer extends Position { id: string; nickname: string; weapon: Weapon; health: number; downed: boolean; walking: boolean; facingRight: boolean; attackNonce?: string; updatedAt: number }
 export interface PlayerPayload { id: string; nickname: string; x: number; y: number; weapon: Weapon; health: number; downed: boolean; walking: boolean; facingRight: boolean }
-export interface PresencePayload { id: string; nickname: string; joinedAt: number }
+export interface PresencePayload { id: string; nickname: string; joinedAt: number; role?: 'host' | 'guest' }
 export type SharedGame = Pick<GameState, 'day' | 'phase' | 'baseHealth' | 'maxNights' | 'difficulty' | 'merchantVisits' | 'completionTime'> & { paused: boolean };
 export type ResourceKind = 'wood' | 'food' | 'water' | 'spear' | 'axe' | 'sword' | 'wrench';
 export interface SharedDrop extends Position { id: string; kind: ResourceKind }

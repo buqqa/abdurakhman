@@ -67,10 +67,11 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, localPlayerId, 
       setObjects((current) => current.filter((item) => item.id !== object.id));
     }
   }, [multiplayerMode, onWorldTake]);
-  const buildings = objects.filter((object) => object.kind === 'building');
-  const trees = objects.filter((object) => object.kind === 'tree');
-  const crates = objects.filter((object) => object.kind.startsWith('crate-'));
-  const interactionObjects = objects.filter((object) => object.kind !== 'tree' && !object.kind.startsWith('crate-') && !object.kind.startsWith('structure-'));
+  const visibleObjects = worldReady ? objects : [];
+  const buildings = visibleObjects.filter((object) => object.kind === 'building');
+  const trees = visibleObjects.filter((object) => object.kind === 'tree');
+  const crates = visibleObjects.filter((object) => object.kind.startsWith('crate-'));
+  const interactionObjects = visibleObjects.filter((object) => object.kind !== 'tree' && !object.kind.startsWith('crate-') && !object.kind.startsWith('structure-'));
   const sharedDropObjects = sharedDrops.map((drop) => ({ ...drop, kind: 'shared-drop' }));
   const sharedHandlers = { ...handlers,
     ...(multiplayerMode ? { food: () => undefined, water: () => undefined, wrench: () => undefined } : {}),
@@ -113,10 +114,10 @@ export function ForestMap({ paused, mobileMode, multiplayerMode, localPlayerId, 
         </div>)}
         <WorldStructures structures={structures} />
         {crates.map((crate) => <LootCrate crate={crate} animation={crateAnimation?.id === crate.id ? crateAnimation.breaking ? 'break' : 'hit' : undefined} key={crate.id} />)}
-        {objects.filter((object) => object.kind === 'food').map((food) => <ChickenLeg className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id} />)}
-        {objects.filter((object) => object.kind === 'water').map((water) => <WaterBottle className="map-water-bottle" key={water.id}
+        {visibleObjects.filter((object) => object.kind === 'food').map((food) => <ChickenLeg className="map-food-drop" style={{ left: food.x - 11, top: food.y - 12 }} key={food.id} />)}
+        {visibleObjects.filter((object) => object.kind === 'water').map((water) => <WaterBottle className="map-water-bottle" key={water.id}
           style={{ left: water.x - 8, top: water.y - 14 }} />)}
-        {objects.filter((object) => object.kind === 'wrench').map((wrench) => <WeaponItem kind="wrench" className="map-weapon-drop" style={{ left: wrench.x - 8, top: wrench.y - 15 }} key={wrench.id} />)}
+        {visibleObjects.filter((object) => object.kind === 'wrench').map((wrench) => <WeaponItem kind="wrench" className="map-weapon-drop" style={{ left: wrench.x - 8, top: wrench.y - 15 }} key={wrench.id} />)}
         {sharedDrops.map((drop) => <span className={`shared-drop shared-drop--${drop.kind}`} style={{ left: drop.x, top: drop.y }} key={drop.id}>
           {drop.kind === 'wood' ? '🪵' : drop.kind === 'food' ? <ChickenLeg /> : drop.kind === 'water' ? <WaterBottle className="shared-drop__water" /> : <WeaponItem kind={drop.kind} />}
         </span>)}

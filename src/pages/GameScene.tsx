@@ -27,7 +27,7 @@ export function GameScene({ playerNickname, isRegistered }: { playerNickname: st
   const [mobileHeight, setMobileHeight] = useState(() => window.innerHeight);
   const [wrenchInfoOpen, setWrenchInfoOpen] = useState(false);
   const { game, startGame, gatherWood, gatherCrateLoot, gatherFood, gatherWater, eatFood, drinkWater, dropResource, receiveResource, interactionUnavailable, attack, buySpear, buyAxe, buySword, switchWeapon, repairBase, applyTeammateRepair, startNight, damagePlayer, revivePlayer, payReviveCost, damageBase, finishNight, restart, syncSharedGame, pauseClock, resumeClock } = useGameLoop();
-  const multiplayer = useMultiplayerRoom(party?.code, playerNickname, party?.maxPlayers);
+  const multiplayer = useMultiplayerRoom(party?.code, playerNickname, party?.maxPlayers, party?.role === 'host');
   const handledRepairs = useRef(0);
   const handledPlayerDamage = useRef(0);
   const handledCrateGrants = useRef(new Set<string>());
